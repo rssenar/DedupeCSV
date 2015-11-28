@@ -1,18 +1,28 @@
-# +-+-+-+-+-+-+ +-+-+-+
-# |D|e|d|u|p|e| |C|S|V|
-# +-+-+-+-+-+-+ +-+-+-+  
+'''
+ /$$$$$$$                /$$                            /$$$$$$  /$$$$$$ /$$    /$$
+| $$__  $$              | $$                           /$$__  $$/$$__  $| $$   | $$
+| $$  \ $$ /$$$$$$  /$$$$$$$/$$   /$$ /$$$$$$  /$$$$$$| $$  \__| $$  \__| $$   | $$
+| $$  | $$/$$__  $$/$$__  $| $$  | $$/$$__  $$/$$__  $| $$     |  $$$$$$|  $$ / $$/
+| $$  | $| $$$$$$$| $$  | $| $$  | $| $$  \ $| $$$$$$$| $$      \____  $$\  $$ $$/ 
+| $$  | $| $$_____| $$  | $| $$  | $| $$  | $| $$_____| $$    $$/$$  \ $$ \  $$$/  
+| $$$$$$$|  $$$$$$|  $$$$$$|  $$$$$$| $$$$$$$|  $$$$$$|  $$$$$$|  $$$$$$/  \  $/   
+|_______/ \_______/\_______/\______/| $$____/ \_______/\______/ \______/    \_/    
+                                    | $$                                           
+                                    | $$                                           
+                                    |__/                                            
+'''
 #!/usr/bin/python3.4.3
 # Required Modules
 import csv
-# +-+-+-+-+-+-+-+-+-+
-# |V|a|r|i|a|b|l|e|s|
-# +-+-+-+-+-+-+-+-+-+
+# +-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
+# |G|l|o|b|a|l| |V|a|r|i|a|b|l|e|s|
+# +-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
 CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
-InputFile = "Input.csv" 
+InputFile = "/Users/rssenar/Desktop/Input.csv" 
 # ---------------------------------------------
-CleanOutput = "_CleanOutput.csv"
-Dupes = "_Dupes.csv" 
+CleanOutput = "/Users/rssenar/Desktop/_CleanOutput.csv"
+Dupes = "/Users/rssenar/Desktop/_Dupes.csv" 
 # ---------------------------------------------
 # Dedupe Criteria : 
 # OPHH = One Record Per House Hold
@@ -21,16 +31,16 @@ Dupes = "_Dupes.csv"
 # ---------------------------------------------
 Selection = 'OPHH'
 # ---------------------------------------------
-# Col[0] = CustomerID
-# Col[1] = FirstName
-# Col[2] = MI
-# Col[3] = LastName
-# Col[4] = Address1
-# Col[5] = Address2
-# Col[6] = AddressCombined
-# Col[7] = City
-# Col[8] = State
-# Col[9] = Zip
+# Col[00] = CustomerID
+# Col[01] = FirstName
+# Col[02] = MI
+# Col[03] = LastName
+# Col[04] = Address1
+# Col[05] = Address2
+# Col[06] = AddressCombined
+# Col[07] = City
+# Col[08] = State
+# Col[09] = Zip
 # Col[10] = Zip + 4
 # Col[11] = SCF
 # Col[12] = Phone
@@ -48,9 +58,11 @@ Selection = 'OPHH'
 # Col[24] = KBB
 # Col[25] = Buyback Value
 # Col[26] = Winning Number
-# Col[27] = Misc1
-# Col[28] = Misc2
-# Col[29] = Misc3
+# Col[27] = MailDNQ
+# Col[28] = BlitzDNQ
+# Col[29] = Misc1
+# Col[30] = Misc2
+# Col[31] = Misc3
 # ---------------------------------------------
 FirstName = 1
 LastName = 3
@@ -61,6 +73,7 @@ City = 7
 State = 8
 Zip = 9
 SCF = 11
+Phone = 12
 Email = 13
 VIN = 14
 TradeYear = 15
@@ -69,6 +82,8 @@ TradeModel = 17
 Radius = 20
 VINLen = 21
 WinningNum = 26
+MailDNQ = 27
+BlitzDNQ = 28
 # ---------------------------------------------
 Entries = set() # Alocate Entries set to emplty
 HeaderRow = [\
@@ -99,6 +114,8 @@ HeaderRow = [\
 	'KBB',\
 	'Buyback Value',\
 	'Winning Number',\
+	'Mail DNQ',\
+	'Blitz DNQ',\
 	'Misc1',\
 	'Misc2',\
 	'Misc3'\
@@ -127,10 +144,8 @@ def SetCase(): # Set case fields
 	line[State] = str.upper(line[State])
 
 def SetRadiusToInteger():
-	if line[Radius] == "Null":
-		line[Radius] = line[Radius]
-	elif line[Radius] == "":
-		line[Radius] = 'Null'
+	if line[Radius] == "":
+		line[Radius] = 9999
 	else:
 		line[Radius] = int(float(line[Radius]))
 
@@ -160,6 +175,18 @@ def SetSCF(): # Parse VIN# then assign value to SCF field
 	else:
 		line[SCF] = (line[Zip])[:3] # if ZIP is 5 Digits
 
+def CheckMailDNQ():
+	if line[FirstName] == "" or line[LastName] == "" or line[Radius] == 9999:
+		line[MailDNQ] = "DNQ"
+	else:
+		line[MailDNQ] = ""
+
+def CheckBlitzDNQ():
+	if len(line[Phone]) < 8 or len(line[VIN]) < 17: 
+		line[BlitzDNQ] = "DNQ"
+	else:
+		line[BlitzDNQ] = ""
+
 def CheckDupeCriteriaThenOutput(): # Checks Selection Criteria
 	if Selection == 'OPHH':
 		key = (line[AddressCombined],line[Zip])
@@ -181,9 +208,13 @@ for line in Input:
 		FirstLine = False
 	else:
 		SetCase()
+		SetRadiusToInteger()
 		SetVINLen()
 		SetWinningNum()
 		SetSCF()
 		CombineAddress()
-		SetRadiusToInteger()
+		CheckMailDNQ()
+		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
+
+
