@@ -19,7 +19,7 @@ import csv
 # +-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
 CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
-InputFile = "/Users/rssenar/Desktop/Input.csv" 
+InputFile = "/Users/rssenar/Desktop/" + input("File Name : ") + ".csv" 
 # ---------------------------------------------
 CleanOutput = "/Users/rssenar/Desktop/_CleanOutput.csv"
 Dupes = "/Users/rssenar/Desktop/_Dupes.csv" 
@@ -216,5 +216,3 @@ for line in Input:
 		CheckMailDNQ()
 		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
-
-
