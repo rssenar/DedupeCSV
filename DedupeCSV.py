@@ -14,12 +14,13 @@
 #!/usr/bin/python3.4.3
 # Required Modules
 import csv
-# +-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
-# |G|l|o|b|a|l| |V|a|r|i|a|b|l|e|s|
-# +-+-+-+-+-+-+ +-+-+-+-+-+-+-+-+-+
+# ---------------------------------------------
+# GLOBAL VARIABLE
+# ---------------------------------------------
 CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
-InputFile = "/Users/rssenar/Desktop/" + input("File Name : ") + ".csv" 
+InputFile = "/Users/rssenar/Desktop/" + input("Input File Name : ") + ".csv" 
+ZipRadiusFile = "/Users/rssenar/Desktop/" + input("Zip Radius File Name : ") + ".csv" 
 # ---------------------------------------------
 CleanOutput = "/Users/rssenar/Desktop/_CleanOutput.csv"
 Dupes = "/Users/rssenar/Desktop/_Dupes.csv" 
@@ -84,6 +85,10 @@ VINLen = 21
 WinningNum = 26
 MailDNQ = 27
 BlitzDNQ = 28
+
+# ZIP Code File
+ZipCodeCol = 0
+RadiusCol = 1
 # ---------------------------------------------
 Entries = set() # Alocate Entries set to emplty
 HeaderRow = [\
@@ -120,17 +125,34 @@ HeaderRow = [\
 	'Misc2',\
 	'Misc3'\
 	]
-# +-+-+-+-+-+-+-+
-# |O|b|j|e|c|t|s|
-# +-+-+-+-+-+-+-+ 
+# ---------------------------------------------
+# OBJECTS
+# ---------------------------------------------
 Input = csv.reader(open(InputFile,'r')) # Read in the input file
+ZipRadius = csv.reader(open(ZipRadiusFile,'r')) # Read in the Zip Radius file
 OutputClean = csv.writer(open(CleanOutput,'a')) # Open Clean output file
 OutDupes = csv.writer(open(Dupes,'a')) # Open Dupes file
 OutputClean.writerow(HeaderRow) # Append Header Row to Clean output file
 OutDupes.writerow(HeaderRow) # Append Header Row to Dupes file
-# +-+-+-+-+-+-+-+-+-+
-# |F|u|n|c|t|i|o|n|s|
-# +-+-+-+-+-+-+-+-+-+
+# ---------------------------------------------
+# LOAD ZIP DICTIONARY INTO MEMORY
+# ---------------------------------------------
+ZipRadiusDict = {}
+FirstLine = True
+for line in ZipRadius:
+	if CSVFilesHaveHeaderRow and FirstLine:
+		FirstLine = False
+	else:
+		ZipRadiusDict[line[ZipCodeCol]] = line[RadiusCol]
+# ---------------------------------------------
+# FUNCTIONS
+# ---------------------------------------------
+def AppendZipRadius():
+	if line[Zip] in ZipRadiusDict:
+		line[Radius] = ZipRadiusDict[line[Zip]]
+	else:
+		line[Radius] = 9999
+
 def SetCase(): # Set case fields
 	line[FirstName] = str.title(line[FirstName]) 
 	line[LastName] = str.title(line[LastName])
@@ -142,12 +164,6 @@ def SetCase(): # Set case fields
 	line[TradeModel] = str.title(line[TradeModel])
 	line[Email] = str.lower(line[Email])
 	line[State] = str.upper(line[State])
-
-def SetRadiusToInteger():
-	if line[Radius] == "":
-		line[Radius] = 9999
-	else:
-		line[Radius] = int(float(line[Radius]))
 
 def SetVINLen(): # Assign the Length of the VIN# to VinLen Field
 	line[VINLen] = len(line[VIN])
@@ -190,25 +206,25 @@ def CheckBlitzDNQ():
 def CheckDupeCriteriaThenOutput(): # Checks Selection Criteria
 	if Selection == 'OPHH':
 		key = (line[AddressCombined],line[Zip])
-	elif Selection == 'OPP':
+	if Selection == 'OPP':
 		key = (line[FirstName],line[LastName],line[AddressCombined],line[Zip])
-	else:
+	if Selection == 'VIN':
 		key = (line[VIN])
 	if key not in Entries: # Check if key is in the Entries set
 		OutputClean.writerow(line) # write to processed output file
 		Entries.add(key) # add row to Entries set
 	else:
 		OutDupes.writerow(line) # write to Dupes file
-# +-+-+-+-+ +-+-+-+-+-+-+-+
-# |M|a|i|n| |P|r|o|g|r|a|m|
-# +-+-+-+-+ +-+-+-+-+-+-+-+
+# ---------------------------------------------
+# MAIN PROGRAM
+# ---------------------------------------------
 FirstLine = True
 for line in Input:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
+		AppendZipRadius()
 		SetCase()
-		SetRadiusToInteger()
 		SetVINLen()
 		SetWinningNum()
 		SetSCF()
@@ -216,3 +232,4 @@ for line in Input:
 		CheckMailDNQ()
 		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
+
