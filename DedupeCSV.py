@@ -14,16 +14,22 @@
 #!/usr/bin/python3.4.3
 # Required Modules
 import csv
+from geopy.distance import vincenty
 # ---------------------------------------------
 # GLOBAL VARIABLE
 # ---------------------------------------------
 CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
-InputFile = "/Users/rssenar/Desktop/" + input("Input File Name : ") + ".csv" 
-ZipRadiusFile = "/Users/rssenar/Desktop/" + input("Zip Radius File Name : ") + ".csv" 
+# InputFile = "/Users/rssenar/Desktop/input.csv" 
+# SuppressionFile = "/Users/rssenar/Desktop/suppression.csv"
+InputFile = "/Users/rssenar/Desktop/" + input("Enter Input File Name : ") + ".csv" 
+SuppressionFile = "/Users/rssenar/Desktop/" + input("Enter Suppression File Name : ") + ".csv" 
+CentralZip = input("Enter Central ZIP codes: ")
 # ---------------------------------------------
-CleanOutput = "/Users/rssenar/Desktop/_CleanOutput.csv"
-Dupes = "/Users/rssenar/Desktop/_Dupes.csv" 
+ZipCoordinateFile = "/Users/rssenar/Dropbox/HUB/py_projects/_Resources/US_ZIP_Coordinates.csv" 
+# ---------------------------------------------
+CleanOutput = "/Users/rssenar/Desktop/__CleanOutput.csv"
+Dupes = "/Users/rssenar/Desktop/__Dupes.csv" 
 # ---------------------------------------------
 # Dedupe Criteria : 
 # OPHH = One Record Per House Hold
@@ -31,39 +37,6 @@ Dupes = "/Users/rssenar/Desktop/_Dupes.csv"
 # VIN = Vin#
 # ---------------------------------------------
 Selection = 'OPHH'
-# ---------------------------------------------
-# Col[00] = CustomerID
-# Col[01] = FirstName
-# Col[02] = MI
-# Col[03] = LastName
-# Col[04] = Address1
-# Col[05] = Address2
-# Col[06] = AddressCombined
-# Col[07] = City
-# Col[08] = State
-# Col[09] = Zip
-# Col[10] = Zip + 4
-# Col[11] = SCF
-# Col[12] = Phone
-# Col[13] = Email
-# Col[14] = VIN
-# Col[15] = TradeYear
-# Col[16] = TradeMake
-# Col[17] = TradeModel
-# Col[18] = DelDate
-# Col[19] = Date
-# Col[20] = Radius
-# Col[21] = Vin Number Length
-# Col[22] = DSF_WALK_SEQ
-# Col[23] = CRRT
-# Col[24] = KBB
-# Col[25] = Buyback Value
-# Col[26] = Winning Number
-# Col[27] = MailDNQ
-# Col[28] = BlitzDNQ
-# Col[29] = Misc1
-# Col[30] = Misc2
-# Col[31] = Misc3
 # ---------------------------------------------
 FirstName = 1
 LastName = 3
@@ -81,16 +54,22 @@ TradeYear = 15
 TradeMake = 16
 TradeModel = 17
 Radius = 20
-VINLen = 21
-WinningNum = 26
-MailDNQ = 27
-BlitzDNQ = 28
-
-# ZIP Code File
+Coordinates = 21
+VINLen = 22
+WinningNum = 27
+MailDNQ = 28
+BlitzDNQ = 29
+## ZIP Code File
 ZipCodeCol = 0
-RadiusCol = 1
+ZipRadiusCol = 1
+## ZIP Coordinate File
+ZipCodeCoordinateCol = 0
+LatitudeCoordinateCol = 1
+LongitudeCoordinateCol = 2
+## Suppression File
+SupprAddressCol = 2
+SupprZipCol = 5
 # ---------------------------------------------
-Entries = set() # Alocate Entries set to emplty
 HeaderRow = [\
 	'Customer ID',\
 	'First Name',\
@@ -113,6 +92,7 @@ HeaderRow = [\
 	'DelDate',\
 	'Date',\
 	'Radius',\
+	'Coordinates',\
 	'VINLen',\
 	'DSF_WALK_SEQ',\
 	'Crrt',\
@@ -128,30 +108,53 @@ HeaderRow = [\
 # ---------------------------------------------
 # OBJECTS
 # ---------------------------------------------
-Input = csv.reader(open(InputFile,'r')) # Read in the input file
-ZipRadius = csv.reader(open(ZipRadiusFile,'r')) # Read in the Zip Radius file
-OutputClean = csv.writer(open(CleanOutput,'a')) # Open Clean output file
-OutDupes = csv.writer(open(Dupes,'a')) # Open Dupes file
-OutputClean.writerow(HeaderRow) # Append Header Row to Clean output file
-OutDupes.writerow(HeaderRow) # Append Header Row to Dupes file
+Input = csv.reader(open(InputFile,'r')) 
+ZipCoordinate = csv.reader(open(ZipCoordinateFile,'r'))
+Suppression = csv.reader(open(SuppressionFile,'r'))
+ZipCoordinateAppend = csv.reader(open(ZipCoordinateFile,'a'))
+OutputClean = csv.writer(open(CleanOutput,'a'))
+OutDupes = csv.writer(open(Dupes,'a'))
+OutputClean.writerow(HeaderRow)
+OutDupes.writerow(HeaderRow)
 # ---------------------------------------------
-# LOAD ZIP DICTIONARY INTO MEMORY
+# ADD SUPPRESSIONS INTO THE ENTRIES SET
 # ---------------------------------------------
-ZipRadiusDict = {}
+Entries = set()
 FirstLine = True
-for line in ZipRadius:
+for line in Suppression:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		ZipRadiusDict[line[ZipCodeCol]] = line[RadiusCol]
+		Entries.add((str.title(line[SupprAddressCol]),str.title(line[SupprZipCol])))
+# ---------------------------------------------
+# LOAD ZIP DICTIONARY INTO MEMORY
+# ---------------------------------------------
+ZipCoordinateDict = {}
+FirstLine = True
+for line in ZipCoordinate:
+	if CSVFilesHaveHeaderRow and FirstLine:
+		FirstLine = False
+	else:
+		ZipCoordinateDict[line[ZipCodeCoordinateCol]] = (line[LatitudeCoordinateCol], line[LongitudeCoordinateCol])
 # ---------------------------------------------
 # FUNCTIONS
 # ---------------------------------------------
-def AppendZipRadius():
-	if line[Zip] in ZipRadiusDict:
-		line[Radius] = ZipRadiusDict[line[Zip]]
+def CalculateRadiusfromCentralZip():
+	if CentralZip in ZipCoordinateDict:
+		OriginZipCoordinates = ZipCoordinateDict[CentralZip]
 	else:
-		line[Radius] = 9999
+		OriginZipCoordinates = 0
+
+	if line[Zip] in ZipCoordinateDict:
+		TargetZipCoordinates = ZipCoordinateDict[line[Zip]]
+		line[Coordinates] = TargetZipCoordinates
+	else:
+		TargetZipCoordinates = 0
+
+	if OriginZipCoordinates == 0 or TargetZipCoordinates == 0:
+		line[Radius] = "n/a"
+	else:
+		line[Radius] = (float(vincenty(OriginZipCoordinates, TargetZipCoordinates).miles))
 
 def SetCase(): # Set case fields
 	line[FirstName] = str.title(line[FirstName]) 
@@ -192,14 +195,14 @@ def SetSCF(): # Parse VIN# then assign value to SCF field
 		line[SCF] = (line[Zip])[:3] # if ZIP is 5 Digits
 
 def CheckMailDNQ():
-	if line[FirstName] == "" or line[LastName] == "" or line[Radius] == 9999:
-		line[MailDNQ] = "DNQ"
+	if line[FirstName] == "" or line[LastName] == "":
+		line[MailDNQ] = "dnq"
 	else:
 		line[MailDNQ] = ""
 
 def CheckBlitzDNQ():
 	if len(line[Phone]) < 8 or len(line[VIN]) < 17: 
-		line[BlitzDNQ] = "DNQ"
+		line[BlitzDNQ] = "dnq"
 	else:
 		line[BlitzDNQ] = ""
 
@@ -223,7 +226,7 @@ for line in Input:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		AppendZipRadius()
+		CalculateRadiusfromCentralZip()
 		SetCase()
 		SetVINLen()
 		SetWinningNum()
@@ -232,4 +235,3 @@ for line in Input:
 		CheckMailDNQ()
 		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
-
