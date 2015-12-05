@@ -1,15 +1,10 @@
 '''
- /$$$$$$$                /$$                            /$$$$$$  /$$$$$$ /$$    /$$
-| $$__  $$              | $$                           /$$__  $$/$$__  $| $$   | $$
-| $$  \ $$ /$$$$$$  /$$$$$$$/$$   /$$ /$$$$$$  /$$$$$$| $$  \__| $$  \__| $$   | $$
-| $$  | $$/$$__  $$/$$__  $| $$  | $$/$$__  $$/$$__  $| $$     |  $$$$$$|  $$ / $$/
-| $$  | $| $$$$$$$| $$  | $| $$  | $| $$  \ $| $$$$$$$| $$      \____  $$\  $$ $$/ 
-| $$  | $| $$_____| $$  | $| $$  | $| $$  | $| $$_____| $$    $$/$$  \ $$ \  $$$/  
-| $$$$$$$|  $$$$$$|  $$$$$$|  $$$$$$| $$$$$$$|  $$$$$$|  $$$$$$|  $$$$$$/  \  $/   
-|_______/ \_______/\_______/\______/| $$____/ \_______/\______/ \______/    \_/    
-                                    | $$                                           
-                                    | $$                                           
-                                    |__/                                            
+   ___         __             __________   __
+  / _ \___ ___/ __ _____ ___ / ___/ __| | / /
+ / // / -_/ _  / // / _ / -_/ /___\ \ | |/ / 
+/____/\__/\_,_/\_,_/ .__\__/\___/___/ |___/  
+                  /_/                        
+                                           
 '''
 #!/usr/bin/python3.4.3
 # Required Modules
@@ -22,19 +17,17 @@ CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
 # InputFile = "/Users/rssenar/Desktop/input.csv" 
 # SuppressionFile = "/Users/rssenar/Desktop/suppression.csv"
-InputFile = "/Users/rssenar/Desktop/" + input("Enter Input File Name : ") + ".csv" 
-SuppressionFile = "/Users/rssenar/Desktop/" + input("Enter Suppression File Name : ") + ".csv" 
+InputFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/" + input("Enter Input File Name : ") + ".csv"
 CentralZip = input("Enter Central ZIP codes: ")
 # ---------------------------------------------
-ZipCoordinateFile = "/Users/rssenar/Dropbox/HUB/py_projects/_Resources/US_ZIP_Coordinates.csv" 
+ZipCoordinateFile = "/Users/rssenar/Dropbox/HUB/py_projects/_Resources/US_ZIP_Coordinates.csv"
+SuppressionFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/suppression.csv"
 # ---------------------------------------------
-CleanOutput = "/Users/rssenar/Desktop/__CleanOutput.csv"
-Dupes = "/Users/rssenar/Desktop/__Dupes.csv" 
+CleanOutput = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutput.csv"
+Dupes = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__Dupes.csv" 
 # ---------------------------------------------
 # Dedupe Criteria : 
-# OPHH = One Record Per House Hold
-# OPP = One Record Per Person
-# VIN = Vin#
+# OPHH = One Record Per House Hold / OPP = One Record Per Person / VIN = Vin#
 # ---------------------------------------------
 Selection = 'OPHH'
 # ---------------------------------------------
@@ -111,7 +104,6 @@ HeaderRow = [\
 Input = csv.reader(open(InputFile,'r')) 
 ZipCoordinate = csv.reader(open(ZipCoordinateFile,'r'))
 Suppression = csv.reader(open(SuppressionFile,'r'))
-ZipCoordinateAppend = csv.reader(open(ZipCoordinateFile,'a'))
 OutputClean = csv.writer(open(CleanOutput,'a'))
 OutDupes = csv.writer(open(Dupes,'a'))
 OutputClean.writerow(HeaderRow)
