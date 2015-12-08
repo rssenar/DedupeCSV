@@ -1,10 +1,11 @@
 '''
-   ___         __             __________   __
-  / _ \___ ___/ __ _____ ___ / ___/ __| | / /
- / // / -_/ _  / // / _ / -_/ /___\ \ | |/ / 
-/____/\__/\_,_/\_,_/ .__\__/\___/___/ |___/  
-                  /_/                        
-                                           
+  ____           _                   ____ ______     __
+ |  _ \  ___  __| |_   _ _ __   ___ / ___/ ___\ \   / /
+ | | | |/ _ \/ _` | | | | '_ \ / _ | |   \___ \\ \ / / 
+ | |_| |  __| (_| | |_| | |_) |  __| |___ ___) |\ V /  
+ |____/ \___|\__,_|\__,_| .__/ \___|\____|____/  \_/   
+                        |_|                            
+                      
 '''
 #!/usr/bin/python3.4.3
 # Required Modules
@@ -15,15 +16,17 @@ from geopy.distance import vincenty
 # ---------------------------------------------
 CSVFilesHaveHeaderRow = True # True or False if input files include a header row
 # ---------------------------------------------
-# InputFile = "/Users/rssenar/Desktop/input.csv" 
-# SuppressionFile = "/Users/rssenar/Desktop/suppression.csv"
-InputFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/" + input("Enter Input File Name : ") + ".csv"
+InputFileName = input("Enter Suppression File Name : ")
+InputFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/" + InputFileName + ".csv"
+SuppressionFileName = input("Enter Suppression File Name : ")
+SuppressionFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/" + SuppressionFileName + ".csv"
 CentralZip = input("Enter Central ZIP codes: ")
 # ---------------------------------------------
 ZipCoordinateFile = "/Users/rssenar/Dropbox/HUB/py_projects/_Resources/US_ZIP_Coordinates.csv"
-SuppressionFile = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/suppression.csv"
 # ---------------------------------------------
 CleanOutput = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutput.csv"
+CleanOutputDatabase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputDatabase.csv"
+CleanOutputPurchase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputPurchase.csv"
 Dupes = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__Dupes.csv" 
 # ---------------------------------------------
 # Dedupe Criteria : 
@@ -31,7 +34,9 @@ Dupes = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__Dupes.csv"
 # ---------------------------------------------
 Selection = 'OPHH'
 # ---------------------------------------------
+CustomerID = 0
 FirstName = 1
+MI = 2
 LastName = 3
 Address1 = 4
 Address2 = 5
@@ -39,29 +44,38 @@ AddressCombined = 6
 City = 7
 State = 8
 Zip = 9
+Zip4 = 10
 SCF = 11
 Phone = 12
 Email = 13
 VIN = 14
-TradeYear = 15
-TradeMake = 16
-TradeModel = 17
+Year = 15
+Make = 16
+Model = 17
 Radius = 20
 Coordinates = 21
 VINLen = 22
+DSF_WALK_SEQ = 23
+CRRT = 24
+BuybackValues = 26
 WinningNum = 27
 MailDNQ = 28
 BlitzDNQ = 29
+
 ## ZIP Code File
 ZipCodeCol = 0
 ZipRadiusCol = 1
+
 ## ZIP Coordinate File
 ZipCodeCoordinateCol = 0
 LatitudeCoordinateCol = 1
 LongitudeCoordinateCol = 2
+
 ## Suppression File
 SupprAddressCol = 2
 SupprZipCol = 5
+
+Entries = set()
 # ---------------------------------------------
 HeaderRow = [\
 	'Customer ID',\
@@ -79,9 +93,9 @@ HeaderRow = [\
 	'Phone',\
 	'Email',\
 	'VIN',\
-	'TradeYear',\
-	'TradeMake',\
-	'TradeModel',\
+	'Year',\
+	'Make',\
+	'Model',\
 	'DelDate',\
 	'Date',\
 	'Radius',\
@@ -98,26 +112,61 @@ HeaderRow = [\
 	'Misc2',\
 	'Misc3'\
 	]
+HeaderRowDatabase = [\
+	'Customer ID',\
+	'First Name',\
+	'Last Name',\
+	'Address',\
+	'City',\
+	'State',\
+	'Zip',\
+	'Phone',\
+	'Year',\
+	'Make',\
+	'Model',\
+	'Buyback Value',\
+	'Winning Number'\
+	]
+HeaderRowPurchase = [\
+	'Customer ID',\
+	'First Name',\
+	'Last Name',\
+	'Address',\
+	'City',\
+	'State',\
+	'Zip',\
+	'4Zip',\
+	'DSF_WALK_SEQ',\
+	'Phone',\
+	'Crrt',\
+	'Winning Number'\
+	]
 # ---------------------------------------------
 # OBJECTS
 # ---------------------------------------------
 Input = csv.reader(open(InputFile,'r')) 
 ZipCoordinate = csv.reader(open(ZipCoordinateFile,'r'))
-Suppression = csv.reader(open(SuppressionFile,'r'))
 OutputClean = csv.writer(open(CleanOutput,'a'))
+OutputCleanDatabase = csv.writer(open(CleanOutputDatabase,'a'))
+OutputCleanPurchase = csv.writer(open(CleanOutputPurchase,'a'))
 OutDupes = csv.writer(open(Dupes,'a'))
 OutputClean.writerow(HeaderRow)
+OutputCleanDatabase.writerow(HeaderRowDatabase)
+OutputCleanPurchase.writerow(HeaderRowPurchase)
 OutDupes.writerow(HeaderRow)
 # ---------------------------------------------
 # ADD SUPPRESSIONS INTO THE ENTRIES SET
 # ---------------------------------------------
-Entries = set()
-FirstLine = True
-for line in Suppression:
-	if CSVFilesHaveHeaderRow and FirstLine:
-		FirstLine = False
-	else:
-		Entries.add((str.title(line[SupprAddressCol]),str.title(line[SupprZipCol])))
+if SuppressionFileName == "":
+	pass
+else:
+	Suppression = csv.reader(open(SuppressionFile,'r'))
+	FirstLine = True
+	for line in Suppression:
+		if CSVFilesHaveHeaderRow and FirstLine:
+			FirstLine = False
+		else:
+			Entries.add((str.title(line[SupprAddressCol]),str.title(line[SupprZipCol])))
 # ---------------------------------------------
 # LOAD ZIP DICTIONARY INTO MEMORY
 # ---------------------------------------------
@@ -150,13 +199,17 @@ def CalculateRadiusfromCentralZip():
 
 def SetCase(): # Set case fields
 	line[FirstName] = str.title(line[FirstName]) 
+	if len(line[MI]) == 1:
+		line[MI] = str.upper(line[MI]) 
+	else:
+		line[MI] = str.title(line[MI]) 
 	line[LastName] = str.title(line[LastName])
 	line[Address1] = str.title(line[Address1])
 	line[Address2] = str.title(line[Address2])
 	line[City] = str.title(line[City])
-	line[TradeYear] = str.title(line[TradeYear])
-	line[TradeMake] = str.title(line[TradeMake])
-	line[TradeModel] = str.title(line[TradeModel])
+	line[Year] = str.title(line[Year])
+	line[Make] = str.title(line[Make])
+	line[Model] = str.title(line[Model])
 	line[Email] = str.lower(line[Email])
 	line[State] = str.upper(line[State])
 
@@ -207,6 +260,35 @@ def CheckDupeCriteriaThenOutput(): # Checks Selection Criteria
 		key = (line[VIN])
 	if key not in Entries: # Check if key is in the Entries set
 		OutputClean.writerow(line) # write to processed output file
+		OutputCleanDatabase.writerow((\
+			line[CustomerID],\
+			line[FirstName],\
+			line[LastName],\
+			line[AddressCombined],\
+			line[City],\
+			line[State],\
+			line[Zip],\
+			line[Phone],\
+			line[Year],\
+			line[Make],\
+			line[Model],\
+			line[BuybackValues],\
+			line[WinningNum]\
+			))
+		OutputCleanPurchase.writerow((\
+			line[CustomerID],\
+			line[FirstName],\
+			line[LastName],\
+			line[AddressCombined],\
+			line[City],\
+			line[State],\
+			line[Zip],\
+			line[Zip4],\
+			line[DSF_WALK_SEQ],\
+			line[Phone],\
+			line[CRRT],\
+			line[WinningNum]\
+			))
 		Entries.add(key) # add row to Entries set
 	else:
 		OutDupes.writerow(line) # write to Dupes file
@@ -218,12 +300,12 @@ for line in Input:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
+		CombineAddress()
 		CalculateRadiusfromCentralZip()
 		SetCase()
 		SetVINLen()
 		SetWinningNum()
 		SetSCF()
-		CombineAddress()
 		CheckMailDNQ()
 		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
