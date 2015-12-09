@@ -1,10 +1,10 @@
 '''
-  ____           _                   ____ ______     __
- |  _ \  ___  __| |_   _ _ __   ___ / ___/ ___\ \   / /
- | | | |/ _ \/ _` | | | | '_ \ / _ | |   \___ \\ \ / / 
- | |_| |  __| (_| | |_| | |_) |  __| |___ ___) |\ V /  
- |____/ \___|\__,_|\__,_| .__/ \___|\____|____/  \_/   
-                        |_|                            
+  ____                  __        __         _        
+ |  _ \ _ __ ___ _ __ __\ \      / ___  _ __| | _____ 
+ | |_) | '__/ _ | '_ ` _ \ \ /\ / / _ \| '__| |/ / __|
+ |  __/| | |  __| | | | | \ V  V | (_) | |  |   <\__ \
+ |_|   |_|  \___|_| |_| |_|\_/\_/ \___/|_|  |_|\_|___/
+                                                      
                       
 '''
 #!/usr/bin/python3.4.3
@@ -24,10 +24,10 @@ CentralZip = input("Enter Central ZIP codes: ")
 # ---------------------------------------------
 ZipCoordinateFile = "/Users/rssenar/Dropbox/HUB/py_projects/_Resources/US_ZIP_Coordinates.csv"
 # ---------------------------------------------
-CleanOutput = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutput.csv"
-CleanOutputDatabase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputDatabase.csv"
-CleanOutputPurchase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputPurchase.csv"
-Dupes = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__Dupes.csv" 
+CleanOutput = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputMAIN.csv"
+CleanOutputDatabase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputDatabaseFormat.csv"
+CleanOutputPurchase = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__CleanOutputPurchaseFormat.csv"
+Dupes = "/Users/rssenar/Dropbox/HUB/_PROCESS Folder/__DUPES.csv" 
 # ---------------------------------------------
 # Dedupe Criteria : 
 # OPHH = One Record Per House Hold / OPP = One Record Per Person / VIN = Vin#
@@ -301,8 +301,8 @@ for line in Input:
 		FirstLine = False
 	else:
 		CombineAddress()
-		CalculateRadiusfromCentralZip()
 		SetCase()
+		CalculateRadiusfromCentralZip()
 		SetVINLen()
 		SetWinningNum()
 		SetSCF()

@@ -1,4 +1,4 @@
-# DedupeCSV
+# PremWorks
 The program runs through every record in the database and performs the following funtions:
 * Check file for duplicate recrods based on Address & ZIP match
 * Appends Latitude & Longitude Information then calculates straight line distance based on a central ZIP code
