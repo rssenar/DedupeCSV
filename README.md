@@ -43,13 +43,14 @@ Customer File:
 * Col[31] = Misc2
 * Col[32] = Misc3
 
-Customer File:
+Suppression File:
 * Col[00] = FirstName
 * Col[01] = LastName
 * Col[02] = Address
 * Col[03] = City
 * Col[04] = State
 * Col[05] = Zip
+* Col[06] = Phone
 
 Lat-Long File:
 * Col[00] = zip code
