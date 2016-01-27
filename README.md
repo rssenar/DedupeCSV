@@ -56,3 +56,8 @@ Lat-Long File:
 * Col[00] = zip code
 * Col[01] = latitude
 * Col[02] = longitude
+
+Year Decode File:
+* Col[00] = YearAbv
+* Col[01] = Year
+

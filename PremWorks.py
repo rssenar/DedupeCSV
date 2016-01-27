@@ -1,3 +1,4 @@
+
 #!/usr/bin/python2.7.10
 # ---------------------------------------------
 '''
@@ -15,19 +16,19 @@ Set TRUE or FALSE value depending if input files include a header row
 '''
 CSVFilesHaveHeaderRow = True
 # ---------------------------------------------
-ZipCoordFile = "/Users/rssenar/Dropbox/HUB/Projects/_Resources/US_ZIP_Coordinates.csv"
-YearDecodeFile = "/Users/rssenar/Dropbox/HUB/Projects/_Resources/Year_Decode.csv"
+ZipCoordFile = "../_Resources/US_ZIP_Coordinates.csv"
+YearDecodeFile = "../_Resources/Year_Decode.csv"
 # ---------------------------------------------
 InputFileName = raw_input("Enter Name : ")
-InputFile = "/Users/rssenar/Desktop/" + InputFileName + ".csv"
+InputFile = "../../../../Desktop/" + InputFileName + ".csv"
 SuppressionFileName = raw_input("Enter Suppression Name : ")
-SuppressionFile = "/Users/rssenar/Desktop/" + SuppressionFileName + ".csv"
+SuppressionFile = "../../../../Desktop/" + SuppressionFileName + ".csv"
 CentralZip = raw_input("Enter Central ZIP codes: ")
 # ---------------------------------------------
-CleanOutput = "/Users/rssenar/Desktop/__CleanOutputMAIN.csv"
-CleanOutputDatabase = "/Users/rssenar/Desktop/_CleanOutputDatabaseFormat.csv"
-CleanOutputPurchase = "/Users/rssenar/Desktop/_CleanOutputPurchaseFormat.csv"
-Dupes = "/Users/rssenar/Desktop/_DUPES.csv" 
+CleanOutput = "../../../../Desktop/__CleanOutputMAIN.csv"
+CleanOutputDatabase = "../../../../Desktop/_CleanOutputDatabaseFormat.csv"
+CleanOutputPurchase = "../../../../Desktop/_CleanOutputPurchaseFormat.csv"
+Dupes = "../../../../Desktop/_DUPES.csv" 
 # ---------------------------------------------
 '''
 Set selection options:
@@ -73,22 +74,22 @@ BlitzDNQ = 29
 Misc1 = 30
 Misc2 = 31
 Misc3 = 32
-# ZIP Code File
+# ZIPCode File
 ZipCodeCol = 0
 ZipRadiusCol = 1
-# ZIP Coordinate File
+# ZIPCoordinate File
 ZipCoordCol = 0
 LatCoordCol = 1
 LongCoordCol = 2
-# VIN Decode File
+# VINDecode File
 YearDecodeYearAb = 0
 YearDecodeYear = 1
 # Suppression File
 SupprAddressCol = 2
 SupprZipCol = 5
-# Sets
+# Set
 Entries = set()
-# Set Sequence Number
+# Set Sequence#
 SeqNum = 1000
 # ---------------------------------------------
 '''
@@ -444,7 +445,7 @@ for line in tqdm(Input):
 	SeqNum += 1
 # ---------------------------------------------
 ''' 
-Close all opened files
+Close all opened objects
 '''
 InputFile.close()
 ZipCoordFile.close()
