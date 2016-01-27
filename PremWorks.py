@@ -227,6 +227,8 @@ for line in YearDecode:
 	else:
 		YearDecodeDict[line[YearDecodeYearAb]] = (line[YearDecodeYear])
 # ---------------------------------------------
+# Fuctions
+# ---------------------------------------------
 ''' 
 Function sets Customer ID Sequence Number.  If walk sequence is not present,
 assig "d" to sequence number. else, set "a"
