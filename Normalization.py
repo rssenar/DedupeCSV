@@ -1,11 +1,10 @@
-# ---------------------------------------------
 #!/usr/bin/env python
 # ---------------------------------------------
 '''
 Import required modules
 '''
 from __future__ import division, print_function
-import csv
+import csv, os
 from geopy.distance import vincenty
 from dateutil.parser import *
 from datetime import *
@@ -15,6 +14,11 @@ from tqdm import tqdm
 Set TRUE or FALSE value depending if input files include a header row
 '''
 CSVFilesHaveHeaderRow = True
+# ---------------------------------------------
+'''
+Change present working directory to desktop
+'''
+os.chdir('../../../../Desktop/')
 # ---------------------------------------------
 ZipCoordFile = "../_Resources/US_ZIP_Coordinates.csv"
 YearDecodeFile = "../_Resources/Year_Decode.csv"
@@ -167,10 +171,10 @@ HeaderRowPurchase = [\
 '''
 Create Objects and csv.reader and csv.writer methods
 '''
-InputFile = open(InputFile,'rb')
-ZipCoordFile = open(ZipCoordFile,'rb')
-YearDecodeFile = open(YearDecodeFile,'rb')
-GenSuppressionFile = open(GenSuppressionFile,'rb')
+InputFile = open(InputFile,'rU')
+ZipCoordFile = open(ZipCoordFile,'rU')
+YearDecodeFile = open(YearDecodeFile,'rU')
+GenSuppressionFile = open(GenSuppressionFile,'rU')
 CleanOutput = open(CleanOutput,'ab')
 CleanOutputDatabase = open(CleanOutputDatabase,'ab')
 CleanOutputPurchase = open(CleanOutputPurchase,'ab')
@@ -199,7 +203,7 @@ Add SPECIFIC Suppression File values (If Specified) into the entries set for the
 if SuppressionFileName == "":
 	pass
 else:
-	SuppressionFile = open(SuppressionFile,'rb')
+	SuppressionFile = open(SuppressionFile,'rU')
 	Suppression = csv.reader(SuppressionFile)
 	FirstLine = True
 	for line in Suppression:

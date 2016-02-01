@@ -1,5 +1,4 @@
-# ---------------------------------------------
-#!/usr/bin/python2.7.10
+#!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
 import csv
@@ -20,9 +19,9 @@ Entries = set()
 InputFileDF = pd.read_csv(InputFile)
 TotalRows = len(InputFileDF)
 # ---------------------------------------------
-InputFile = open(InputFile,'rb')
-DatabaseFile = open(DatabaseFile,'rb')
-PurchaseFile = open(PurchaseFile,'rb')
+InputFile = open(InputFile,'rU')
+DatabaseFile = open(DatabaseFile,'rU')
+PurchaseFile = open(PurchaseFile,'rU')
 # ---------------------------------------------
 Input = csv.reader(InputFile)
 Database = csv.reader(DatabaseFile)
@@ -33,7 +32,7 @@ for line in Database:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		Entries.add((line[1],line[2],line[3],line[4],line[5],line[6]))
+			Entries.add((line[1],line[2],line[3],line[4],line[5],line[6]))
 # ---------------------------------------------
 FirstLine = True
 for line in Purchase:
