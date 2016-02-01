@@ -290,7 +290,7 @@ def YearDecode():
 Function sets case for FirstName, MI, LastName, Address1, Address2, City,
 Year, Make, Model, Year, Email & State to Title Case for better readability
 '''
-def SetCase(): # Set case fields
+def SetCase():
 	line[FirstName] = str.title(line[FirstName]) 
 	if len(line[MI]) == 1:
 		line[MI] = str.upper(line[MI]) 
@@ -470,3 +470,4 @@ CleanOutputDatabase.close()
 CleanOutputPurchase.close()
 Dupes.close()
 GenSuppressionFile.close()
+# ---------------------------------------------
