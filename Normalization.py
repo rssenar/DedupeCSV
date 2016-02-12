@@ -13,16 +13,19 @@ from tqdm import tqdm
 '''
 Set TRUE or FALSE value depending if input files include a header row
 '''
-CSVFilesHaveHeaderRow = True
 # ---------------------------------------------
-'''
-Change present working directory to desktop
-'''
-os.chdir('../../../../Desktop/')
+CSVFilesHaveHeaderRow = True
+DatabaseHeader =  True
+DatabaseFirstLine = True
+PurchaseHeader =  True
+PurchaseFirstLine = True
+PhonesHeader =  True
+PhonesFirstLine = True
 # ---------------------------------------------
 ZipCoordFile = "../_Resources/US_ZIP_Coordinates.csv"
 YearDecodeFile = "../_Resources/Year_Decode.csv"
 GenSuppressionFile = "../_Resources/Gen_Suppression_File.csv"
+DropFile = "../_Resources/Drop_File.csv"
 # ---------------------------------------------
 InputFileName = raw_input("Enter Name : ")
 InputFile = "../../../../Desktop/" + InputFileName + ".csv"
@@ -33,15 +36,8 @@ CentralZip = raw_input("Enter Central ZIP codes: ")
 CleanOutput = "../../../../Desktop/" + "__" + InputFileName + "_CleanOutputMAIN.csv"
 CleanOutputDatabase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD DATA.csv"
 CleanOutputPurchase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD.csv"
-Dupes = "../../../../Desktop/_DUPLICATES.csv" 
-# ---------------------------------------------
-'''
-Set selection options:
-OPHH = One Record Per House Hold
-OPP = One Record Per Person
-VIN = Vin#
-'''
-Selection = 'OPHH'
+CleanOutputPhones = "../../../../Desktop/" + "_" + InputFileName + " PHONES.csv"
+Dupes = "../../../../Desktop/__DUPLICATES.csv" 
 # ---------------------------------------------
 '''
 Assign list numbers to variables for readability
@@ -71,34 +67,19 @@ Coordinates = 21
 VINLen = 22
 DSF_WALK_SEQ = 23
 CRRT = 24
-KBB = 25
-BuybackValues = 26
-WinningNum = 27
-MailDNQ = 28
-BlitzDNQ = 29
-Misc1 = 30
-Misc2 = 31
-Misc3 = 32
-# ZIPCode File
-ZipCodeCol = 0
-ZipRadiusCol = 1
-# ZIPCoordinate File
-ZipCoordCol = 0
-LatCoordCol = 1
-LongCoordCol = 2
-# VINDecode File
-YearDecodeYearAb = 0
-YearDecodeYear = 1
-# Suppression File
-SupprAddressCol = 2
-SupprZipCol = 5
-# GenSuppression File
-GenSupprAddressCol = 2
-GenSupprZipCol = 5
-# Set
+ZipCRRT = 25 
+KBB = 26
+BuybackValues = 27
+WinningNum = 28
+MailDNQ = 29
+BlitzDNQ = 30
+DropVal = 31
+Misc1 = 32
+Misc2 = 33
+Misc3 = 34
+
 Entries = set()
-# Set Sequence#
-SeqNum = 1000
+SeqNum = 10000
 # ---------------------------------------------
 '''
 Assign column names to header output files
@@ -129,11 +110,13 @@ HeaderRow = [\
 	'VINLen',\
 	'DSF_WALK_SEQ',\
 	'Crrt',\
+	'ZipCrrt',\
 	'KBB',\
 	'Buyback Value',\
 	'Winning Number',\
 	'Mail DNQ',\
 	'Blitz DNQ',\
+	'Drop',\
 	'Misc1',\
 	'Misc2',\
 	'Misc3'\
@@ -151,7 +134,8 @@ HeaderRowDatabase = [\
 	#'Make',\
 	#'Model',\
 	#'Buyback Value',\
-	'Winning Number'\
+	'Winning Number',\
+	'Drop'\
 	]
 HeaderRowPurchase = [\
 	'Customer ID',\
@@ -165,37 +149,40 @@ HeaderRowPurchase = [\
 	'DSF_WALK_SEQ',\
 	#'Phone',\
 	'Crrt',\
-	'Winning Number'\
+	'Winning Number',\
+	'Drop'\
+	]
+HeaderRowPhones = [\
+	'First Name',\
+	'Last Name',\
+	'Phone',\
+	'Address',\
+	'City',\
+	'State',\
+	'Zip'\
 	]
 # ---------------------------------------------
 '''
 Create Objects and csv.reader and csv.writer methods
 '''
 InputFile = open(InputFile,'rU')
-ZipCoordFile = open(ZipCoordFile,'rU')
-YearDecodeFile = open(YearDecodeFile,'rU')
-GenSuppressionFile = open(GenSuppressionFile,'rU')
-CleanOutput = open(CleanOutput,'ab')
-CleanOutputDatabase = open(CleanOutputDatabase,'ab')
-CleanOutputPurchase = open(CleanOutputPurchase,'ab')
-Dupes = open(Dupes,'ab')
-# ---------------------------------------------
 Input = csv.reader(InputFile)
-ZipCoordinate = csv.reader(ZipCoordFile)
-YearDecode = csv.reader(YearDecodeFile)
-GenSuppression = csv.reader(GenSuppressionFile)
-OutputClean = csv.writer(CleanOutput)
-OutputCleanDatabase = csv.writer(CleanOutputDatabase)
-OutputCleanPurchase = csv.writer(CleanOutputPurchase)
-OutDupes = csv.writer(Dupes)
 # ---------------------------------------------
-'''
-Create output files and assign headers to header row
-'''
+GenSuppressionFile = open(GenSuppressionFile,'rU')
+GenSuppression = csv.reader(GenSuppressionFile)
+# ---------------------------------------------
+CleanOutput = open(CleanOutput,'ab')
+OutputClean = csv.writer(CleanOutput)
 OutputClean.writerow(HeaderRow)
-OutputCleanDatabase.writerow(HeaderRowDatabase)
-OutputCleanPurchase.writerow(HeaderRowPurchase)
+# ---------------------------------------------
+Dupes = open(Dupes,'ab')
+OutDupes = csv.writer(Dupes)
 OutDupes.writerow(HeaderRow)
+# ---------------------------------------------
+# CleanOutputDatabase = open(CleanOutputDatabase,'ab')
+# CleanOutputPurchase = open(CleanOutputPurchase,'ab')
+# CleanOutputPhones = open(CleanOutputPhones,'ab')
+# Dupes = open(Dupes,'ab')
 # ---------------------------------------------
 '''
 Add SPECIFIC Suppression File values (If Specified) into the entries set for the purposes of de-duping
@@ -210,7 +197,7 @@ else:
 		if CSVFilesHaveHeaderRow and FirstLine:
 			FirstLine = False
 		else:
-			Entries.add((str.title(line[SupprAddressCol]),str.title(line[SupprZipCol])))
+			Entries.add((str.title(line[2]),str.title(line[5])))
 	SuppressionFile.close()
 # ---------------------------------------------
 '''
@@ -221,31 +208,51 @@ for line in GenSuppression:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		Entries.add((str.title(line[GenSupprAddressCol]),str.title(line[GenSupprZipCol])))
+		Entries.add((str.title(line[2]),str.title(line[5])))
 # ---------------------------------------------
 '''
 Create a Zip Dictionary from US_ZIP_Coordinates.csv file and load into
 memory. Information includes Longitude and Latitude Information
 '''
 ZipCoordinateDict = {}
+ZipCoordFile = open(ZipCoordFile,'rU')
+ZipCoordinate = csv.reader(ZipCoordFile)
 FirstLine = True
 for line in ZipCoordinate:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		ZipCoordinateDict[line[ZipCoordCol]] = (line[LatCoordCol], line[LongCoordCol])
+		ZipCoordinateDict[line[0]] = (line[1], line[2])
+ZipCoordFile.close()
+# ---------------------------------------------
+'''
+Create a Drop Dictionary from Drop_File.csv file
+'''
+DropDict = {}
+DropFile = open(DropFile,'rU')
+Drop = csv.reader(DropFile)
+FirstLine = True
+for line in Drop:
+	if CSVFilesHaveHeaderRow and FirstLine:
+		FirstLine = False
+	else:
+		DropDict[line[0]] = line[1]
+DropFile.close()
 # ---------------------------------------------
 '''
 Create a Year Decode Dictionary from Year_Decode.csv file and load into
 memory
 '''
 YearDecodeDict = {}
+YearDecodeFile = open(YearDecodeFile,'rU')
+YearDecode = csv.reader(YearDecodeFile)
 FirstLine = True
 for line in YearDecode:
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
 	else:
-		YearDecodeDict[line[YearDecodeYearAb]] = (line[YearDecodeYear])
+		YearDecodeDict[line[0]] = (line[1])
+YearDecodeFile.close()
 # ---------------------------------------------
 # Fuctions
 # ---------------------------------------------
@@ -326,29 +333,23 @@ Fuction normalizes the date column
 def SetDateFormat():
 	CurrentDate = parse('')
 	CurrentDateUpdate = CurrentDate.date()
-	
 	DelDateNew = parse(line[DelDate])
 	DelDateUpdate = DelDateNew.date()
-
 	DateNew = parse(line[Date])
 	DateUpdate = DateNew.date()
-
 	if DelDateUpdate == CurrentDateUpdate:
 		line[DelDate] = ''
 	else:
 		line[DelDate] = DelDateUpdate
-
 	if DateUpdate == CurrentDateUpdate:
 		line[Date] = ''
 	else:
 		line[Date] = DateUpdate
-
 ''' 
 Fuction sets the value for the winning # column
 '''
 def SetWinningNum(): 
 	line[WinningNum] = 40754
-
 ''' 
 Fuction combines values for Address1 & Address2
 '''
@@ -360,17 +361,38 @@ def CombineAddress():
 			line[AddressComb] = line[Address1] + ' ' + line[Address2]
 	else:
 		line[AddressComb] = str.title(line[AddressComb])
-
 ''' 
 Fuction extrapolates 3-Digit SCF from the ZIP code
 '''
 def SetSCF(): 
 	ZipLen = len(line[Zip])
 	if ZipLen < 5:
+		line
 		line[SCF] = (line[Zip])[:2] 
 	else:
 		line[SCF] = (line[Zip])[:3] 
-
+''' 
+Fuction combined Zip + Crrt Fields
+'''
+def SetZipCrrt(): 
+	if line[Zip] == '' or line[CRRT] == '':
+		line[ZipCRRT] = ''
+	else:
+		line[ZipCRRT] = line[Zip] + line[CRRT]
+''' 
+Fuction Sets DROP Number
+'''
+def SetDrop():
+	if line[DSF_WALK_SEQ] == '':
+		if line[Zip] in DropDict:
+			line[DropVal] = DropDict[line[Zip]]
+		else:
+			line[DropVal] = ''
+	else:
+		if line[ZipCRRT] in DropDict:
+			line[DropVal] = DropDict[line[ZipCRRT]]
+		else:
+			line[DropVal] = ''
 ''' 
 Fuction assigns 'dnq' to records that dont qualify for mail
 '''
@@ -379,7 +401,6 @@ def CheckMailDNQ():
 		line[MailDNQ] = "dnq"
 	else:
 		line[MailDNQ] = ""
-
 ''' 
 Fuction assigns 'dnq' to records that dont qualify for phone blitz
 '''
@@ -388,55 +409,139 @@ def CheckBlitzDNQ():
 		line[BlitzDNQ] = "dnq"
 	else:
 		line[BlitzDNQ] = ""
-
 '''
-Fuction checks for dupes based on:
-OPHH = One Record Per House Hold
-OPP = One Record Per Person
-VIN = Vin#
-Value is then added to 'Entries' set to avoid dedupe
+Function checks for dupes based on: OPHH = One Record Per House Hold, 
+OPP = One Record Per Person or VIN = Vin#
 '''
 def CheckDupeCriteriaThenOutput(): 
-	if Selection == 'OPHH':
-		key = (line[AddressComb],line[Zip])
-	if Selection == 'OPP':
-		key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
-	if Selection == 'VIN':
-		key = (line[VIN])
+	key = (line[AddressComb],line[Zip])
+	# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
+	# key = (line[VIN])
 	if key not in Entries:
 		Entries.add(key)
 		OutputClean.writerow(line)
-		OutputCleanDatabase.writerow((\
-			line[CustomerID],\
-			line[FirstName],\
-			line[LastName],\
-			line[AddressComb],\
-			line[City],\
-			line[State],\
-			line[Zip],\
-			line[Phone],\
-			#line[Year],\
-			#line[Make],\
-			#line[Model],\
-			#line[BuybackValues],\
-			line[WinningNum]\
-			))
-		OutputCleanPurchase.writerow((\
-			line[CustomerID],\
-			line[FirstName],\
-			line[LastName],\
-			line[AddressComb],\
-			line[City],\
-			line[State],\
-			line[Zip],\
-			line[Zip4],\
-			line[DSF_WALK_SEQ],\
-			#line[Phone],\
-			line[CRRT],\
-			line[WinningNum]\
-			))
 	else:
 		OutDupes.writerow(line)
+'''
+Function outputs processed Database, Purchase & Dupes Files
+'''
+def CreateDatabasePurchaseOutput():
+	global DatabaseFirstLine
+	global PurchaseFirstLine
+	global CleanOutputDatabase
+	global CleanOutputPurchase
+	if line[DSF_WALK_SEQ] == '':
+		if DatabaseHeader and DatabaseFirstLine:
+			CleanOutputDatabase = open(CleanOutputDatabase,'ab')
+			OutputCleanDatabase = csv.writer(CleanOutputDatabase)
+			OutputCleanDatabase.writerow(HeaderRowDatabase)
+			OutputCleanDatabase.writerow((\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Phone],\
+				#line[Year],\
+				#line[Make],\
+				#line[Model],\
+				#line[BuybackValues],\
+				line[WinningNum],\
+				line[DropVal]\
+				))
+			DatabaseFirstLine = False
+		else:
+			OutputCleanDatabase = csv.writer(CleanOutputDatabase)
+			OutputCleanDatabase.writerow((\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Phone],\
+				#line[Year],\
+				#line[Make],\
+				#line[Model],\
+				#line[BuybackValues],\
+				line[WinningNum],\
+				line[DropVal]\
+				))
+	else:
+		if PurchaseHeader and PurchaseFirstLine:
+			CleanOutputPurchase = open(CleanOutputPurchase,'ab')
+			OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+			OutputCleanPurchase.writerow(HeaderRowPurchase)
+			OutputCleanPurchase.writerow((\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Zip4],\
+				line[DSF_WALK_SEQ],\
+				#line[Phone],\
+				line[CRRT],\
+				line[WinningNum],\
+				line[DropVal]\
+				))
+			PurchaseFirstLine = False
+		else:
+			OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+			OutputCleanPurchase.writerow((\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Zip4],\
+				line[DSF_WALK_SEQ],\
+				#line[Phone],\
+				line[CRRT],\
+				line[WinningNum],\
+				line[DropVal]\
+				))
+
+'''
+Function outputs Phone List File
+'''
+def ExtractPhonesList():
+	global PhonesFirstLine
+	global CleanOutputPhones
+	if line[Phone] != '':
+		if PhonesHeader and PhonesFirstLine:
+			CleanOutputPhones = open(CleanOutputPhones,'ab')
+			OutputPhones = csv.writer(CleanOutputPhones)
+			OutputPhones.writerow(HeaderRowPhones)
+			OutputPhones.writerow((\
+				line[FirstName],\
+				line[LastName],\
+				line[Phone],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip]\
+				))
+			PhonesFirstLine = False
+		else:
+			OutputPhones = csv.writer(CleanOutputPhones)
+			OutputPhones.writerow((\
+				line[FirstName],\
+				line[LastName],\
+				line[Phone],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip]\
+				))
+
 # ---------------------------------------------
 # Main Program
 # ---------------------------------------------
@@ -458,20 +563,26 @@ for line in tqdm(Input):
 		SetDateFormat()
 		SetWinningNum()
 		SetSCF()
+		SetZipCrrt()
+		# SetDrop()
 		CheckMailDNQ()
 		CheckBlitzDNQ()
 		CheckDupeCriteriaThenOutput()
-	SeqNum += 1
+		CreateDatabasePurchaseOutput()
+		ExtractPhonesList()
+	SeqNum+=1
 # ---------------------------------------------
 ''' 
 Close all opened objects
 '''
 InputFile.close()
-ZipCoordFile.close()
-YearDecodeFile.close()
 CleanOutput.close()
-CleanOutputDatabase.close()
-CleanOutputPurchase.close()
-Dupes.close()
 GenSuppressionFile.close()
+Dupes.close()
+if line[DSF_WALK_SEQ] == '':
+	CleanOutputDatabase.close()
+else:
+	CleanOutputPurchase.close()
+if line[Phone] != '':
+	CleanOutputPhones.close()
 # ---------------------------------------------

@@ -1,18 +1,21 @@
 #!/usr/bin/env python
-# ---------------------------------------------
 from __future__ import division, print_function
 import csv, os, glob
 from tqdm import tqdm
 # ---------------------------------------------
+os.chdir('../../../../Desktop/')
+# ---------------------------------------------
 CSVFilesHaveHeaderRow = True
 FirstFileUseHeaderRow = True
 # ---------------------------------------------
-os.chdir('../../../../Desktop/')
 CSVFiles = glob.glob('*.csv')
-OutputClean = csv.writer(open('__MergeFile.csv','ab'))
+# ---------------------------------------------
+Merge = open('__MergeFile.csv','ab')
+OutputClean = csv.writer(Merge)
 # ---------------------------------------------
 for line in CSVFiles:
-	Input = csv.reader(open(line,'rU'))
+	File = open(line,'rU')
+	Input = csv.reader(File)
 	if FirstFileUseHeaderRow == True:
 		for line in tqdm(Input):
 			OutputClean.writerow(line)
@@ -24,3 +27,7 @@ for line in CSVFiles:
 				FirstLine = False
 			else:
 				OutputClean.writerow(line)
+
+Merge.close()
+File.close()
+# ---------------------------------------------
