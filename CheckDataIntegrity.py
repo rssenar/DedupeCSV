@@ -61,4 +61,4 @@ Percentage = Counter/TotalRows*100
 if Percentage == 100:
 	print(str(Percentage) + "%" + " Matches - OK!")
 else:
-	print(str(Percentage) + "%" + " Matches - !!WARNING!! -- !!WARNING!! -- !!WARNING!!")
+	print(str(Percentage) + "%" + " Matches - !!!!!!!!!!!WARNING!!!!!!!!!!!!")

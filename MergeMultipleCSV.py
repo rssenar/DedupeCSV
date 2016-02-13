@@ -10,7 +10,7 @@ FirstFileUseHeaderRow = True
 # ---------------------------------------------
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
-Merge = open('__MergeFile.csv','ab')
+Merge = open('_MergeFile.csv','ab')
 OutputClean = csv.writer(Merge)
 # ---------------------------------------------
 for line in CSVFiles:
@@ -27,7 +27,5 @@ for line in CSVFiles:
 				FirstLine = False
 			else:
 				OutputClean.writerow(line)
-
 Merge.close()
 File.close()
-# ---------------------------------------------

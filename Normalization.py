@@ -5,6 +5,7 @@ Import required modules
 '''
 from __future__ import division, print_function
 import csv, os
+import pandas as pd
 from geopy.distance import vincenty
 from dateutil.parser import *
 from datetime import *
@@ -21,6 +22,7 @@ PurchaseHeader =  True
 PurchaseFirstLine = True
 PhonesHeader =  True
 PhonesFirstLine = True
+ValidateDupesExists = False
 # ---------------------------------------------
 ZipCoordFile = "../_Resources/US_ZIP_Coordinates.csv"
 YearDecodeFile = "../_Resources/Year_Decode.csv"
@@ -33,11 +35,11 @@ SuppressionFileName = raw_input("Enter Suppression Name : ")
 SuppressionFile = "../../../../Desktop/" + SuppressionFileName + ".csv"
 CentralZip = raw_input("Enter Central ZIP codes: ")
 # ---------------------------------------------
-CleanOutput = "../../../../Desktop/" + "__" + InputFileName + "_CleanOutputMAIN.csv"
+CleanOutput = "../../../../Desktop/" + "__" + InputFileName + " OutputMASTER.csv"
 CleanOutputDatabase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD DATA.csv"
 CleanOutputPurchase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD.csv"
 CleanOutputPhones = "../../../../Desktop/" + "_" + InputFileName + " PHONES.csv"
-Dupes = "../../../../Desktop/__DUPLICATES.csv" 
+Dupes = "../../../../Desktop/__MATCHES.csv" 
 # ---------------------------------------------
 '''
 Assign list numbers to variables for readability
@@ -175,14 +177,9 @@ CleanOutput = open(CleanOutput,'ab')
 OutputClean = csv.writer(CleanOutput)
 OutputClean.writerow(HeaderRow)
 # ---------------------------------------------
-Dupes = open(Dupes,'ab')
-OutDupes = csv.writer(Dupes)
-OutDupes.writerow(HeaderRow)
-# ---------------------------------------------
-# CleanOutputDatabase = open(CleanOutputDatabase,'ab')
-# CleanOutputPurchase = open(CleanOutputPurchase,'ab')
-# CleanOutputPhones = open(CleanOutputPhones,'ab')
 # Dupes = open(Dupes,'ab')
+# OutDupes = csv.writer(Dupes)
+# OutDupes.writerow(HeaderRow)
 # ---------------------------------------------
 '''
 Add SPECIFIC Suppression File values (If Specified) into the entries set for the purposes of de-duping
@@ -326,7 +323,6 @@ def SetVINLen():
 		line[VIN] = ""
 	else:
 		line[VIN] = str.upper(line[VIN])
-
 ''' 
 Fuction normalizes the date column
 '''
@@ -414,6 +410,8 @@ Function checks for dupes based on: OPHH = One Record Per House Hold,
 OPP = One Record Per Person or VIN = Vin#
 '''
 def CheckDupeCriteriaThenOutput(): 
+	global Dupes
+	global OutDupes
 	key = (line[AddressComb],line[Zip])
 	# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
 	# key = (line[VIN])
@@ -421,6 +419,10 @@ def CheckDupeCriteriaThenOutput():
 		Entries.add(key)
 		OutputClean.writerow(line)
 	else:
+		ValidateDupesExists = True
+		Dupes = open(Dupes,'ab')
+		OutDupes = csv.writer(Dupes)
+		OutDupes.writerow(HeaderRow)
 		OutDupes.writerow(line)
 '''
 Function outputs processed Database, Purchase & Dupes Files
@@ -508,7 +510,6 @@ def CreateDatabasePurchaseOutput():
 				line[WinningNum],\
 				line[DropVal]\
 				))
-
 '''
 Function outputs Phone List File
 '''
@@ -541,7 +542,6 @@ def ExtractPhonesList():
 				line[State],\
 				line[Zip]\
 				))
-
 # ---------------------------------------------
 # Main Program
 # ---------------------------------------------
@@ -578,7 +578,8 @@ Close all opened objects
 InputFile.close()
 CleanOutput.close()
 GenSuppressionFile.close()
-Dupes.close()
+if ValidateDupesExists is True:
+	Dupes.close()
 if line[DSF_WALK_SEQ] == '':
 	CleanOutputDatabase.close()
 else:
