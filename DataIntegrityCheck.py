@@ -9,9 +9,6 @@ CSVFilesHaveHeaderRow = True
 os.chdir('../../../../Desktop/')
 Entries = set()
 # ---------------------------------------------
-# InputFile = raw_input("Input File Name : ") + ".csv"
-# DatabaseFile = raw_input("Database File : ") + ".csv"
-# PurchaseFile = raw_input("Purchase File : ") + ".csv"
 InputFile = "a.csv"
 DatabaseFile = "b.csv"
 PurchaseFile = "c.csv"
