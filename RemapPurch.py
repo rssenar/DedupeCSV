@@ -54,6 +54,7 @@ Output.writerow(HeaderRow)
 for FileName in CSVFiles:
 	InputFile = open(FileName,'rU')
 	Input = csv.reader(InputFile)
+
 FirstLine = True
 for line in tqdm(Input):
 	if CSVFilesHaveHeaderRow and FirstLine:

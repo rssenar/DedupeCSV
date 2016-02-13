@@ -19,7 +19,7 @@ HeaderRow = [\
 	'Zip',\
 	]
 # ---------------------------------------------
-def EblastConversion():
+def PURLConversion():
 	global FirstTime
 	global FirstLine
 	global HeaderURL
@@ -60,10 +60,6 @@ def EblastConversion():
 					line[6]\
 					))
 # ---------------------------------------------
-# for FileName in CSVFiles:
-# 	InputFile = open(FileName,'rU')
-# 	Input = csv.reader(InputFile)
-# ---------------------------------------------
 for index in range(0,len(CSVFiles)):
 	FirstTime = True
 	FirstLine = True
@@ -74,7 +70,7 @@ for index in range(0,len(CSVFiles)):
 	Output = csv.writer(OutputFile)
 	Output.writerow(HeaderRow)
 	# ---------------------------------------------
-	EblastConversion()
+	PURLConversion()
 # ---------------------------------------------
 OutputFile.close()
 InputFile.close()

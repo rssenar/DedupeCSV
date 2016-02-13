@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # ---------------------------------------------
-# Imported Modules
 from __future__ import division, print_function
 import csv, os
 import pandas as pd
