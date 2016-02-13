@@ -27,5 +27,7 @@ for line in CSVFiles:
 				FirstLine = False
 			else:
 				OutputClean.writerow(line)
+# ---------------------------------------------
 Merge.close()
 File.close()
+# ---------------------------------------------
