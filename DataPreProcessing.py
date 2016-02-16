@@ -15,7 +15,7 @@ PurchaseHeader =  True
 PurchaseFirstLine = True
 PhonesHeader =  True
 PhonesFirstLine = True
-ValidateDupesExists = False
+DupesFirstTime = True
 # ---------------------------------------------
 ZipCoordFile = "../_Resources/US_ZIP_Coordinates.csv"
 YearDecodeFile = "../_Resources/Year_Decode.csv"
@@ -32,7 +32,7 @@ CleanOutput = "../../../../Desktop/" + "__" + InputFileName + " OutputMASTER.csv
 CleanOutputDatabase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD DATA.csv"
 CleanOutputPurchase = "../../../../Desktop/" + "_" + InputFileName + " UPLOAD.csv"
 CleanOutputPhones = "../../../../Desktop/" + "_" + InputFileName + " PHONES.csv"
-Dupes = "../../../../Desktop/__MATCHES.csv" 
+Dupes = "../../../../Desktop/__DUPES.csv" 
 # ---------------------------------------------
 # Assign Variables For Readability
 CustomerID = 0
@@ -364,6 +364,7 @@ def CheckBlitzDNQ():
 def CheckDupeCriteriaThenOutput(): 
 	global Dupes
 	global OutDupes
+	global DupesFirstTime
 	key = (line[AddressComb],line[Zip])
 	# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
 	# key = (line[VIN])
@@ -371,11 +372,14 @@ def CheckDupeCriteriaThenOutput():
 		Entries.add(key)
 		OutputClean.writerow(line)
 	else:
-		ValidateDupesExists = True
-		Dupes = open(Dupes,'ab')
-		OutDupes = csv.writer(Dupes)
-		OutDupes.writerow(HeaderRow)
-		OutDupes.writerow(line)
+		if DupesFirstTime is True:
+			Dupes = open(Dupes,'ab')
+			OutDupes = csv.writer(Dupes)
+			OutDupes.writerow(HeaderRow)
+			OutDupes.writerow(line)
+			DupesFirstTime = False
+		else:
+			OutDupes.writerow(line)
 
 # Output Processed Database, Purchase & Duplicate Files
 def CreateDatabasePurchaseOutput():
@@ -521,7 +525,7 @@ for line in tqdm(Input):
 InputFile.close()
 CleanOutput.close()
 GenSuppressionFile.close()
-if ValidateDupesExists is True:
+if DupesFirstTime is False:
 	Dupes.close()
 if line[DSF_WALK_SEQ] == '':
 	CleanOutputDatabase.close()
