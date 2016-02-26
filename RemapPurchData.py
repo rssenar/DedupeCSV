@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -55,7 +56,6 @@ Output.writerow(HeaderRow)
 for FileName in CSVFiles:
 	InputFile = open(FileName,'rU')
 	Input = csv.reader(InputFile)
-
 FirstLine = True
 for line in tqdm(Input):
 	if CSVFilesHaveHeaderRow and FirstLine:

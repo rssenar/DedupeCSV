@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -8,13 +9,13 @@ from tqdm import tqdm
 CSVFilesHaveHeaderRow = True
 Message1 = 'OK'
 Message2 = '''
-oooooooooooo                                      .o.      oooooooooooo                                      .o. 
-`888'     `8                                      888      `888'     `8                                      888 
- 888         oooo d8b oooo d8b  .ooooo.  oooo d8b 888       888         oooo d8b oooo d8b  .ooooo.  oooo d8b 888 
- 888oooo8    `888""8P `888""8P d88' `88b `888""8P Y8P       888oooo8    `888""8P `888""8P d88' `88b `888""8P Y8P 
- 888    "     888      888     888   888  888     `8'       888    "     888      888     888   888  888     `8' 
- 888       o  888      888     888   888  888     .o.       888       o  888      888     888   888  888     .o. 
-o888ooooood8 d888b    d888b    `Y8bod8P' d888b    Y8P      o888ooooood8 d888b    d888b    `Y8bod8P' d888b    Y8P 
+oooooooooooo                                      .o.
+`888'     `8                                      888
+ 888         oooo d8b oooo d8b  .ooooo.  oooo d8b 888
+ 888oooo8    `888""8P `888""8P d88' `88b `888""8P Y8P
+ 888    "     888      888     888   888  888     `8'
+ 888       o  888      888     888   888  888     .o.
+o888ooooood8 d888b    d888b    `Y8bod8P' d888b    Y8P
 '''
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
