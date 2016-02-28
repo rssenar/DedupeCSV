@@ -31,9 +31,7 @@ def PURLConversion():
 			FirstLine = False
 		else:
 			if FirstTime is True:
-				PURL = 'http://' + line[0]
-				F_PURL = requests.get(PURL)
-				F_PURL = str(F_PURL.url) + '8'
+				F_PURL = str(requests.get('http://' + line[0])) + '8'
 				FName = line[1] + line[2]
 				URL = F_PURL.split(FName)
 				HeaderURL = URL[0]

@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
-import csv, os
+import csv, os, re
 import pandas as pd
 from geopy.distance import vincenty
 from dateutil.parser import *
@@ -514,6 +514,7 @@ FirstLine = True
 for line in tqdm(Input):
 	if CSVFilesHaveHeaderRow and FirstLine:
 		FirstLine = False
+		print(line)
 	else:
 		SetDropIndex()
 		SetCustomerID()
