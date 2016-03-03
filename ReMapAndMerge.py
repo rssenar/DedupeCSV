@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -13,9 +12,8 @@ os.chdir('../../../../Desktop/')
 # ---------------------------------------------
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
-MergeInput = raw_input("Merge Files? [Y/N] : ")
+Selection = raw_input("Merge Files? [Y/N]: ")
 # ---------------------------------------------
-# Assign Variables For Readability
 CustomerID = 0
 FirstName = 1
 MI = 2
@@ -211,7 +209,7 @@ def MultiFileMarge():
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('_*.csv')
 	for line in CSVFiles:
-		with open(line,'rU') as File, open('_MergeFile.csv','ab') as Merge:
+		with open(line,'rU') as File, open('__MergeFile.csv','ab') as Merge:
 			File = open(line,'rU')
 			OutputClean = csv.writer(Merge)
 			Input = csv.reader(File)
@@ -229,5 +227,5 @@ def MultiFileMarge():
 # ---------------------------------------------
 ReMapHeaderFields()
 # ---------------------------------------------
-if MergeInput == 'Y' or MergeInput == 'y':
+if Selection == 'Y' or Selection == 'y':
 	MultiFileMarge()

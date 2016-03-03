@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -20,26 +19,31 @@ PurchaseFirstTimeN = True
 PhonesFirstTime = True
 DupesFirstTime = True
 # ---------------------------------------------
-ZipCoordFile = "../Dropbox/HUB/Projects/_Resources/US_ZIP_Coordinates.csv"
-YearDecodeFile = "../Dropbox/HUB/Projects/_Resources/Year_Decode.csv"
-GenSuppressionFile = "../Dropbox/HUB/Projects/_Resources/Gen_Suppression_File.csv"
-DropFile = "../Dropbox/HUB/Projects/_Resources/Drop_File.csv"
+ZipCoordFile = '../Dropbox/HUB/Projects/_Resources/US_ZIP_Coordinates.csv'
+YearDecodeFile = '../Dropbox/HUB/Projects/_Resources/Year_Decode.csv'
+GenSuppressionFile = '../Dropbox/HUB/Projects/_Resources/GEN_Suppression.csv'
+DropFile = '../Dropbox/HUB/Projects/_Resources/Drop_File.csv'
 # ---------------------------------------------
-IPFName = raw_input("Enter Name : ")
-InputFile = IPFName + ".csv"
-SuppressionFileName = raw_input("Enter Suppression Name : ")
-SuppressionFile = SuppressionFileName+".csv"
-CentralZip = raw_input("Enter Central ZIP codes: ")
-HRSelect = raw_input("ReMap Header Row? [Y/N]: ")
+IPFName = raw_input('Enter Name : ')
+InputFile = IPFName + '.csv'
+SuppressionFileName = raw_input('Enter Suppression Name : ')
+SuppressionFile = SuppressionFileName+'.csv'
+CentralZip = raw_input('Enter Central ZIP codes: ')
 # ---------------------------------------------
-ReMappedOutput = "___" + IPFName + "_ReMapped.csv"
-CleanOutput = "__" + IPFName + "_OutputMASTER.csv"
-CleanOutputDatabase = "_" + IPFName + "_UPLOAD DATA.csv"
-CleanOutputPurchase = "_" + IPFName + "_UPLOAD.csv"
-CleanOutputPurchaseP = "_" + IPFName + "_UPLOAD Penny.csv"
-CleanOutputPurchaseN = "_" + IPFName + "_UPLOAD Nickel.csv"
-CleanOutputPhones = "_" + IPFName + "_PHONES.csv"
-Dupes = "__DUPES.csv" 
+HRSelect = raw_input('ReMap Header Row? [Y/N]: ')
+while HRSelect != 'Y' and HRSelect != 'y' and \
+HRSelect != 'N' and HRSelect != 'n':
+	HRSelect = raw_input('ReMap Header Row? [Y/N]: ')
+# ---------------------------------------------
+ReMappedOutput = '___'+IPFName+'_ReMapped.csv'
+CleanOutput = '__'+IPFName+'_OutputMASTER.csv'
+CleanOutputPD = '__'+IPFName+'_OutputMASTER.csv'
+Dupes = '__DUPES.csv'
+CleanOutputDatabase = '_'+IPFName+'_UPLOAD DATA.csv'
+CleanOutputPurchase = '_'+IPFName+'_UPLOAD.csv'
+CleanOutputPurchaseP = '_'+IPFName+'_UPLOAD Penny.csv'
+CleanOutputPurchaseN = '_'+IPFName+'_UPLOAD Nickel.csv'
+CleanOutputPhones = '_'+IPFName+'_PHONES.csv'
 # ---------------------------------------------
 # Assign Variables For Readability
 CustomerID = 0
@@ -128,9 +132,7 @@ SeqNum = 10000
 Entries = set()
 # ---------------------------------------------
 # Import LOCAL Suppression File for the purposes of de-duping
-if SuppressionFileName == "":
-	pass
-else:
+if SuppressionFileName != '':
 	with open(SuppressionFile,'rU') as SuppressionFile:
 		Suppression = csv.reader(SuppressionFile)
 		FirstLine = True
@@ -271,7 +273,6 @@ def ReMapHeaderFields():
 			HeaderDict[Misc2] = 'line['+str(i)+']' 
 		elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 			HeaderDict[Misc3] = 'line['+str(i)+']'
-
 	global i
 	global x
 	global InputFile
@@ -326,22 +327,26 @@ def ZipPlus4Split():
 		FullZip = line[Zip].split('-')
 		line[Zip] = FullZip[0]
 		line[Zip4] = FullZip[1]
-
+		
 # Function Calculates Radius Based on the Central Zip
 def CalculateRadiusfromCentralZip():
 	if CentralZip in ZipCoordinateDict:
 		OriginZipCoord = ZipCoordinateDict[CentralZip]
 	else:
 		OriginZipCoord = 0
+	
+	if int(line[Zip][:1]) == 0:
+		line[Zip] = line[Zip][-4:]
+	
 	if line[Zip] in ZipCoordinateDict:
 		TargetZipCoord = ZipCoordinateDict[line[Zip]]
 		line[Coordinates] = TargetZipCoord
 	else:
-		TargetZipCoord = 0
+		TargetZipCoord = 0	
 	if OriginZipCoord == 0 or TargetZipCoord == 0:
-		line[Radius] = "n/a"
+		line[Radius] = 'n/a'
 	else:
-		line[Radius] = (float(vincenty(OriginZipCoord, TargetZipCoord).miles))
+		line[Radius] = (float(vincenty(OriginZipCoord,TargetZipCoord).miles))
 		
 # Select usable phone
 def AssignPhone():
@@ -417,8 +422,8 @@ def SetWinningNum():
 
 # Combines values - Address1 & Address2
 def CombineAddress(): 
-	if line[AddressComb] == "":
-		if line[Address2] == "":
+	if line[AddressComb] == '':
+		if line[Address2] == '':
 			line[AddressComb] = line[Address1] 
 		else:
 			line[AddressComb] = line[Address1] + ' ' + line[Address2]
@@ -439,19 +444,22 @@ def SetZipCrrt():
 	if line[Zip] == '' or line[CRRT] == '':
 		line[ZipCRRT] = ''
 	else:
-		line[ZipCRRT] = line[Zip] + line[CRRT] 
+		if len(line[Zip]) < 5:
+			line[ZipCRRT] = '0' + line[Zip] + line[CRRT]
+		else:
+			line[ZipCRRT] = line[Zip] + line[CRRT]
 
 # Assign 'dnq' to records that dont qualify for mail
 def CheckMailDNQ():
-	if line[FirstName] == "" or line[LastName] == "":
-		line[MailDNQ] = "dnq"
+	if line[FirstName] == '' or line[LastName] == '':
+		line[MailDNQ] = 'dnq'
 	else:
 		line[MailDNQ] = "" 
 
 # Assign 'dnq' to records that dont qualify for phone blitz
 def CheckBlitzDNQ():
 	if len(line[Phone]) < 8 or len(line[VIN]) < 17: 
-		line[BlitzDNQ] = "dnq"
+		line[BlitzDNQ] = 'dnq'
 	else:
 		line[BlitzDNQ] = ""
 
@@ -647,6 +655,7 @@ if HRSelect == 'Y' or HRSelect == 'y':
 	ReMapHeaderFields()
 else:
 	Selection = InputFile
+
 with open(Selection,'rU') as InputFile:
 	Input = csv.reader(InputFile)
 	FirstLine = True
@@ -690,3 +699,6 @@ else:
 if line[Phone] != '':
 	CleanOutputPhones.close()
 # ---------------------------------------------
+ProcDataFrame = pd.read_csv(CleanOutputPD, low_memory=False)
+DF = ProcDataFrame.loc[:,['Year','Radius']]
+print(DF.shape)
