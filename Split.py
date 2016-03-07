@@ -6,6 +6,15 @@ import csv, os, glob, re
 from tqdm import tqdm
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
+
+CSVFilesHaveHeaderRow = True
+CleanOutputFirstTime = True
+DatabaseFirstTime = True
+PurchaseFirstTime = True
+PurchaseFirstTimeP = True
+PurchaseFirstTimeN = True
+PhonesFirstTime = True
+DupesFirstTime = True
 # ---------------------------------------------
 CSVFilesHaveHeaderRow = True
 # ---------------------------------------------
@@ -206,28 +215,115 @@ def ReMapHeaderFields():
 							newline.append('')
 					Output.writerow(newline)
 
-def MultiFileMarge():
+def Split():
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('__*.csv')
-	for line in CSVFiles:
-		with open(line,'rU') as File, open('___MergeFile.csv','ab') as Merge:
-			File = open(line,'rU')
-			OutputClean = csv.writer(Merge)
-			Input = csv.reader(File)
-			if FirstFileUseHeaderRow:
-				for line in tqdm(Input):
-					OutputClean.writerow(line)
-				FirstFileUseHeaderRow = False
+	for Files in CSVFiles:
+		for line in Files:
+			HeaderRowDatabase = [\
+				'Customer ID',\
+				'First Name',\
+				'Last Name',\
+				'Address',\
+				'City',\
+				'State',\
+				'Zip',\
+				'Phone',\
+				'Year',\
+				'Make',\
+				'Model',\
+				#'Buyback Value',\
+				'Winning Number',\
+				'Drop'\
+				]
+			HeaderRowPurchase = [\
+				'Customer ID',\
+				'First Name',\
+				'Last Name',\
+				'Address',\
+				'City',\
+				'State',\
+				'Zip',\
+				'4Zip',\
+				'DSF_WALK_SEQ',\
+				#'Phone',\
+				'Crrt',\
+				'Winning Number',\
+				'Drop'\
+				]
+			DatabaseOutputHeader = (\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Phone],\
+				line[Year],\
+				line[Make],\
+				line[Model],\
+				#line[BuybackValues],\
+				line[WinningNum],\
+				line[DropVal]\
+				)
+			PurchaseOutputHeader = (\
+				line[CustomerID],\
+				line[FirstName],\
+				line[LastName],\
+				line[AddressComb],\
+				line[City],\
+				line[State],\
+				line[Zip],\
+				line[Zip4],\
+				line[DSF_WALK_SEQ],\
+				#line[Phone],\
+				line[CRRT],\
+				line[WinningNum],\
+				line[DropVal]\
+				)
+		
+			global PurchaseFirstTimeP
+			global PurchaseFirstTimeN
+			global PurchaseFirstTime
+			global CleanOutputPurchaseP
+			global CleanOutputPurchaseN
+			global CleanOutputPurchase
+					
+			if (line[CustomerID])[:1] == 'p' or (line[CustomerID])[:1] == 'P': 
+				if PurchaseFirstTimeP:
+					CleanOutputPurchaseP = open('Penny_' + str(Files),'ab')
+					OutputCleanPurchaseP = csv.writer(CleanOutputPurchaseP)
+					OutputCleanPurchaseP.writerow(HeaderRowPurchase)
+					OutputCleanPurchaseP.writerow(PurchaseOutputHeader)
+					PurchaseFirstTimeP = False
+				else:
+					OutputCleanPurchaseP = csv.writer(CleanOutputPurchaseP)
+					OutputCleanPurchaseP.writerow(PurchaseOutputHeader)
+			elif (line[CustomerID])[:1] == 'n' or (line[CustomerID])[:1] == 'N': 
+				if PurchaseFirstTimeN:
+					CleanOutputPurchaseN = open('Nikel_' + str(Files),'ab')
+					OutputCleanPurchaseN = csv.writer(CleanOutputPurchaseN)
+					OutputCleanPurchaseN.writerow(HeaderRowPurchase)
+					OutputCleanPurchaseN.writerow(PurchaseOutputHeader)
+					PurchaseFirstTimeN = False
+				else:
+					OutputCleanPurchaseN = csv.writer(CleanOutputPurchaseN)
+					OutputCleanPurchaseN.writerow(PurchaseOutputHeader)
 			else:
-				FirstLine = True
-				for line in tqdm(Input):
-					if CSVFilesHaveHeaderRow and FirstLine:
-						FirstLine = False
-					else:
-						OutputClean.writerow(line)
+				if PurchaseFirstTime:
+					CleanOutputPurchase = open(Files,'ab')
+					OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+					OutputCleanPurchase.writerow(HeaderRowPurchase)
+					OutputCleanPurchase.writerow(PurchaseOutputHeader)
+					PurchaseFirstTime = False
+				else:
+					OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+					OutputCleanPurchase.writerow(PurchaseOutputHeader)
+
 # ---------------------------------------------
 ReMapHeaderFields()
-MultiFileMarge()
+Split()
 # ---------------------------------------------
 
 

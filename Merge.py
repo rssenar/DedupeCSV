@@ -2,17 +2,23 @@
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
-import csv, os, glob
+import csv, os, glob, re
 from tqdm import tqdm
 # ---------------------------------------------
+CSVFilesHaveHeaderRow = True
+FirstTime = True
+NewHeaderRowFirstTime = True
+# ---------------------------------------------
 os.chdir('../../../../Desktop/')
+# ---------------------------------------------
+CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
 def MultiFileMarge():
 	CSVFilesHaveHeaderRow = True
 	FirstFileUseHeaderRow = True
-	CSVFiles = glob.glob('_*.csv')
+	CSVFiles = glob.glob('*.csv')
 	for line in CSVFiles:
-		with open(line,'rU') as File, open('_MergeFile.csv','ab') as Merge:
+		with open(line,'rU') as File, open('___MergedFile.csv','ab') as Merge:
 			File = open(line,'rU')
 			OutputClean = csv.writer(Merge)
 			Input = csv.reader(File)
@@ -30,3 +36,5 @@ def MultiFileMarge():
 # ---------------------------------------------
 MultiFileMarge()
 # ---------------------------------------------
+
+
