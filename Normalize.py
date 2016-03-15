@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -8,8 +7,11 @@ from geopy.distance import vincenty
 from dateutil.parser import *
 from datetime import *
 from tqdm import tqdm
+from nameparser import HumanName
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
+# ---------------------------------------------
+HRSelect = 'Y'
 # ---------------------------------------------
 CSVFilesHaveHeaderRow = True
 CleanOutputFirstTime = True
@@ -24,20 +26,24 @@ AppendFirstTime = True
 AppendFirstTimeP = True
 AppendFirstTimeN = True
 MDNQFirstTime = True
+MonthlySuppressionFirstTime = True
 # ---------------------------------------------
 ZipCoordFile = '../Dropbox/HUB/Projects/_Resources/US_ZIP_Coordinates.csv'
 YearDecodeFile = '../Dropbox/HUB/Projects/_Resources/Year_Decode.csv'
 GenSuppressionFile = '../Dropbox/HUB/Projects/_Resources/GEN_Suppression.csv'
+MonthlySuppressionFile = '../Dropbox/HUB/Projects/_Resources/Monthly_Suppression.csv'
 DropFile = '../Dropbox/HUB/Projects/_Resources/Drop_File.csv'
 # ---------------------------------------------
 WinningNumber = 40754
+# ---------------------------------------------
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
 SeqNumPurchase = 50000
 Entries = set()
+DoNotMailFile = set()
 # ---------------------------------------------
-IPFName = raw_input('Enter Name : ')
+IPFName = raw_input('File Name : ')
 InputFile = IPFName + '.csv'
 # ---------------------------------------------
 # Import Zip Dictionary from US_ZIP_Coordinates.csv file
@@ -74,6 +80,16 @@ with open(GenSuppressionFile,'rU') as GenSuppressionFile:
 		else:
 			Entries.add((str.title(line[2]),str.title(line[5])))
 # ---------------------------------------------
+# Import Montly Suppression File for the purposes of de-duping
+with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
+	MonthlySuppression = csv.reader(MonthlySuppressionFile)
+	FirstLine = True
+	for line in MonthlySuppression:
+		if CSVFilesHaveHeaderRow and FirstLine:
+			FirstLine = False
+		else:
+			Entries.add((str.title(line[2]),str.title(line[5])))
+# ---------------------------------------------
 # Import Drop Dictionary from Drop_File.csv file
 DropDict = {}
 with open(DropFile,'rU') as DropFile:
@@ -100,10 +116,7 @@ CentralZip = raw_input('Enter Central ZIP codes: ')
 while CentralZip not in ZipCoordinateDict:
 	CentralZip = raw_input('Invalid Zip code, Enter Central ZIP Codes: ')
 # ---------------------------------------------
-HRSelect = raw_input('Re-Map Header Row? [Y/N]: ')
-while HRSelect != 'Y' and HRSelect != 'y' and \
-HRSelect != 'N' and HRSelect != 'n':
-	HRSelect = raw_input('Invalid entry, Re-Map Header Row? [Y/N]: ')
+MaxRadius = int(raw_input('Set Max Radius: '))
 # ---------------------------------------------
 CleanOutput = IPFName + '_OutputMASTER.csv'
 CleanOutputPD = IPFName + '_OutputMASTER.csv'
@@ -118,55 +131,61 @@ CleanOutputPurchaseR = '<< ' + IPFName + '_Other.csv'
 # ---------------------------------------------
 CleanOutputDatabase = IPFName + '_UPLOAD-DATA.csv'
 CleanOutputPurchaseAll = IPFName + '_UPLOAD.csv'
-CleanOutputAppend = IPFName + '_MAIN List.csv'
+# ---------------------------------------------
+CleanOutputAppend = IPFName + '_OTHER List.csv'
 CleanOutputAppendP = IPFName + '_PENNY List.csv'
 CleanOutputAppendN = IPFName + '_NICKEL List.csv'
+# ---------------------------------------------
+AppendMonthlySuppFile = IPFName + '_Append to Monthly Suppression List.csv'
+# ---------------------------------------------
 CleanOutputPhones = IPFName + '_PHONES List.csv'
 # ---------------------------------------------
 # Assign Variables For Readability
 CustomerID = 0
-FirstName = 1
-MI = 2
-LastName = 3
-Address1 = 4
-Address2 = 5
-AddressComb = 6
-City = 7
-State = 8
-Zip = 9
-Zip4 = 10
-SCF = 11
-Phone = 12
-HPhone = 13
-WPhone = 14
-MPhone = 15
-Email = 16
-VIN = 17
-Year = 18
-Make = 19
-Model = 20
-DelDate = 21
-Date = 22
-Radius = 23
-Coordinates = 24
-VINLen = 25
-DSF_WALK_SEQ = 26
-CRRT = 27
-ZipCRRT = 28
-KBB = 29
-BuybackValues = 30
-WinningNum = 31
-MailDNQ = 32
-BlitzDNQ = 33
-DropVal = 34
-PURL = 35
-Misc1 = 36
-Misc2 = 37
-Misc3 = 38
+FullName = 1
+FirstName = 2
+MI = 3
+LastName = 4
+Address1 = 5
+Address2 = 6
+AddressComb = 7
+City = 8
+State = 9
+Zip = 10
+Zip4 = 11
+SCF = 12
+Phone = 13
+HPhone = 14
+WPhone = 15
+MPhone = 16
+Email = 17
+VIN = 18
+Year = 19
+Make = 20
+Model = 21
+DelDate = 22
+Date = 23
+Radius = 24
+Coordinates = 25
+VINLen = 26
+DSF_WALK_SEQ = 27
+CRRT = 28
+ZipCRRT = 29
+KBB = 30
+BuybackValues = 31
+WinningNum = 32
+MailDNQ = 33
+BlitzDNQ = 34
+DropVal = 35
+PURL = 36
+Misc1 = 37
+Misc2 = 38
+Misc3 = 39
 
 # Assign Column Names To Header Output Files
 HeaderRow = [\
 	'Customer ID',\
+	'FullName',\
 	'First Name',\
 	'MI',\
 	'Last Name',\
@@ -213,6 +232,8 @@ def ReMapHeaderFields():
 	def match(field):
 		if bool(re.search('cus.+id',field,flags=re.I)):
 			HeaderDict[CustomerID] = 'line['+str(i)+']'
+		elif bool(re.search('ful.+me',field,flags=re.I)):
+			HeaderDict[FullName] = 'line['+str(i)+']'		
 		elif bool(re.search('fir.+me',field,flags=re.I)):
 			HeaderDict[FirstName] = 'line['+str(i)+']'
 		elif bool(re.search(r'\bmi\b',field,flags=re.I)) or\
@@ -322,6 +343,12 @@ def ReMapHeaderFields():
 						newline.append('')
 				Output.writerow(newline)
 
+def FullNameParser():
+	ParsedFName = HumanName(str.title(line[FullName]))
+	line[FirstName] = ParsedFName.first.encode('utf-8')
+	line[MI] = ParsedFName.middle.encode('utf-8')
+	line[LastName] = ParsedFName.last.encode('utf-8')
+
 # Function sets Customer ID Sequence Number
 def SetCustomerID():
 	if line[DSF_WALK_SEQ] == '':
@@ -402,6 +429,7 @@ def YearDecode():
 
 # Sets Field Case
 def SetCase():
+	line[FullName] = str.title(line[FullName]) 
 	line[FirstName] = str.title(line[FirstName]) 
 	if len(line[MI]) == 1:
 		line[MI] = str.upper(line[MI]) 
@@ -450,9 +478,10 @@ def SetWinningNum():
 def CombineAddress(): 
 	if line[AddressComb] == '':
 		if line[Address2] == '':
-			line[AddressComb] = line[Address1] 
+			line[AddressComb] = str.title(line[Address1]) 
 		else:
-			line[AddressComb] = line[Address1] + ' ' + line[Address2]
+			line[AddressComb] = str.title(line[Address1]) + ' ' + \
+			str.title(line[Address2])
 	else:
 		line[AddressComb] = str.title(line[AddressComb]) 
 
@@ -474,13 +503,6 @@ def SetZipCrrt():
 			line[ZipCRRT] = '0' + line[Zip] + line[CRRT]
 		else:
 			line[ZipCRRT] = line[Zip] + line[CRRT]
-
-# Assign 'dnq' to records that dont qualify for mail
-def CheckMailDNQ():
-	if line[FirstName] == '' or line[LastName] == '':
-		line[MailDNQ] = 'dnq'
-	else:
-		line[MailDNQ] = "" 
 
 # Assign 'dnq' to records that dont qualify for phone blitz
 def CheckBlitzDNQ():
@@ -507,9 +529,105 @@ def CheckDupesAndMailQualification():
 	# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
 	# key = (line[VIN])
 	# -------------------------
+	DoNotMailFile = (\
+		'inc',\
+		'inc.',\
+		'incorporated',\
+		'international',\
+		'corporation',\
+		'corp',\
+		'corp.',\
+		'construction',\
+		'const',\
+		'const.',\
+		'prof',\
+		'prof.',\
+		'professional',\
+		'service',\
+		'services',\
+		'consultancy',\
+		'consultant',\
+		'consultants',\
+		'living',\
+		'trust',\
+		'llc',\
+		'enterprise',\
+		'enterprises',\
+		'infrastructure',\
+		'the',\
+		'resource',\
+		'resources',\
+		'cooperative',\
+		'cooperatives',\
+		'comp',\
+		'company',\
+		'companies',\
+		'store',\
+		'dealer',\
+		'dealers',\
+		'dealership',\
+		'dealerships',\
+		'fleet',\
+		'office',\
+		'station',\
+		'health',\
+		'acura',\
+		'am general',\
+		'audi',\
+		'bmw',\
+		'buick',\
+		'cadillac',\
+		'chevrolet',\
+		'chrysler',\
+		'daewoo',\
+		'dodge',\
+		'ferrari',\
+		'fiat',\
+		'gmc',\
+		'honda',\
+		'hummer',\
+		'hyundai',\
+		'infiniti',\
+		'isuzu',\
+		'jaguar',\
+		'jeep',\
+		'kia',\
+		'land rover',\
+		'lexus',\
+		'lincoln',\
+		'maserati',\
+		'maybach',\
+		'mazda',\
+		'mercedes',\
+		'mercedes-benz',\
+		'mercury',\
+		'mini',\
+		'mitsubishi',\
+		'nissan',\
+		'oldsmobile',\
+		'plymouth',\
+		'pontiac',\
+		'porsche',\
+		'ram',\
+		'saab',\
+		'saturn',\
+		'scion',\
+		'smart',\
+		'subaru',\
+		'suzuki',\
+		'toyota',\
+		'volkswagen',\
+		'volvo',\
+		'auto',\
+		'automotive',\
+		'group')
+
 	if key not in Entries:
 		if line[FirstName] == '' or line[LastName] == '' or \
-		int(line[Radius]) >= 50:
+		str.lower(line[FirstName]) in DoNotMailFile or \
+		str.lower(line[MI]) in DoNotMailFile or \
+		str.lower(line[LastName]) in DoNotMailFile or \
+		int(line[Radius]) >= MaxRadius:
 			if MDNQFirstTime:
 				OutMDNQ = csv.writer(MDNQ)
 				OutMDNQ.writerow(HeaderRow)
@@ -554,7 +672,7 @@ def SecondaryOutputDatabase():
 		'Make',\
 		'Model',\
 		'Winning Number',\
-		'Drop'\
+		'Position'\
 		]
 	DatabaseOutputHeader = (\
 		line[CustomerID],\
@@ -596,7 +714,7 @@ def SecondaryOutputPurchase():
 		'DSF_WALK_SEQ',\
 		'Crrt',\
 		'Winning Number',\
-		'Drop'\
+		'Position'\
 		]
 	PurchaseOutputHeader = (\
 		line[CustomerID],\
@@ -651,7 +769,7 @@ def SecondaryOutputPurchase():
 		else:
 			OutputCleanPurchaseN = csv.writer(CleanOutputPurchaseN)
 			OutputCleanPurchaseN.writerow(PurchaseOutputHeader)
-	elif line[CustomerID][:1] == 'a' or (line[CustomerID])[:1] == 'A': 
+	else:
 		if PurchaseFirstTime:
 			CleanOutputPurchaseR = open(CleanOutputPurchaseR,'ab')
 			OutputCleanPurchaseR = csv.writer(CleanOutputPurchaseR)
@@ -675,7 +793,7 @@ def GenerateAppendOutput():
 		'Crrt',\
 		'DSF_WALK_SEQ',\
 		'Customer ID',\
-		'Drop'\
+		'Position'\
 		]
 	AppendOutputHeader = (\
 		line[PURL],\
@@ -697,6 +815,8 @@ def GenerateAppendOutput():
 	global CleanOutputAppendP
 	global CleanOutputAppendN
 	global CleanOutputAppend
+	global MonthlySuppressionFirstTime
+	global MonthlySuppression
 
 	if line[CustomerID][:1] == 'p' or line[CustomerID][:1] == 'P': 
 		if AppendFirstTimeP:
@@ -718,7 +838,7 @@ def GenerateAppendOutput():
 		else:
 			OutputCleanAppendN = csv.writer(CleanOutputAppendN)
 			OutputCleanAppendN.writerow(AppendOutputHeader)
-	elif line[CustomerID][:1] == 'a' or line[CustomerID][:1] == 'A': 
+	else: 
 		if AppendFirstTime:
 			CleanOutputAppend = open(CleanOutputAppend,'ab')
 			OutputCleanAppend = csv.writer(CleanOutputAppend)
@@ -739,9 +859,9 @@ def ExtractPhonesList():
 		'City',\
 		'State',\
 		'Zip',\
-		'Last Trade Year',\
-		'Last Trade Make',\
-		'Last Trade Model'\
+		'Last Veh Year',\
+		'Last Veh Make',\
+		'Last Veh Model'\
 		]
 	HeaderOutputPhones = (\
 		line[FirstName],\
@@ -757,7 +877,7 @@ def ExtractPhonesList():
 		)
 	global PhonesFirstTime
 	global CleanOutputPhones
-	if line[Phone] != '':
+	if line[Phone] != '' and line[FirstName] != '' and line[LastName] != '':
 		if PhonesFirstTime:
 			CleanOutputPhones = open(CleanOutputPhones,'ab')
 			OutputPhones = csv.writer(CleanOutputPhones)
@@ -767,6 +887,35 @@ def ExtractPhonesList():
 		else:
 			OutputPhones = csv.writer(CleanOutputPhones)
 			OutputPhones.writerow(HeaderOutputPhones)
+
+def AddMonthlySuppressionFile():
+	HeaderRow = [\
+		'First Name',\
+		'Last Name',\
+		'Address',\
+		'City',\
+		'State',\
+		'Zip',\
+		'Campaign Name'\
+		]
+	HeaderRowOutput = (\
+		line[FirstName],\
+		line[LastName],\
+		line[AddressComb],\
+		line[City],\
+		line[State],\
+		line[Zip],\
+		IPFName
+		)
+	global MonthlySuppressionFirstTime
+	if MonthlySuppressionFirstTime:
+		MonthlySupp = csv.writer(AppendMonthlySupp)
+		MonthlySupp.writerow(HeaderRow)
+		MonthlySupp.writerow(HeaderRowOutput)
+		MonthlySuppressionFirstTime = False
+	else:
+		MonthlySupp = csv.writer(AppendMonthlySupp)
+		MonthlySupp.writerow(HeaderRowOutput)
 # ---------------------------------------------
 # Main Program
 if HRSelect == 'Y' or HRSelect == 'y':
@@ -774,34 +923,38 @@ if HRSelect == 'Y' or HRSelect == 'y':
 	ReMapHeaderFields()
 else:
 	Selection = InputFile
-
-with open(Selection,'rU') as InputFile, open(CleanOutput,'ab') as CleanOutput,\
-open(Dupes,'ab') as Dupes, open(MDNQ,'ab') as MDNQ:
+# ---------------------------------------------
+with open(Selection,'rU') as InputFile,\
+open(CleanOutput,'ab') as CleanOutput,\
+open(Dupes,'ab') as Dupes,\
+open(MDNQ,'ab') as MDNQ,\
+open(AppendMonthlySuppFile,'ab') as AppendMonthlySupp:
 	Input = csv.reader(InputFile)
 	FirstLine = True
 	for line in tqdm(Input):
 		if CSVFilesHaveHeaderRow and FirstLine:
 			FirstLine = False
 		else:
+			if line[FullName] != '' and line[FirstName] == '' and line[LastName] == '':
+				FullNameParser()
+			ZipPlus4Split()
 			SetZipCrrt()
+			CombineAddress()
 			SetDropIndex()
 			if line[PURL] == '':
 				SetCustomerID()
 			AssignPhone()
 			ReformatPhones()
 			SetCase()
-			CombineAddress()
-			ZipPlus4Split()
 			CalculateRadiusfromCentralZip()
 			YearDecode()
 			SetVINLen()
 			SetDateFormat()
 			SetWinningNum()
 			SetSCF()
-			CheckMailDNQ()
 			CheckBlitzDNQ()
 			CheckDupesAndMailQualification()
-			if line[DSF_WALK_SEQ] == '':
+			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
 				SecondaryOutputDatabase()
 			else:
 				if line[PURL] == '':
@@ -809,16 +962,20 @@ open(Dupes,'ab') as Dupes, open(MDNQ,'ab') as MDNQ:
 				else:
 					GenerateAppendOutput()
 			ExtractPhonesList()
+			AddMonthlySuppressionFile()
+		# ---------------------------------------------
 		if line[DSF_WALK_SEQ] == '':
 			SeqNumDatabase+=1
-		elif line[DropVal] == 'p' or line[DropVal] == 'P':
+		elif line[DropVal] == 'p' or line[DropVal] == 'P' or \
+		line[DropVal] == 'penny' or line[DropVal] == 'Penny':
 			SeqNumPurchaseP+=1
-		elif line[DropVal] == 'n' or line[DropVal] == 'N':
+		elif line[DropVal] == 'n' or line[DropVal] == 'N' or \
+		line[DropVal] == 'nickel' or line[DropVal] == 'Nickel':
 			SeqNumPurchaseN+=1
 		else:
 			SeqNumPurchase+=1
 # ---------------------------------------------
-if line[DSF_WALK_SEQ] == '':
+if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
  	CleanOutputDatabase.close()
 elif (line[CustomerID])[:1] == 'p' or (line[CustomerID])[:1] == 'P':
 	if line[PURL] == '':
@@ -834,12 +991,14 @@ else:
 	if line[PURL] == '':
  		CleanOutputPurchaseR.close()
  	else:
-		CleanOutputAppend.close() 	
-if line[Phone] != '':
+		CleanOutputAppend.close()
+if line[Phone] != '' and line[FirstName] != '' and line[LastName] != '':
 	CleanOutputPhones.close()
 # ---------------------------------------------
-ProcDataFrame = pd.read_csv(CleanOutputPD, low_memory=False)
-DF = ProcDataFrame.loc[:,['Radius']]
-print(DF.describe())
+try:
+	ProcDataFrame = pd.read_csv(CleanOutputPD, low_memory=False)
+	DF = ProcDataFrame.loc[:,['Radius']]
+	print(DF.describe())	
+except:
+	print('OutputMASTER file is empty!')
 # ---------------------------------------------
-

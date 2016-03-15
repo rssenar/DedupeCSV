@@ -12,47 +12,49 @@ CSVFilesHaveHeaderRow = True
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
 CustomerID = 0
-FirstName = 1
-MI = 2
-LastName = 3
-Address1 = 4
-Address2 = 5
-AddressComb = 6
-City = 7
-State = 8
-Zip = 9
-Zip4 = 10
-SCF = 11
-Phone = 12
-HPhone = 13
-WPhone = 14
-MPhone = 15
-Email = 16
-VIN = 17
-Year = 18
-Make = 19
-Model = 20
-DelDate = 21
-Date = 22
-Radius = 23
-Coordinates = 24
-VINLen = 25
-DSF_WALK_SEQ = 26
-CRRT = 27
-ZipCRRT = 28
-KBB = 29
-BuybackValues = 30
-WinningNum = 31
-MailDNQ = 32
-BlitzDNQ = 33
-DropVal = 34
-PURL = 35
-Misc1 = 36
-Misc2 = 37
-Misc3 = 38
+FullName = 1
+FirstName = 2
+MI = 3
+LastName = 4
+Address1 = 5
+Address2 = 6
+AddressComb = 7
+City = 8
+State = 9
+Zip = 10
+Zip4 = 11
+SCF = 12
+Phone = 13
+HPhone = 14
+WPhone = 15
+MPhone = 16
+Email = 17
+VIN = 18
+Year = 19
+Make = 20
+Model = 21
+DelDate = 22
+Date = 23
+Radius = 24
+Coordinates = 25
+VINLen = 26
+DSF_WALK_SEQ = 27
+CRRT = 28
+ZipCRRT = 29
+KBB = 30
+BuybackValues = 31
+WinningNum = 32
+MailDNQ = 33
+BlitzDNQ = 34
+DropVal = 35
+PURL = 36
+Misc1 = 37
+Misc2 = 38
+Misc3 = 39
 
 HeaderRow = [\
 	'Customer ID',\
+	'FullName',\
 	'First Name',\
 	'MI',\
 	'Last Name',\
@@ -99,6 +101,8 @@ def ReMapHeaderFields():
 	def match(field):
 		if bool(re.search('cus.+id',field,flags=re.I)):
 			HeaderDict[CustomerID] = 'line['+str(i)+']'
+		elif bool(re.search('ful.+me',field,flags=re.I)):
+			HeaderDict[FullName] = 'line['+str(i)+']'		
 		elif bool(re.search('fir.+me',field,flags=re.I)):
 			HeaderDict[FirstName] = 'line['+str(i)+']'
 		elif bool(re.search(r'\bmi\b',field,flags=re.I)) or\
@@ -229,5 +233,3 @@ def MultiFileMarge():
 ReMapHeaderFields()
 MultiFileMarge()
 # ---------------------------------------------
-
-
