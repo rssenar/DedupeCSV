@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # ---------------------------------------------
 from __future__ import division, print_function
@@ -48,9 +47,10 @@ MailDNQ = 33
 BlitzDNQ = 34
 DropVal = 35
 PURL = 36
-Misc1 = 37
-Misc2 = 38
-Misc3 = 39
+YrDec = 37
+Misc1 = 38
+Misc2 = 39
+Misc3 = 40
 
 HeaderRow = [\
 	'Customer ID',\
@@ -90,6 +90,7 @@ HeaderRow = [\
 	'Blitz DNQ',\
 	'Drop',\
 	'PURL',\
+	'YrDec',\
 	'Misc1',\
 	'Misc2',\
 	'Misc3'\
@@ -181,6 +182,8 @@ def ReMapHeaderFields():
 			HeaderDict[DropVal] = 'line['+str(i)+']' 
 		elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
 			HeaderDict[PURL] = 'line['+str(i)+']'
+		elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
+			HeaderDict[YearDec] = 'line['+str(i)+']'
 		elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
 			HeaderDict[Misc1] = 'line['+str(i)+']' 
 		elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
@@ -214,7 +217,8 @@ def MultiFileMarge():
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('__*.csv')
 	for line in CSVFiles:
-		with open(line,'rU') as File, open('___MergeFile.csv','ab') as Merge:
+		with open(line,'rU') as File,\
+		open('___MergeFile.csv','ab') as Merge:
 			File = open(line,'rU')
 			OutputClean = csv.writer(Merge)
 			Input = csv.reader(File)
