@@ -10,45 +10,29 @@ from tqdm import tqdm
 from nameparser import HumanName
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
-rpath = '../Dropbox/HUB/Projects/_Resources'
+path = '../Dropbox/HUB/Projects/_Resources'
+
+MDNQFile = os.path.join(path,'MDNQ.csv')
+DropFile = os.path.join(path,'Drop_File.csv')
+ZipCoordFile = os.path.join(path,'US_ZIP_Coordinates.csv')
+YearDecodeFile = os.path.join(path,'Year_Decode.csv')
+GenSuppressionFile = os.path.join(path,'GEN_Suppression.csv')
+MonthlySuppressionFile = os.path.join(path,'Monthly_Suppression.csv')
 # ---------------------------------------------
-CSVFilesHaveHeaderRow = True
-CleanOutputFirstTime = True
-DatabaseFirstTime = True
-PurchaseFirstTimeP = True
-PurchaseFirstTimeN = True
-PurchaseFirstTimeR = True
-PurchaseFirstTimeAll = True
-PhonesFirstTime = True
-DupesFirstTime = True
-AppendFirstTime = True
-AppendFirstTimeP = True
-AppendFirstTimeN = True
-MDNQFirstTime = True
-MonthlySuppressionFirstTime = True
-# ---------------------------------------------
-ZipCoordFile = os.path.join(rpath,'US_ZIP_Coordinates.csv')
-YearDecodeFile = os.path.join(rpath,'Year_Decode.csv')
-GenSuppressionFile = os.path.join(rpath,'GEN_Suppression.csv')
-MonthlySuppressionFile = os.path.join(rpath,'Monthly_Suppression.csv')
-MDNQFile = os.path.join(rpath,'MDNQ.csv')
-DropFile = os.path.join(rpath,'Drop_File.csv')
-# ---------------------------------------------
-HRSelect = 'Y'
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
 SeqNumPurchase = 50000
-Entries = set()
-DoNotMailFile = set()
-# ---------------------------------------------
+
 PennyCounter = 0
 NickelCounter = 0
 DatabaseCounter = 0
 PurchaseCounter = 0
-# ---------------------------------------------
-IPFName = raw_input('File Name................ : ')
-InputFile = IPFName + '.csv'
+MDNQCounter = 0
+DupesCounter = 0
+
+Entries = set()
+DoNotMailFile = set()
 # ---------------------------------------------
 # Import Zip Dictionary from US_ZIP_Coordinates.csv file
 try:
@@ -57,28 +41,12 @@ try:
 		ZipCoordinate = csv.reader(ZipCoordFile)
 		FirstLine = True
 		for line in ZipCoordinate:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				ZipCoordinateDict[line[0]] = (line[1], line[2])
 except:
 	print('Zip Dictionary File not located')
-# ---------------------------------------------
-# Import LOCAL Suppression File for the purposes of de-duping
-try:
-	SuppressionFileName = raw_input('Enter Suppression Name... : ')
-	SuppressionFile = SuppressionFileName+'.csv'
-	if SuppressionFileName != '':
-		with open(SuppressionFile,'rU') as SuppressionFile:
-			Suppression = csv.reader(SuppressionFile)
-			FirstLine = True
-			for line in Suppression:
-				if CSVFilesHaveHeaderRow and FirstLine:
-					FirstLine = False
-				else:
-					Entries.add((str.title(line[2]),str.title(line[5])))
-except:
-	print('LOCAL Suppression File not loaded')
 # ---------------------------------------------
 # Import GENERAL Suppression File for the purposes of de-duping
 try:
@@ -86,7 +54,7 @@ try:
 		GenSuppression = csv.reader(GenSuppressionFile)
 		FirstLine = True
 		for line in GenSuppression:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				Entries.add((str.title(line[2]),str.title(line[5])))
@@ -99,7 +67,7 @@ try:
 		MonthlySuppression = csv.reader(MonthlySuppressionFile)
 		FirstLine = True
 		for line in MonthlySuppression:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				Entries.add((str.title(line[2]),str.title(line[5])))
@@ -112,7 +80,7 @@ try:
 		MDNQ = csv.reader(MDNQFile)
 		FirstLine = True
 		for line in MDNQ:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				DoNotMailFile.add(line[0])
@@ -126,7 +94,7 @@ try:
 		Drop = csv.reader(DropFile)
 		FirstLine = True
 		for line in Drop:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				DropDict[line[0]] = line[1]
@@ -140,34 +108,48 @@ try:
 		YearDecode = csv.reader(YearDecodeFile)
 		FirstLine = True
 		for line in YearDecode:
-			if CSVFilesHaveHeaderRow and FirstLine:
+			if FirstLine:
 				FirstLine = False
 			else:
 				YearDecodeDict[line[0]] = (line[1])
 except:
 	print('Year Decode Dictionary File not loaded')
 # ---------------------------------------------
+IPFName = raw_input('File Name................ : ')
+InputFile = IPFName + '.csv'
 CentralZip = raw_input('Enter Central ZIP codes.. : ')
 while CentralZip not in ZipCoordinateDict:
 	CentralZip = raw_input('Enter Valid Central ZIP Codes : ')
-# ---------------------------------------------
 MaxRadius = int(raw_input('Enter Maximum Radius..... : '))
 # ---------------------------------------------
-CleanOutput = IPFName + '_OutputMASTER.csv'
-CleanOutput1 = IPFName + '_OutputMASTER.csv'
+# Import LOCAL Suppression File for the purposes of de-duping
+try:
+	SuppressionFileName = raw_input('Enter Suppression Name... : ')
+	SuppressionFile = SuppressionFileName+'.csv'
+	if SuppressionFileName != '':
+		with open(SuppressionFile,'rU') as SuppressionFile:
+			Suppression = csv.reader(SuppressionFile)
+			FirstLine = True
+			for line in Suppression:
+				if FirstLine:
+					FirstLine = False
+				else:
+					Entries.add((str.title(line[2]),str.title(line[5])))
+except:
+	print('Local suppression file not loaded')
 # ---------------------------------------------
-ReMappedOutput = '<<< ' + IPFName + '_Re-Mapped.csv'
-Dupes = '<<< DUPES.csv'
-MDNQ = '<<< MAIL-DNQ.csv'
-# ---------------------------------------------
-AppendMonthlySuppFile = '>> ' + IPFName + '_Add MONTHLY Suppression.csv'
-# ---------------------------------------------
-CleanOutputPhones = IPFName + '_PHONES List.csv'
-CleanOutputDatabase = IPFName + '_UPLOAD-DATA.csv'
-CleanOutputPurchaseAll = IPFName + '_UPLOAD.csv'
-CleanOutputAppendP = IPFName + '_PENNY List.csv'
-CleanOutputAppendN = IPFName + '_NICKEL List.csv'
-CleanOutputAppendR = IPFName + '_OTHER List.csv'
+ReMappedOutput = '>>> ' + IPFName + '_Re-Mapped.csv'
+Dupes = '>>> DUPES.csv'
+MDNQ = '>>> M-DNQ.csv'
+CleanOutput = IPFName + ' OutputMAIN.csv'
+CleanOutputPD = IPFName + ' OutputMAIN.csv'
+AppendMonthlySuppFile = IPFName + ' Add Monthly Suppression List.csv'
+CleanOutputPhones = IPFName + ' PHONES List.csv'
+CleanOutputDatabase = IPFName + ' UPLOAD DATA List.csv'
+CleanOutputPurchaseAll = IPFName + ' UPLOAD List.csv'
+CleanOutputAppendP = IPFName + ' PENNY List.csv'
+CleanOutputAppendN = IPFName + ' NICKEL List.csv'
+CleanOutputAppendR = IPFName + ' OTHER List.csv'
 # ---------------------------------------------
 # Assign Variables For Readability
 CustomerID = 0
@@ -256,14 +238,13 @@ HeaderRow = [\
 	'Misc2',\
 	'Misc3'\
 	]
-# ---------------------------------------------
-# Re-Map Column Fields
-def ReMapHeaderFields():
-	global i
-	global x
-	global InputFile
-	global OutputFile
-	global ReMappedOutputFile
+# ------------------------------------------- #
+# M a i n - P r o g r a m                     #
+# ------------------------------------------- #
+HRSelect = 'Y'
+if HRSelect == 'Y' or HRSelect == 'y':
+	Selection = ReMappedOutput
+	# Re-Map Header Fields
 	HeaderDict = {}
 	def match(field):
 		if bool(re.search('cus.+id',field,flags=re.I)):
@@ -364,7 +345,7 @@ def ReMapHeaderFields():
 		Output.writerow(HeaderRow)
 		FirstLine = True
 		for line in tqdm(Input):
-			if CSVFilesHaveHeaderRow and FirstLine:	
+			if FirstLine:	
 				for i in range(0,len(line)):
 					match(line[i])
 				FirstLine = False
@@ -376,241 +357,6 @@ def ReMapHeaderFields():
 					else:
 						newline.append('')
 				Output.writerow(newline)
-
-def CheckDupesAndMailQualification():
-	global CleanOutput
-	global Dupes
-	global DupesFirstTime
-	global CleanOutputFirstTime
-	global MDNQFirstTime
-	global MDNQ
-	# ----------------------------------------------------------------- #
-	key = (line[AddressComb],line[Zip])
-	# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
-	# key = (line[VIN])
-	# ----------------------------------------------------------------- #
-	if key not in Entries:
-		if line[FirstName] == '' or line[LastName] == '' or \
-		str.lower(line[FirstName]) in DoNotMailFile or \
-		str.lower(line[MI]) in DoNotMailFile or \
-		str.lower(line[LastName]) in DoNotMailFile or \
-		int(line[Radius]) > MaxRadius:
-			if MDNQFirstTime:
-				OutMDNQ = csv.writer(MDNQ)
-				OutMDNQ.writerow(HeaderRow)
-				OutMDNQ.writerow(line)
-				MDNQFirstTime = False
-			else:
-				OutMDNQ = csv.writer(MDNQ)
-				OutMDNQ.writerow(line)
-		else:
-			if CleanOutputFirstTime:
-				OutputClean = csv.writer(CleanOutput)
-				OutputClean.writerow(HeaderRow)
-				OutputClean.writerow(line)
-				Entries.add(key)
-				CleanOutputFirstTime = False
-			else:
-				OutputClean = csv.writer(CleanOutput)
-				OutputClean.writerow(line)
-				Entries.add(key)
-	else:
-		if DupesFirstTime:
-			OutDupes = csv.writer(Dupes)
-			OutDupes.writerow(HeaderRow)
-			OutDupes.writerow(line)
-			DupesFirstTime = False
-		else:
-			OutDupes = csv.writer(Dupes)
-			OutDupes.writerow(line)
-
-def SecondaryOutputDatabase():
-	global DatabaseFirstTime
-	global CleanOutputDatabase
-	HeaderRowDatabase = [\
-		'Customer ID',\
-		'First Name',\
-		'Last Name',\
-		'Address',\
-		'City',\
-		'State',\
-		'Zip',\
-		'Phone',\
-		'Year',\
-		'Make',\
-		'Model',\
-		'Winning Number',\
-		'Position'\
-		]
-	DatabaseOutputHeader = (\
-		line[CustomerID],\
-		line[FirstName],\
-		line[LastName],\
-		line[AddressComb],\
-		line[City],\
-		line[State],\
-		line[Zip],\
-		line[Phone],\
-		line[Year],\
-		line[Make],\
-		line[Model],\
-		line[WinningNum],\
-		line[DropVal]\
-		)
-	if DatabaseFirstTime:
-		CleanOutputDatabase = open(CleanOutputDatabase,'ab')
-		OutputCleanDatabase = csv.writer(CleanOutputDatabase)
-		OutputCleanDatabase.writerow(HeaderRowDatabase)
-		OutputCleanDatabase.writerow(DatabaseOutputHeader)
-		DatabaseFirstTime = False
-	else:
-		OutputCleanDatabase = csv.writer(CleanOutputDatabase)
-		OutputCleanDatabase.writerow(DatabaseOutputHeader)
-
-def SecondaryOutputPurchase():
-	global CleanOutputPurchaseAll
-	global PurchaseFirstTimeAll
-	HeaderRowPurchase = [\
-		'Customer ID',\
-		'First Name',\
-		'Last Name',\
-		'Address',\
-		'City',\
-		'State',\
-		'Zip',\
-		'4Zip',\
-		'DSF_WALK_SEQ',\
-		'Crrt',\
-		'Winning Number',\
-		'Position'\
-		]
-	PurchaseOutputHeader = (\
-		line[CustomerID],\
-		line[FirstName],\
-		line[LastName],\
-		line[AddressComb],\
-		line[City],\
-		line[State],\
-		line[Zip],\
-		line[Zip4],\
-		line[DSF_WALK_SEQ],\
-		line[CRRT],\
-		line[WinningNum],\
-		line[DropVal]\
-		)
-	if PurchaseFirstTimeAll:
-		CleanOutputPurchaseAll = open(CleanOutputPurchaseAll,'ab')
-		OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
-		OutputCleanPurchaseAll.writerow(HeaderRowPurchase)
-		OutputCleanPurchaseAll.writerow(PurchaseOutputHeader)
-		PurchaseFirstTimeAll = False
-	else:
-		OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
-		OutputCleanPurchaseAll.writerow(PurchaseOutputHeader)
-
-def GenerateAppendOutput():
-	global AppendFirstTimeP
-	global AppendFirstTimeN
-	global AppendFirstTime
-	global CleanOutputAppendP
-	global CleanOutputAppendN
-	global CleanOutputAppendR
-	global MonthlySuppressionFirstTime
-	global MonthlySuppression
-	HeaderRowAppend = [\
-		'PURL',\
-		'First Name',\
-		'Last Name',\
-		'Address1',\
-		'City',\
-		'State',\
-		'Zip',\
-		'4Zip',\
-		'Crrt',\
-		'DSF_WALK_SEQ',\
-		'Customer ID',\
-		'Position'\
-		]
-	AppendOutputHeader = (\
-		line[PURL],\
-		line[FirstName],\
-		line[LastName],\
-		line[Address1],\
-		line[City],\
-		line[State],\
-		line[Zip],\
-		line[Zip4],\
-		line[CRRT],\
-		line[DSF_WALK_SEQ],\
-		line[CustomerID],\
-		line[DropVal]\
-		)
-	if line[CustomerID][:1] == 'p' or line[CustomerID][:1] == 'P':
-		if AppendFirstTimeP:
-			CleanOutputAppendP = open(CleanOutputAppendP,'ab')
-			OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-			OutputCleanAppendP.writerow(HeaderRowAppend)
-			OutputCleanAppendP.writerow(AppendOutputHeader)
-			AppendFirstTimeP = False
-		else:
-			OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-			OutputCleanAppendP.writerow(AppendOutputHeader)
-	elif line[CustomerID][:1] == 'n' or line[CustomerID][:1] == 'N':
-		if AppendFirstTimeN:
-			CleanOutputAppendN = open(CleanOutputAppendN,'ab')
-			OutputCleanAppendN = csv.writer(CleanOutputAppendN)
-			OutputCleanAppendN.writerow(HeaderRowAppend)
-			OutputCleanAppendN.writerow(AppendOutputHeader)
-			AppendFirstTimeN = False
-		else:
-			OutputCleanAppendN = csv.writer(CleanOutputAppendN)
-			OutputCleanAppendN.writerow(AppendOutputHeader)
-	else: 
-		if AppendFirstTime:
-			CleanOutputAppendR = open(CleanOutputAppendR,'ab')
-			OutputCleanAppendR = csv.writer(CleanOutputAppendR)
-			OutputCleanAppendR.writerow(HeaderRowAppend)
-			OutputCleanAppendR.writerow(AppendOutputHeader)
-			AppendFirstTime = False
-		else:
-			OutputCleanAppendR = csv.writer(CleanOutputAppendR)
-			OutputCleanAppendR.writerow(AppendOutputHeader)
-
-def AddMonthlySuppressionFile():
-	global MonthlySuppressionFirstTime
-	HeaderRow = [\
-		'First Name',\
-		'Last Name',\
-		'Address',\
-		'City',\
-		'State',\
-		'Zip',\
-		'Campaign Name'\
-		]
-	HeaderRowOutput = (\
-		line[FirstName],\
-		line[LastName],\
-		line[AddressComb],\
-		line[City],\
-		line[State],\
-		line[Zip],\
-		IPFName
-		)
-	if MonthlySuppressionFirstTime:
-		MonthlySupp = csv.writer(AppendMonthlySupp)
-		MonthlySupp.writerow(HeaderRow)
-		MonthlySupp.writerow(HeaderRowOutput)
-		MonthlySuppressionFirstTime = False
-	else:
-		MonthlySupp = csv.writer(AppendMonthlySupp)
-		MonthlySupp.writerow(HeaderRowOutput)
-
-# ------------------------------------------- #
-# M a i n - P r o g r a m                     #
-# ------------------------------------------- #
-if HRSelect == 'Y' or HRSelect == 'y':
-	Selection = ReMappedOutput
-	ReMapHeaderFields()
 else:
 	Selection = InputFile
 # ---------------------------------------------
@@ -619,11 +365,31 @@ open(CleanOutput,'ab') as CleanOutput, \
 open(Dupes,'ab') as Dupes, \
 open(MDNQ,'ab') as MDNQ, \
 open(CleanOutputPhones,'ab') as CleanOutputPhones, \
+open(CleanOutputDatabase,'ab') as CleanOutputDatabase, \
+open(CleanOutputPurchaseAll,'ab') as CleanOutputPurchaseAll, \
+open(CleanOutputAppendP,'ab') as CleanOutputAppendP, \
+open(CleanOutputAppendN,'ab') as CleanOutputAppendN, \
+open(CleanOutputAppendR,'ab') as CleanOutputAppendR, \
 open(AppendMonthlySuppFile,'ab') as AppendMonthlySupp:
+	
+	CleanOutputFirstTime = True
+	DatabaseFirstTime = True
+	PurchaseFirstTimeP = True
+	PurchaseFirstTimeN = True
+	PurchaseFirstTimeR = True
+	PurchaseFirstTimeAll = True
+	PhonesFirstTime = True
+	DupesFirstTime = True
+	AppendFirstTimeP = True
+	AppendFirstTimeN = True
+	AppendFirstTimeR = True
+	MDNQFirstTime = True
+	MonthlySuppressionFirstTime = True
+
 	Input = csv.reader(InputFile)
 	FirstLine = True
 	for line in tqdm(Input):
-		if CSVFilesHaveHeaderRow and FirstLine:
+		if FirstLine:
 			FirstLine = False
 		else:
 			# ---------------------------------------------
@@ -803,7 +569,7 @@ open(AppendMonthlySuppFile,'ab') as AppendMonthlySupp:
 				TargetZipCoord = 0	
 			
 			if OriginZipCoord == 0 or TargetZipCoord == 0:
-				line[Radius] = 'n/a'
+				line[Radius] = '9999'
 			else:
 				line[Radius] = float(vincenty(OriginZipCoord,TargetZipCoord).miles)
 			# --------------------------------------------- 
@@ -843,53 +609,239 @@ open(AppendMonthlySuppFile,'ab') as AppendMonthlySupp:
 					OutputPhones = csv.writer(CleanOutputPhones)
 					OutputPhones.writerow(HeaderOutputPhones)
 			# --------------------------------------------- #
-			# F u n c t i o n - C a l l s                   #
-			# --------------------------------------------- #
-			CheckDupesAndMailQualification()
-			if line[PURL] != '':
-				AddMonthlySuppressionFile()
-			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
-				SecondaryOutputDatabase()
-			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
-				SecondaryOutputPurchase()
+			# Check for Dupes and Mail Qualification
+			key = (line[AddressComb],line[Zip])
+			# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
+			# key = (line[VIN])
+			if key not in Entries:
+				if line[FirstName] == '' or line[LastName] == '' or \
+				str.lower(line[FirstName]) in DoNotMailFile or \
+				str.lower(line[MI]) in DoNotMailFile or \
+				str.lower(line[LastName]) in DoNotMailFile or \
+				float(line[Radius]) > MaxRadius:
+					if MDNQFirstTime:
+						OutMDNQ = csv.writer(MDNQ)
+						OutMDNQ.writerow(HeaderRow)
+						OutMDNQ.writerow(line)
+						MDNQFirstTime = False
+						MDNQCounter += 1
+					else:
+						OutMDNQ = csv.writer(MDNQ)
+						OutMDNQ.writerow(line)
+						MDNQCounter += 1
+				else:
+					if CleanOutputFirstTime:
+						OutputClean = csv.writer(CleanOutput)
+						OutputClean.writerow(HeaderRow)
+						OutputClean.writerow(line)
+						Entries.add(key)
+						CleanOutputFirstTime = False
+					else:
+						OutputClean = csv.writer(CleanOutput)
+						OutputClean.writerow(line)
+						Entries.add(key)
 			else:
-				GenerateAppendOutput()
+				if DupesFirstTime:
+					OutDupes = csv.writer(Dupes)
+					OutDupes.writerow(HeaderRow)
+					OutDupes.writerow(line)
+					DupesFirstTime = False
+					DupesCounter += 1
+				else:
+					OutDupes = csv.writer(Dupes)
+					OutDupes.writerow(line)
+					DupesCounter += 1
+			# --------------------------------------------- #
+			if line[PURL] != '':
+				# Generate Monthly Suppression File
+				HeaderRow = [\
+					'First Name',\
+					'Last Name',\
+					'Address',\
+					'City',\
+					'State',\
+					'Zip',\
+					'Campaign Name'\
+					]
+				HeaderRowOutput = (\
+					line[FirstName],\
+					line[LastName],\
+					line[AddressComb],\
+					line[City],\
+					line[State],\
+					line[Zip],\
+					IPFName
+					)
+				if MonthlySuppressionFirstTime:
+					MonthlySupp = csv.writer(AppendMonthlySupp)
+					MonthlySupp.writerow(HeaderRow)
+					MonthlySupp.writerow(HeaderRowOutput)
+					MonthlySuppressionFirstTime = False
+				else:
+					MonthlySupp = csv.writer(AppendMonthlySupp)
+					MonthlySupp.writerow(HeaderRowOutput)
+			# --------------------------------------------- #
+			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
+				# Genrate Secondary Output Database File
+				HeaderRowDatabase = [\
+					'Customer ID',\
+					'First Name',\
+					'Last Name',\
+					'Address',\
+					'City',\
+					'State',\
+					'Zip',\
+					'Phone',\
+					'Year',\
+					'Make',\
+					'Model',\
+					'Winning Number',\
+					'Position'\
+					]
+				DatabaseOutputHeader = (\
+					line[CustomerID],\
+					line[FirstName],\
+					line[LastName],\
+					line[AddressComb],\
+					line[City],\
+					line[State],\
+					line[Zip],\
+					line[Phone],\
+					line[Year],\
+					line[Make],\
+					line[Model],\
+					line[WinningNum],\
+					line[DropVal]\
+					)
+				if DatabaseFirstTime:
+					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
+					OutputCleanDatabase.writerow(HeaderRowDatabase)
+					OutputCleanDatabase.writerow(DatabaseOutputHeader)
+					DatabaseFirstTime = False
+				else:
+					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
+					OutputCleanDatabase.writerow(DatabaseOutputHeader)
+
+			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
+				# Generate Secondary Output Purchase
+				HeaderRowPurchase = [\
+					'Customer ID',\
+					'First Name',\
+					'Last Name',\
+					'Address',\
+					'City',\
+					'State',\
+					'Zip',\
+					'4Zip',\
+					'DSF_WALK_SEQ',\
+					'Crrt',\
+					'Winning Number',\
+					'Position'\
+					]
+				PurchaseOutputHeader = (\
+					line[CustomerID],\
+					line[FirstName],\
+					line[LastName],\
+					line[AddressComb],\
+					line[City],\
+					line[State],\
+					line[Zip],\
+					line[Zip4],\
+					line[DSF_WALK_SEQ],\
+					line[CRRT],\
+					line[WinningNum],\
+					line[DropVal]\
+					)
+				if PurchaseFirstTimeAll:
+					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
+					OutputCleanPurchaseAll.writerow(HeaderRowPurchase)
+					OutputCleanPurchaseAll.writerow(PurchaseOutputHeader)
+					PurchaseFirstTimeAll = False
+				else:
+					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
+					OutputCleanPurchaseAll.writerow(PurchaseOutputHeader)
+
+			else:
+				# Generate Append Output File
+				HeaderRowAppend = [\
+					'PURL',\
+					'First Name',\
+					'Last Name',\
+					'Address1',\
+					'City',\
+					'State',\
+					'Zip',\
+					'4Zip',\
+					'Crrt',\
+					'DSF_WALK_SEQ',\
+					'Customer ID',\
+					'Position'\
+					]
+				AppendOutputHeader = (\
+					line[PURL],\
+					line[FirstName],\
+					line[LastName],\
+					line[Address1],\
+					line[City],\
+					line[State],\
+					line[Zip],\
+					line[Zip4],\
+					line[CRRT],\
+					line[DSF_WALK_SEQ],\
+					line[CustomerID],\
+					line[DropVal]\
+					)
+				if line[CustomerID][:1] == 'p' or line[CustomerID][:1] == 'P':
+					if AppendFirstTimeP:
+						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
+						OutputCleanAppendP.writerow(HeaderRowAppend)
+						OutputCleanAppendP.writerow(AppendOutputHeader)
+						AppendFirstTimeP = False
+					else:
+						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
+						OutputCleanAppendP.writerow(AppendOutputHeader)
+				elif line[CustomerID][:1] == 'n' or line[CustomerID][:1] == 'N':
+					if AppendFirstTimeN:
+						OutputCleanAppendN = csv.writer(CleanOutputAppendN)
+						OutputCleanAppendN.writerow(HeaderRowAppend)
+						OutputCleanAppendN.writerow(AppendOutputHeader)
+						AppendFirstTimeN = False
+					else:
+						OutputCleanAppendN = csv.writer(CleanOutputAppendN)
+						OutputCleanAppendN.writerow(AppendOutputHeader)
+				else: 
+					if AppendFirstTimeR:
+						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
+						OutputCleanAppendR.writerow(HeaderRowAppend)
+						OutputCleanAppendR.writerow(AppendOutputHeader)
+						AppendFirstTimeR = False
+					else:
+						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
+						OutputCleanAppendR.writerow(AppendOutputHeader)
+
 # ---------------------------------------------
-# Close open objects
-if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
-	CleanOutputDatabase.close()
-elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
-	CleanOutputPurchaseAll.close()
-else:
-	if line[CustomerID][:1] == 'P' or line[CustomerID][:1] == 'p':
-		CleanOutputAppendP.close()
-	elif line[CustomerID][:1] == 'N' or line[CustomerID][:1] == 'n':
-		CleanOutputAppendN.close()
-	else:
-		CleanOutputAppendR.close()
-# ---------------------------------------------
-# Remove un-needed files
+# Upkeep - Remove temporary files
 Files = glob.glob('*.csv')
 for record in Files:
 	if os.path.getsize(record) == 0:
 		os.remove(record)
-	elif bool(re.match('.+Re-Mapped.+',record,flags=re.I)):
+	if bool(re.match('.+Re-Mapped.+',record,flags=re.I)):
 		os.remove(record)
 # ---------------------------------------------
 # Terminal Output
 try:
-	ProcDataFrame = pd.read_csv(CleanOutput1, low_memory = False)
-	ProcDataF = ProcDataFrame.loc[:,['Radius','Year']]
-	print('--------------------------')
+	ProcDataFrame = pd.read_csv(CleanOutputPD, low_memory = False)
+	ProcDataF = ProcDataFrame.loc[:,['Radius','Year','DelDate']]
+	print('===================================')
 	print(ProcDataF.describe())
-	print('--------------------------')
-	print('Database Count : {}'.format(DatabaseCounter))
-	print('Purchase Count : {}'.format(PurchaseCounter))
-	print('   Penny Count : {}'.format(PennyCounter))
-	print('  Nickel Count : {}'.format(NickelCounter))
-	print('     T O T A L : {}'.format(DatabaseCounter + PurchaseCounter + \
-		NickelCounter +PennyCounter))
+	print('===================================')
+	print('   DATABASE Count = {}'.format(DatabaseCounter))
+	print('   PURCHASE Count = {}'.format(PurchaseCounter))
+	print('      PENNY Count = {}'.format(PennyCounter))
+	print('     NICKEL Count = {}'.format(NickelCounter))
+	print('  Less MDNQ Count = ({})'.format(MDNQCounter))
+	print(' Less Dupes Count = ({})'.format(DupesCounter))
+	print('==== T O T A L ==== {}'.format(DatabaseCounter + PurchaseCounter + \
+		PennyCounter + NickelCounter - MDNQCounter - DupesCounter))
 except:
 	print('Empty File')
-print('--------------------------')
-
