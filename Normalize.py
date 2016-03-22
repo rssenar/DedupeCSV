@@ -2,9 +2,9 @@
 # ---------------------------------------------
 from __future__ import division, print_function
 import csv, os, sys, re, glob
+import datetime
 from geopy.distance import vincenty
 from dateutil.parser import *
-from datetime import *
 from tqdm import tqdm
 from nameparser import HumanName
 # ---------------------------------------------
@@ -23,6 +23,7 @@ def main():
 	global VINDictCounter
 	global CityDictCounter
 	global StateDictCounter
+	global DelDateDictCounter
 	global IPFName
 	global CentralZip
 	global MaxRadius
@@ -30,15 +31,17 @@ def main():
 	global MinYear
 	global CurrentDateUpdate
 	global MaxSaleYear
+	global CentralZipSCFFacility
 	# ---------------------------------------------
 	os.chdir('../../../../Desktop/')
-	path = '../Dropbox/HUB/Projects/_Resources'	
+	path = '../Dropbox/HUB/Projects/PremWorks/_Resources'
 	MDNQFile = os.path.join(path,'MDNQ.csv')
 	DropFile = os.path.join(path,'Drop_File.csv')
 	ZipCoordFile = os.path.join(path,'US_ZIP_Coordinates.csv')
 	YearDecodeFile = os.path.join(path,'Year_Decode.csv')
 	GenSuppressionFile = os.path.join(path,'GEN_Suppression.csv')
 	MonthlySuppressionFile = os.path.join(path,'Monthly_Suppression.csv')
+	SCF3DigitFile = os.path.join(path,'SCF Facilites.csv')
 	# ---------------------------------------------
 	SeqNumDatabase = 10000
 	SeqNumPurchaseP = 30000
@@ -52,6 +55,8 @@ def main():
 	DupesCounter = 0
 	Entries = set()
 	DoNotMailFile = set()
+	SuppressSCFList = []
+	SuppressStateList = []
 	# ---------------------------------------------
 	# Import Zip Dictionary from US_ZIP_Coordinates.csv file
 	try:
@@ -128,31 +133,65 @@ def main():
 					YearDecodeDict[line[0]] = (line[1])
 	except:
 		print('Year Decode Dictionary File not loaded')
+	# Import SCF Dictionary from SCF Facilities.csv file
+	try:
+		SCF3DigitDict = {}
+		with open(SCF3DigitFile,'rU') as SCF3DigitFile:
+			SCF3Digit = csv.reader(SCF3DigitFile)
+			FirstLine = True
+			for line in SCF3Digit:
+				if FirstLine:
+					FirstLine = False
+				else:
+					SCF3DigitDict[line[0]] = (line[1])
+	except:
+		print('SCF 3-Digit Dictionary File not loaded')
 	# ---------------------------------------------
-	IPFName = raw_input('File Name........................ : ')
+	IPFName = raw_input('File Name ........................... : ')
 	InputFile = IPFName + '.csv'
-	CentralZip = raw_input('Enter Central ZIP code........... : ')
+	CentralZip = raw_input('Enter Central ZIP Code .............. : ')
 	while CentralZip not in ZipCoordinateDict:
-		CentralZip = raw_input('Enter Valid Central ZIP Codes : ')
+		CentralZip = raw_input('ERROR!! Enter Valid Central ZIP Codes : ')
 	try:
-		MaxRadius = int(raw_input('Enter Maximum Radius............. : '))
+		MaxRadius = int(raw_input('Enter Max Radius ................[50] : '))
 	except:
-		MaxRadius = 9999
+		MaxRadius = 50
 	try:
-		MaxYear = int(raw_input('Enter Maximum Year............... : '))
+		MaxYear = int(raw_input('Enter Max Year ................[2014] : '))
 	except:
-		MaxYear = 9999
+		MaxYear = 2014
 	try:
-		MinYear = int(raw_input('Enter Minimum Year............... : '))
+		MinYear = int(raw_input('Enter Min Year ................[1995] : '))
 	except:
-		MinYear = 0
+		MinYear = 1995
 	try:
-		MaxSaleYear = int(raw_input('Enter Maximum Sales Year (2015).. : '))
+		MaxSaleYear = int(raw_input('Enter Maximum Sales Year ......[2015] : '))
 	except:
 		MaxSaleYear = 2015
+	# ---------------------------------------------
+	# Generate Suppress SCF List
+	try:
+		SCFList = raw_input('Enter Suppression List .........[SCF] : ')
+		SCFList = SCFList.replace(' ','')
+		SCFList = SCFList.split(',')
+		for item in range(0,len(SCFList)):
+			SuppressSCFList.append(SCFList[item])
+	except:
+		SuppressSCFList = []
+	# ---------------------------------------------
+	# Generate Suppress STATE List
+	try:
+		STATEList = raw_input('Enter Suppression List .......[STATE] : ')
+		STATEList = STATEList.replace(' ','')
+		STATEList = STATEList.split(',')
+		for item in range(0,len(STATEList)):
+			SuppressStateList.append(STATEList[item])
+	except:
+		SuppressStateList = []
+	# ---------------------------------------------
 	# Import LOCAL Suppression File for the purposes of de-duping
 	try: 
-		SuppressionFileName = raw_input('Enter Suppression File........... : ')
+		SuppressionFileName = raw_input('Enter Suppression File ....[OPTIONAL] : ')
 		SuppressionFile = SuppressionFileName + '.csv'
 		if SuppressionFileName != '':
 			with open(SuppressionFile,'rU') as SuppressionFile:
@@ -218,9 +257,10 @@ def main():
 	Drop = 35
 	PURL = 36
 	YrDec = 37
-	Misc1 = 38
-	Misc2 = 39
-	Misc3 = 40
+	SCF3DigitAddr = 38
+	Misc1 = 39
+	Misc2 = 40
+	Misc3 = 41
 	# Assign Column Names To Header Output Files
 	HeaderRow = [\
 		'Customer ID',\
@@ -261,6 +301,7 @@ def main():
 		'Drop',\
 		'PURL',\
 		'YrDec',\
+		'SCF3DigitAddr',\
 		'Misc1',\
 		'Misc2',\
 		'Misc3'\
@@ -354,7 +395,9 @@ def main():
 			elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
 				HeaderDict[PURL] = 'line['+str(i)+']'
 			elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
-				HeaderDict[YrDec] = 'line['+str(i)+']'
+				HeaderDict[YrDec] = 'line['+str(i)+']'		
+			elif bool(re.search(r'\bSCF3DigitAddr\b',field,flags=re.I)):
+				HeaderDict[SCF3DigitAddr] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
 				HeaderDict[Misc1] = 'line['+str(i)+']' 
 			elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
@@ -418,6 +461,7 @@ def main():
 		VINDictCounter = {}
 		CityDictCounter = {}
 		StateDictCounter = {}
+		DelDateDictCounter = {}
 
 		Input = csv.reader(InputFile)
 		FirstLine = True
@@ -425,6 +469,9 @@ def main():
 			if FirstLine:
 				FirstLine = False
 			else:
+				# ---------------------------------------------
+				# Set Winning Number
+				line[WinningNum] = 40754
 				# ---------------------------------------------
 				# Parse Fullname field if First & Last Name field is not available
 				if line[FullName] != '' and line[FirstName] == '' \
@@ -494,6 +541,7 @@ def main():
 					elif line[Drop] == 'a':
 						PurchaseCounter += 1
 				# ---------------------------------------------
+				# ---------------------------------------------
 				# Set Phone # And Reformat
 				if line[MPhone] != '' and len(str(line[MPhone])) > 6:
 					vp = str(line[MPhone]).strip()
@@ -540,13 +588,51 @@ def main():
 				line[Model] = str.title(line[Model])
 				line[Email] = str.lower(line[Email])
 				line[State] = str.upper(line[State])
+				# ---------------------------------------------	
+				# Validate "First Name" & "Last Name" Field
+				if line[FirstName] == '' or line[LastName] == '':
+					line[MailDNQ] == 'dnq'
+				# Check "FirstName", "MI", "LastName", "SCF" & "State"
+				if line[FirstName] in DoNotMailFile or \
+				line[MI] in DoNotMailFile or \
+				line[LastName] in DoNotMailFile or \
+				line[SCF] in SuppressSCFList or \
+				line[State] in SuppressStateList:
+					line[MailDNQ] == 'dnq'
+				# Validate Year and perform MaxYear & MinYear Check
+				try:
+					if int(line[Year]) > MaxYear:
+						line[MailDNQ] = 'dnq'
+					if int(line[Year]) < MinYear:
+						line[MailDNQ] = 'dnq'
+				except:
+					line[Year] = ''
+				# ---------------------------------------------	
+				# Validate "DelDate" & "Date" Field, perform MaxSaleYear Check
+				try:
+					line[DelDate] = parse(line[DelDate])
+					PresentDelDate = parse('')
+					if line[DelDate] == PresentDelDate:
+						line[DelDate] = ''
+					DelDateYear = int(line[DelDate].year)
+					if int(line[DelDate].year) >= MaxSaleYear:
+						line[MailDNQ] = 'dnq'
+				except:
+					line[DelDate] = ''
+				try:
+					line[Date] = parse(line[Date])
+					PresentDate = parse('')
+					if line[Date] == PresentDate:
+						line[Date] = ''
+				except:
+					line[Date] = ''
 				# ---------------------------------------------
-				# Year Decode
-				if str(line[Year]) in YearDecodeDict:
-					line[YrDec] = YearDecodeDict[line[Year]]
+				# Check Blitz DNQ
+				if len(str(line[Phone])) < 8 or len(str(line[VIN])) < 17:
+					line[BlitzDNQ] = 'dnq'
 				else:
-					line[YrDec] = ''
-				# ---------------------------------------------
+					line[BlitzDNQ] = ''
+				# ---------------------------------------------				
 				# Set VIN Length
 				line[VINLen] = len(str(line[VIN]))
 				if line[VINLen] < 17:
@@ -554,37 +640,37 @@ def main():
 				else:
 					line[VIN] = str.upper(line[VIN])
 				# ---------------------------------------------
-				# Set Date Format
-				CurrentDate = parse('')
-				CurrentDateUpdate = CurrentDate.date()
-				DelDateNew = parse(line[DelDate])
-				DelDateUpdate = DelDateNew.date()
-				DateNew = parse(line[Date])
-				DateUpdate = DateNew.date()
-				if DelDateUpdate == CurrentDateUpdate:
-					line[DelDate] = ''
-				else:
-					line[DelDate] = DelDateUpdate
-				if DateUpdate == CurrentDateUpdate:
-					line[Date] = ''
-				else:
-					line[Date] = DateUpdate
+				# Year Decode
+				try:
+					if line[Year] in YearDecodeDict:
+						line[YrDec] = YearDecodeDict[line[Year]]
+				except:
+					line[YrDec] = ''
 				# ---------------------------------------------
-				# Set Winning Number
-				line[WinningNum] = 40754
-				# ---------------------------------------------
-				# Set SCF
+				# Set SCF & Central ZIP SCF 3Digit Address
 				ZipLen = len(str(line[Zip]))
 				if ZipLen < 5:
 					line[SCF] = (line[Zip])[:2]
 				else:
 					line[SCF] = (line[Zip])[:3]
+				
+				try:
+					if line[SCF] in SCF3DigitDict:
+						line[SCF3DigitAddr] = SCF3DigitDict[line[SCF]]
+				except:
+					line[SCF3DigitAddr] = ''
 				# ---------------------------------------------
-				# Check Blitz DNQ
-				if len(str(line[Phone])) < 8 or len(str(line[VIN])) < 17:
-					line[BlitzDNQ] = 'dnq'
+				CentralZipLen = len(str(CentralZip))
+				if CentralZipLen < 5:
+					CentralZipSCF3Digit = CentralZip[:2]
 				else:
-					line[BlitzDNQ] = ''
+					CentralZipSCF3Digit = CentralZip[:3]
+
+				try:
+					if CentralZipSCF3Digit in SCF3DigitDict:
+						CentralZipSCFFacility = SCF3DigitDict[CentralZipSCF3Digit]
+				except:
+					CentralZipSCFFacility = ''
 				# ---------------------------------------------
 				# Calculate Radius from Central Zip
 				if CentralZip in ZipCoordinateDict:
@@ -599,39 +685,53 @@ def main():
 				else:
 					TargetZipCoord = 0
 				if OriginZipCoord == 0 or TargetZipCoord == 0:
-					line[Radius] = '999'
+					line[Radius] = '10000'
 				else:
 					line[Radius] = round(float(vincenty(OriginZipCoord,TargetZipCoord).miles),1)
+				# Validate Radius againt Max Radius
+				if line[Radius] > MaxRadius:
+					line[MailDNQ] = 'dnq'
 				# --------------------------------------------- 
-				# Generate Counters : Year, Make, SCF, Radius, VIN, City, State
+				# Generate YEAR Counter
 				if line[Year] not in YearDictCounter:
 					YearDictCounter[line[Year]] = 1
 				else:
 					YearDictCounter[line[Year]] += 1
+				# Generate MAKE Counter
 				if line[Make] not in MakeDictCounter:
 					MakeDictCounter[line[Make]] = 1
 				else:
 					MakeDictCounter[line[Make]] += 1
+				# Generate SCF Counter
 				if line[SCF] not in SCFDictCounter:
 					SCFDictCounter[line[SCF]] = 1
 				else:
 					SCFDictCounter[line[SCF]] += 1
+				# Generate RADIUS Counter
 				if line[Radius] not in RadiusDictCounter:
 					RadiusDictCounter[line[Radius]] = 1
 				else:
 					RadiusDictCounter[line[Radius]] += 1
+				# Generate VIN Counter
 				if line[VIN] not in VINDictCounter:
 					VINDictCounter[line[VIN]] = 1
 				else:
 					VINDictCounter[line[VIN]] += 1
+				# Generate CITY Counter
 				if line[City] not in CityDictCounter:
 					CityDictCounter[line[City]] = 1
 				else:
 					CityDictCounter[line[City]] += 1
+				# Generate STATE Counter
 				if line[State] not in StateDictCounter:
 					StateDictCounter[line[State]] = 1
 				else:
 					StateDictCounter[line[State]] += 1
+				# Generate DELDATE Counter
+				if line[DelDate] not in DelDateDictCounter:
+					DelDateDictCounter[line[DelDate]] = 1
+				else:
+					DelDateDictCounter[line[DelDate]] += 1
 				# --------------------------------------------- 
 				# Extract Phone List
 				if line[Phone] != '' and line[FirstName] != '' and \
@@ -674,14 +774,7 @@ def main():
 				# key = (line[FirstName],line[LastName],line[AddressComb],line[Zip])
 				# key = (line[VIN])
 				if key not in Entries:
-					if line[FirstName] == '' or line[LastName] == '' or \
-					str.lower(line[FirstName]) in DoNotMailFile or \
-					str.lower(line[MI]) in DoNotMailFile or \
-					str.lower(line[LastName]) in DoNotMailFile or \
-					(line[Year] != '' and int(line[Year]) > MaxYear) or \
-					(line[Year] != '' and int(line[Year]) < MinYear) or \
-					(line[DelDate] != '' and int(CurrentDateUpdate.year) >= MaxSaleYear) or \
-					float(line[Radius]) > MaxRadius:
+					if line[MailDNQ] == 'dnq':
 						if MDNQFirstTime:
 							OutMDNQ = csv.writer(MDNQ)
 							OutMDNQ.writerow(HeaderRow)
@@ -889,75 +982,95 @@ if __name__ == '__main__':
 			os.remove(Record)
 		if bool(re.match('.+Re-Mapped.+',Record,flags=re.I)):
 			os.remove(Record)
-	
+	# Output Log Report
 	RadiusRTotal = 0
 	YearRTotal = 0
 	CityRTotal = 0
 	SCFRTotal = 0
 	StateRTotal = 0
 	MakeRTotal = 0
-	# Output Log Report
+	DelDateRTotal = 0
+
 	Report = sys.stdout
 	with open('Summary_Report_Log.txt','w') as Log:
 		sys.stdout =  Log
 		print('')
 		print('=====================================')
-		print('SUMMARY-REPORT-LOG (as of {})'.format(CurrentDateUpdate))
+		print('SUMMARY REPORT LOG')
 		print('=====================================')
-		print('Project Name.......: {}'.format(IPFName))
-		print('Central ZIP code...: {}'.format(CentralZip))
-		print('Maximum Radius.....: {} Miles'.format(MaxRadius))
-		print('Max Year...........: Yr {}'.format(MaxYear))
-		print('Min Year...........: Yr {}'.format(MinYear))
-		print('Max Sales Year.....: Yr {}'.format(MaxSaleYear))
+		print('Project Name.........: {}'.format(IPFName))
+		print('Central ZIP Code.....: {}'.format(CentralZip))
+		print('SCF Facility.........: {}'.format(CentralZipSCFFacility))
+		print('Max Radius...........: {} Miles'.format(MaxRadius))
+		print('Max Year.............: {}'.format(MaxYear))
+		print('Min Year.............: {}'.format(MinYear))
+		print('Max DelDate Year.....: {}'.format(MaxSaleYear))
 		print('')
-		print('   DATABASE Total..: {}'.format(DatabaseCounter))
-		print('   PURCHASE Total..: {}'.format(PurchaseCounter))
-		print('      PENNY Total..: {}'.format(PennyCounter))
-		print('     NICKEL Total..: {}'.format(NickelCounter))
-		print('  Less MDNQ Total..: ({})'.format(MDNQCounter))
-		print(' Less DUPES Total..: ({})'.format(DupesCounter))
+		print('   DATABASE Total....: {}'.format(DatabaseCounter))
+		print('   PURCHASE Total....: {}'.format(PurchaseCounter))
+		print('      PENNY Total....: {}'.format(PennyCounter))
+		print('     NICKEL Total....: {}'.format(NickelCounter))
+		print('  Less MDNQ Total....: ({})'.format(MDNQCounter))
+		print(' Less DUPES Total....: ({})'.format(DupesCounter))
 		print('')
-		print('GRAND TOTAL........: {}'.format(DatabaseCounter + PurchaseCounter + \
-			PennyCounter + NickelCounter - MDNQCounter - DupesCounter))
-		print('')
-		print('STATE Distribution + Running Total:')
-		for key, value in sorted(StateDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+		print('=====================================')
+		print('GRAND TOTAL..........: {} Records'.format(DatabaseCounter + \
+			PurchaseCounter + PennyCounter + NickelCounter - \
+			MDNQCounter - DupesCounter))
+		print('=====================================')
+		print('STATE Distribution + RTotal:')
+		for key, value in sorted(StateDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
 			StateRTotal = StateRTotal + value
 			print('  {}....: {} [{}]'.format(key, value, StateRTotal))
 		print('')
-		print('SCF Distribution + Running Total:')
-		for key, value in sorted(SCFDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+		print('SCF Distribution + RTotal:')
+		for key, value in sorted(SCFDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
 			SCFRTotal = SCFRTotal + value
 			print('  SCF {}....: {} [{}]'.format(key, value, SCFRTotal))
 		print('')
-		print('CITY Distribution + Running Total:')
-		for key, value in sorted(CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+		print('CITY Distribution + RTotal:')
+		for key, value in sorted(CityDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
 			CityRTotal = CityRTotal + value
 			print('  {}....: {} [{}]'.format(key, value, CityRTotal))
 		print('')
-		print('YEAR Distribution + Running Total:')
+		print('YEAR Distribution + RTotal:')
 		for key in sorted(YearDictCounter.iterkeys(), reverse = True):
 			YearRTotal = YearRTotal + YearDictCounter[key]
-			print('  Yr {}....: {} [{}]'.format(key, YearDictCounter[key], YearRTotal))
+			print('  Yr {}....: {} [{}]'.format(key, \
+				YearDictCounter[key], YearRTotal))
 		print('')
-		print('RADIUS Distribution + Running Total:')
+		print('RADIUS Distribution + RTotal:')
 		for key in sorted(RadiusDictCounter.iterkeys()):
 			RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
-			print('  {} Miles....: {} [{}]'.format(round(key,2), RadiusDictCounter[key], RadiusRTotal))
+			print('  {} Miles....: {} [{}]'.format(round(float(key),2), \
+				RadiusDictCounter[key], RadiusRTotal))
 		print('')
-		print('MAKE Distribution + Running Total:')
-		for key, value in sorted(MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+		print('MAKE Distribution + RTotal:')
+		for key, value in sorted(MakeDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
 			MakeRTotal = MakeRTotal + value
 			print('  {}....: {} [{}]'.format(key, value, MakeRTotal))
 		print('')
-#		print('VIN Distribution:')
-#		for key, value in sorted(VINDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+#		print('DELDATE Distribution + RTotal:')
+#		for key, value in sorted(DelDateDictCounter.iteritems(), \
+#			key = lambda (k,v): (v,k), reverse = True):
+#			DelDateRTotal = DelDateRTotal + value
 #			if value > 1:
-#				print('  {}....: {}'.format(key, value))
-		print('')
+#				print('  {}....: {} [{}]'.format(key, value, DelDateRTotal))
+#		print('')
+# 		print('VIN Distribution:')
+# 		for key, value in sorted(VINDictCounter.iteritems(), \
+# 			key = lambda (k,v): (v,k), reverse = True):
+# 			if value > 1:
+# 				print('  {}....: {}'.format(key, value))
+# 		print('')
 		sys.stdout = Report
-	print('TOTAL............................ : {}'.format(DatabaseCounter + PurchaseCounter + \
-			PennyCounter + NickelCounter - MDNQCounter - DupesCounter))
-	print('')
+	print('=======================================')
+	print('............. T O T A L ............. : {}'.format(DatabaseCounter + \
+		PurchaseCounter + PennyCounter + NickelCounter - MDNQCounter - \
+		DupesCounter))
+
 

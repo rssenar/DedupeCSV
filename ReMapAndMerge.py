@@ -45,12 +45,13 @@ BuybackValues = 31
 WinningNum = 32
 MailDNQ = 33
 BlitzDNQ = 34
-DropVal = 35
+Drop = 35
 PURL = 36
 YrDec = 37
-Misc1 = 38
-Misc2 = 39
-Misc3 = 40
+SCF3DigitAddr = 38
+Misc1 = 39
+Misc2 = 40
+Misc3 = 41
 
 HeaderRow = [\
 	'Customer ID',\
@@ -91,6 +92,7 @@ HeaderRow = [\
 	'Drop',\
 	'PURL',\
 	'YrDec',\
+	'SCF3DigitAddr',\
 	'Misc1',\
 	'Misc2',\
 	'Misc3'\
@@ -184,6 +186,8 @@ def ReMapHeaderFields():
 			HeaderDict[PURL] = 'line['+str(i)+']'
 		elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
 			HeaderDict[YearDec] = 'line['+str(i)+']'
+		elif bool(re.search(r'\bSCF3DigitAddr\b',field,flags=re.I)):
+				HeaderDict[SCF3DigitAddr] = 'line['+str(i)+']'
 		elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
 			HeaderDict[Misc1] = 'line['+str(i)+']' 
 		elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
