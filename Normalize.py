@@ -3,13 +3,13 @@
 from __future__ import division, print_function
 import csv, os, sys, re, glob
 import datetime
-from geopy.distance import vincenty
 from dateutil.parser import *
+from geopy.distance import vincenty
 from tqdm import tqdm
 from nameparser import HumanName
 # ==================================================================== #
 def main():
-	global CleanOutputPD
+	global IPFName
 	global PennyCounter
 	global NickelCounter
 	global DatabaseCounter
@@ -22,6 +22,7 @@ def main():
 	global RadiusDictCounter
 	global CityDictCounter
 	global StateDictCounter
+	global SCF3DFacilityCounter
 	global IPFName
 	global CentralZip
 	global MaxRadius
@@ -29,16 +30,16 @@ def main():
 	global MinYear
 	global CurrentDateUpdate
 	global MaxSaleYear
-	global CentralZipSCFFacility
+	global CentralZipSCFFacilityReport
 	# ==================================================================== #
 	os.chdir('../../../../Desktop/')
 	path = '../Dropbox/HUB/Projects/PremWorks/_Resources'
 	MDNQFile = os.path.join(path,'MailDNQ.csv')
-	DropFile = os.path.join(path,'DropFile.csv')
+	DropFile = os.path.join(path,'_DropFile.csv')
 	ZipCoordFile = os.path.join(path,'USZIPCoordinates.csv')
 	YearDecodeFile = os.path.join(path,'YearDecode.csv')
-	GenSuppressionFile = os.path.join(path,'GeneralSuppression.csv')
-	MonthlySuppressionFile = os.path.join(path,'MonthlySuppression.csv')
+	GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
+	MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
 	SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
 	# ==================================================================== #
 	WinninNumber = 40754
@@ -46,12 +47,15 @@ def main():
 	SeqNumPurchaseP = 30000
 	SeqNumPurchaseN = 40000
 	SeqNumPurchase = 50000
+	# ==================================================================== #
 	PennyCounter = 0
 	NickelCounter = 0
 	DatabaseCounter = 0
 	PurchaseCounter = 0
 	MDNQCounter = 0
 	DupesCounter = 0
+	SCF3DigitFacility = 0
+	# ==================================================================== #
 	Entries = set()
 	DoNotMailFile = set()
 	# ==================================================================== #
@@ -62,7 +66,38 @@ def main():
 			item = item.strip()
 			AppendedList.append(item)
 		return AppendedList
-	# ==================================================================== #	
+	# ==================================================================== #
+	# Import Drop Dictionary from Drop_File.csv file
+	try:
+		DropDict = {}
+		with open(DropFile,'rU') as DropFile:
+			Drop = csv.reader(DropFile)
+			next(DropFile)
+			for line in Drop:
+				DropDict[line[0]] = line[1]
+	except:
+		print('ERROR: Unable to Load Drop Dictionary File')
+	# ==================================================================== #
+	# Import GENERAL Suppression File for the purposes of de-duping
+	try:
+		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
+			GenSuppression = csv.reader(GenSuppressionFile)
+			next(GenSuppressionFile)
+			for line in GenSuppression:
+				Entries.add((str.title(line[2]),str.title(line[5])))
+	except:
+		print('ERROR: Unable to Load GENERAL Suppression File')
+	# ==================================================================== #
+	# Import Montly Suppression File for the purposes of de-duping
+	try:
+		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
+			MonthlySuppression = csv.reader(MonthlySuppressionFile)
+			next(MonthlySuppressionFile)
+			for line in MonthlySuppression:
+				Entries.add((str.title(line[2]),str.title(line[5])))
+	except:
+		print('ERROR: Unable to Load Montly Suppression File')
+	# ==================================================================== #
 	# Import Zip Dictionary from US_ZIP_Coordinates.csv file
 	try:
 		ZipCoordinateDict = {}
@@ -72,22 +107,7 @@ def main():
 				ZipCoordinateDict[line[0]] = (line[1], line[2])
 	except:
 		print('ERROR: Unable to Load Zip Dictionary File')
-	# Import GENERAL Suppression File for the purposes of de-duping
-	try:
-		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
-			GenSuppression = csv.reader(GenSuppressionFile)
-			for line in GenSuppression:
-				Entries.add((str.title(line[2]),str.title(line[5])))
-	except:
-		print('ERROR: Unable to Load GENERAL Suppression File')
-	# Import Montly Suppression File for the purposes of de-duping
-	try:
-		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
-			MonthlySuppression = csv.reader(MonthlySuppressionFile)
-			for line in MonthlySuppression:
-				Entries.add((str.title(line[2]),str.title(line[5])))
-	except:
-		print('ERROR: Unable to Load Montly Suppression File')
+	# ==================================================================== #
 	# Import Mail DNQ File for the purposes of de-duping
 	try:
 		with open(MDNQFile,'rU') as MDNQFile:
@@ -96,15 +116,7 @@ def main():
 				DoNotMailFile.add(line[0])
 	except:
 		print('ERROR: Unable to Load Mail DNQ File')
-	# Import Drop Dictionary from Drop_File.csv file
-	try:
-		DropDict = {}
-		with open(DropFile,'rU') as DropFile:
-			Drop = csv.reader(DropFile)
-			for line in Drop:
-				DropDict[line[0]] = line[1]
-	except:
-		print('ERROR: Unable to Load Drop Dictionary File')
+	# ==================================================================== #
 	# Import Year Decode Dictionary from Year_Decode.csv file
 	try:
 		YearDecodeDict = {}
@@ -114,6 +126,7 @@ def main():
 				YearDecodeDict[line[0]] = (line[1])
 	except:
 		print('ERROR: Unable to Load Year Decode Dictionary File')
+	# ==================================================================== #
 	# Import SCF Dictionary from SCF Facilities.csv file
 	try:
 		SCF3DigitDict = {}
@@ -123,6 +136,9 @@ def main():
 				SCF3DigitDict[line[0]] = (line[1])
 	except:
 		print('ERROR: Unable to Load SCF 3-Digit Dictionary File')
+	# ==================================================================== #
+	# User Input
+	# ==================================================================== #
 	# Capture Input - File Name
 	IPFName = raw_input('Enter File Name ..................... : ')
 	InputFile = IPFName + '.csv'
@@ -157,34 +173,34 @@ def main():
 	STATEList = raw_input('Enter Suppression List .......[STATE] : ')
 	if STATEList != '':
 		STATEList = SplitAndStripFunc(STATEList)
-		print('STATEList = ', STATEList)
+		print('..STATEList :', STATEList)
 	else:
 		STATEList = []
-		print('STATEList = ', STATEList)
+		print('..STATEList :', STATEList)
 	# Generate Suppress SCF List
 	SCFList = raw_input('Enter Suppression List .........[SCF] : ')
 	if SCFList != '':
 		SCFList = SplitAndStripFunc(SCFList)
-		print('SCFList = ', SCFList)
+		print('....SCFList :', SCFList)
 	else:
 		SCFList = []
-		print('SCFList = ', SCFList)
+		print('....SCFList :', SCFList)
 	# Generate Suppress YEAR List
 	YEARList = raw_input('Enter Suppression List ........[YEAR] : ')
 	if YEARList != '':
 		YEARList = SplitAndStripFunc(YEARList)
-		print('YEARList = ', YEARList)
+		print('...YEARList :', YEARList)
 	else:
 		YEARList = []
-		print('YEARList = ', YEARList)
+		print('...YEARList :', YEARList)
 	# Generate Suppress CITY List
 	CITYList = raw_input('Enter Suppression List ........[CITY] : ')
 	if CITYList != '':
 		CITYList = SplitAndStripFunc(CITYList)
-		print('CITYList = ', CITYList)
+		print('...CITYList :', CITYList)
 	else:
 		CITYList =[]
-		print('CITYList = ', CITYList)
+		print('...CITYList :', CITYList)
 	# Import LOCAL Suppression File for the purposes of de-duping
 	SuppressionFileName = raw_input('Enter Suppression File ....[OPTIONAL] : ')
 	SuppressionFile = SuppressionFileName + '.csv'
@@ -192,10 +208,13 @@ def main():
 		try:
 			with open(SuppressionFile,'rU') as SuppressionFile:
 				Suppression = csv.reader(SuppressionFile)
+				next(SuppressionFile)
 				for line in Suppression:
 					Entries.add((str.title(line[2]),str.title(line[5])))
 		except:
 			print('     ERROR: Cannot load local suppression file')
+	else:
+		print('No Suppression File Selected')
 	# Capture ReMap Header Row Selection
 	HRSelect = raw_input('......ReMap Header Row? [Default = N] : ')
 	if HRSelect == '':
@@ -251,7 +270,7 @@ def main():
 	Drop = 35
 	PURL = 36
 	YrDec = 37
-	SCF3DigitAddr = 38
+	SCF3DFacility = 38
 	Misc1 = 39
 	Misc2 = 40
 	Misc3 = 41
@@ -295,7 +314,7 @@ def main():
 		'Drop',\
 		'PURL',\
 		'YrDec',\
-		'SCF3DigitAddr',\
+		'SCF3DFacility',\
 		'Misc1',\
 		'Misc2',\
 		'Misc3'\
@@ -390,8 +409,8 @@ def main():
 				HeaderDict[PURL] = 'line['+str(i)+']'
 			elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
 				HeaderDict[YrDec] = 'line['+str(i)+']'		
-			elif bool(re.search(r'\bSCF3DigitAddr\b',field,flags=re.I)):
-				HeaderDict[SCF3DigitAddr] = 'line['+str(i)+']'
+			elif bool(re.search(r'\bSCF3DFacility\b',field,flags=re.I)):
+				HeaderDict[SCF3DFacility] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
 				HeaderDict[Misc1] = 'line['+str(i)+']' 
 			elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
@@ -447,7 +466,7 @@ def main():
 		AppendFirstTimeR = True
 		MDNQFirstTime = True
 		MonthlySuppressionFirstTime = True
-		# ---------------------------
+		# ============================================================ #
 		YearDictCounter = {}
 		MakeDictCounter = {}
 		ModelDictCounter = {}
@@ -455,7 +474,8 @@ def main():
 		RadiusDictCounter = {}
 		CityDictCounter = {}
 		StateDictCounter = {}
-		# ---------------------------
+		SCF3DFacilityCounter = {}
+		# ============================================================ #
 		Input = csv.reader(InputFile)
 		next(InputFile) # Skip Header Row
 		for line in tqdm(Input):
@@ -591,30 +611,23 @@ def main():
 			except:
 				line[YrDec] = ''
 			# ============================================================ #
-			# Set SCF & Central ZIP SCF 3Digit Address
-			ZipLen = len(str(line[Zip]))				
-			try:
-				if ZipLen < 5:
-					line[SCF] = (line[Zip])[:2]
-				else:
-					line[SCF] = (line[Zip])[:3]
-				if line[SCF] in SCF3DigitDict:
-					line[SCF3DigitAddr] = SCF3DigitDict[line[SCF]]
-			except:
-				line[SCF3DigitAddr] = ''
+			# Set SCF SCF Facility Location
+			ZipLen = len(str(line[Zip]))							
+			if ZipLen < 5:
+				line[SCF] = (line[Zip])[:2]
+			else:
+				line[SCF] = (line[Zip])[:3]
+			if line[SCF] in SCF3DigitDict:
+				line[SCF3DFacility] = SCF3DigitDict[line[SCF]]
 			# ============================================================ #
-			# Set SCF Facility Location from Central ZIP	
+			# Set Central ZIP SCF Facility Location
 			CentralZipLen = len(str(CentralZip))
 			if CentralZipLen < 5:
 				CentralZipSCF3Digit = str(CentralZip[:2])
 			else:
 				CentralZipSCF3Digit = str(CentralZip[:3])
-			try:
-				if CentralZipSCF3Digit in SCF3DigitDict:
-					line[SCF3DigitAddr] = SCF3DigitDict[CentralZipSCF3Digit]
-					CentralZipSCFFacility = line[SCF3DigitAddr]
-			except:
-				line[SCF3DigitAddr] = ''
+			if CentralZipSCF3Digit in SCF3DigitDict:
+				CentralZipSCFFacilityReport = SCF3DigitDict[CentralZipSCF3Digit]
 			# ============================================================ #
 			# Calculate Radius from Central Zip
 			try:
@@ -666,11 +679,12 @@ def main():
 			float(line[Radius]) > MaxRadius:
 				line[MailDNQ] = 'dnq'
 			# Test YEAR Validity
-			try:
-				if int(line[Year]) > MaxYear or int(line[Year]) < MinYear:
+			if line[Year] != '':
+				try:
+					if int(line[Year]) > MaxYear or int(line[Year]) < MinYear:
+						line[MailDNQ] = 'dnq'
+				except:
 					line[MailDNQ] = 'dnq'
-			except:
-				line[MailDNQ] = 'dnq'
 			# Test DELDATE Validity
 			try:
 				line[DelDate] = parse(line[DelDate]) # Convert DateTime format
@@ -719,6 +733,10 @@ def main():
 				StateDictCounter[line[State]] = 1
 			else:
 				StateDictCounter[line[State]] += 1
+			if line[SCF3DFacility] not in SCF3DFacilityCounter: # Generate SCF Facility Counter
+				SCF3DFacilityCounter[line[SCF3DFacility]] = 1
+			else:
+				SCF3DFacilityCounter[line[SCF3DFacility]] += 1
 			# ============================================================ #
 			# OUTPUT Generate Phone File
 			# ============================================================ #
@@ -943,7 +961,7 @@ def main():
 					line[CustomerID],\
 					line[Drop]\
 					)
-				if line[CustomerID][:1] == 'p' or line[CustomerID][:1] == 'P':
+				if line[CustomerID][:1] == 'P' or line[CustomerID][:1] == 'p':
 					if AppendFirstTimeP:
 						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
 						OutputCleanAppendP.writerow(HeaderRowAppend)
@@ -952,7 +970,7 @@ def main():
 					else:
 						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
 						OutputCleanAppendP.writerow(AppendOutputHeader)
-				elif line[CustomerID][:1] == 'n' or line[CustomerID][:1] == 'N':
+				elif line[CustomerID][:1] == 'N' or line[CustomerID][:1] == 'n':
 					if AppendFirstTimeN:
 						OutputCleanAppendN = csv.writer(CleanOutputAppendN)
 						OutputCleanAppendN.writerow(HeaderRowAppend)
@@ -970,10 +988,8 @@ def main():
 					else:
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
 						OutputCleanAppendR.writerow(AppendOutputHeader)
-		# ==================================================================== #
-
+# ==================================================================== #
 if __name__ == '__main__':
-	# ============================================================ #
 	def Upkeep():
 		# Clean up temporary files
 		Files = glob.glob('*.csv')
@@ -983,90 +999,93 @@ if __name__ == '__main__':
 			if bool(re.match('.+Re-Mapped.+',Record,flags=re.I)):
 				os.remove(Record)
 	# ============================================================ #
-	try:
-		main() # Call Main Function
-		RadiusRTotal = 0
-		YearRTotal = 0
-		CityRTotal = 0
-		SCFRTotal = 0
-		StateRTotal = 0
-		MakeRTotal = 0
-		DelDateRTotal = 0
-		# Output Log Report
-		Report = sys.stdout
-		with open('Summary_Report_Log.txt','w') as Log:
-			sys.stdout =  Log
-			print('')
-			print('=====================================')
-			print('SUMMARY REPORT LOG')
-			print('=====================================')
-			print('Project Name.........: {}'.format(IPFName))
-			print('Central ZIP Code.....: {}'.format(CentralZip))
-			print('SCF Facility.........: {}'.format(CentralZipSCFFacility))
-			print('Max Radius...........: {} Miles'.format(MaxRadius))
-			print('Max Year.............: {}'.format(MaxYear))
-			print('Min Year.............: {}'.format(MinYear))
-			print('Max DelDate Year.....: {}'.format(MaxSaleYear))
-			print('')
-			print('   DATABASE Total....: {}'.format(DatabaseCounter))
-			print('   PURCHASE Total....: {}'.format(PurchaseCounter))
-			print('      PENNY Total....: {}'.format(PennyCounter))
-			print('     NICKEL Total....: {}'.format(NickelCounter))
-			print('  Less MDNQ Total....: ({})'.format(MDNQCounter))
-			print(' Less DUPES Total....: ({})'.format(DupesCounter))
-			print('')
-			print('=====================================')
-			print('GRAND TOTAL..........: {} Records'.format(DatabaseCounter + \
-			PurchaseCounter + PennyCounter + NickelCounter - \
-			MDNQCounter - DupesCounter))
-			print('=====================================')
-			print('STATE Distribution + RTotal:')
-			for key, value in sorted(StateDictCounter.iteritems(), \
-				key = lambda (k,v): (v,k), reverse = True):
-				StateRTotal = StateRTotal + value
-				print('  {}....: {} [{}]'.format(key, value, StateRTotal))
-			print('')
-			print('SCF Distribution + RTotal:')
-			for key, value in sorted(SCFDictCounter.iteritems(), \
-				key = lambda (k,v): (v,k), reverse = True):
-				SCFRTotal = SCFRTotal + value
-				print('  SCF {}....: {} [{}]'.format(key, value, SCFRTotal))
-			print('')
-			print('YEAR Distribution + RTotal:')
-			for key in sorted(YearDictCounter.iterkeys(), reverse = True):
-				YearRTotal = YearRTotal + YearDictCounter[key]
-				print('  Yr {}....: {} [{}]'.format(key, YearDictCounter[key], \
-					YearRTotal))
-			print('')
-			print('RADIUS Distribution + RTotal:')
-			for key in sorted(RadiusDictCounter.iterkeys()):
-				RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
-				print('  {} Miles....: {} [{}]'.format(key, RadiusDictCounter[key], \
-					RadiusRTotal))
-			print('')
-			print('CITY Distribution + RTotal:')
-			for key, value in sorted(CityDictCounter.iteritems(), \
-				key = lambda (k,v): (v,k), reverse = True):
-				CityRTotal = CityRTotal + value
-				print('  {}....: {} [{}]'.format(key, value, CityRTotal))
-			print('')
-			print('MAKE Distribution + RTotal:')
-			for key, value in sorted(MakeDictCounter.iteritems(), \
-				key = lambda (k,v): (v,k), reverse = True):
-				MakeRTotal = MakeRTotal + value
-				print('  {}....: {} [{}]'.format(key, value, MakeRTotal))
-			print('')
-			sys.stdout = Report
-		print('=======================================')
-		print('............. T O T A L ............. : {}'.format(DatabaseCounter + \
-			PurchaseCounter + PennyCounter + NickelCounter - \
-			MDNQCounter - DupesCounter))
-		print('=======================================')
-		Upkeep() # Call Upkeep Function
-		print('========= C O M P L E T E D! ==========')
-		print('=======================================')
-	except:
-		print('CRITICAL ERROR! Process Terminated')
+	main() # Main Function
+	RadiusRTotal = 0
+	YearRTotal = 0
+	CityRTotal = 0
+	SCFRTotal = 0
+	StateRTotal = 0
+	MakeRTotal = 0
+	DelDateRTotal = 0
+	SCFFacilityRTotal = 0
+	# ============================================================ #
+	# Output Report
+	Report = sys.stdout
+	with open('>SUMMARY-REPORT_' + IPFName + '.txt','w') as Log:
+		sys.stdout =  Log
 		print('')
-		Upkeep() # Call Upkeep Function
-		
+		print('=====================================')
+		print('SUMMARY REPORT LOG')
+		print('=====================================')
+		print('Project Name.........: {}'.format(IPFName))
+		print('Central ZIP Code.....: {}'.format(CentralZip))
+		print('SCF Facility.........: {}'.format(CentralZipSCFFacilityReport))
+		print('Max Radius...........: {} Miles'.format(MaxRadius))
+		print('Max Year.............: {}'.format(MaxYear))
+		print('Min Year.............: {}'.format(MinYear))
+		print('Max DelDate Year.....: {}'.format(MaxSaleYear))
+		print('')
+		print('   DATABASE Total....: {}'.format(DatabaseCounter))
+		print('   PURCHASE Total....: {}'.format(PurchaseCounter))
+		print('      PENNY Total....: {}'.format(PennyCounter))
+		print('     NICKEL Total....: {}'.format(NickelCounter))
+		print('  Less MDNQ Total....: ({})'.format(MDNQCounter))
+		print(' Less DUPES Total....: ({})'.format(DupesCounter))
+		print('')
+		print('=====================================')
+		print('GRAND TOTAL..........: {} Records'.format(DatabaseCounter + \
+			PurchaseCounter + PennyCounter + NickelCounter - \
+			MDNQCounter - DupesCounter))
+		print('=====================================')
+		print('STATE Distribution + RTotal:')
+		for key, value in sorted(StateDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
+			StateRTotal = StateRTotal + value
+			print('  {}....: {} [{}]'.format(key, value, StateRTotal))
+		print('')
+		print('SCF Distribution + RTotal:')
+		for key, value in sorted(SCFDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
+			SCFRTotal = SCFRTotal + value
+			print('  SCF {}....: {} [{}]'.format(key, value, SCFRTotal))
+		print('')
+		print('SCF Facility + RTotal:')
+		for key, value in sorted(SCF3DFacilityCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
+			SCFFacilityRTotal = SCFFacilityRTotal + value
+			print('  SCF {}....: {} [{}]'.format(key, value, SCFFacilityRTotal))
+		print('')
+		print('YEAR Distribution + RTotal:')
+		for key in sorted(YearDictCounter.iterkeys(), reverse = True):
+			YearRTotal = YearRTotal + YearDictCounter[key]
+			print('  Yr {}....: {} [{}]'.format(key, YearDictCounter[key], \
+				YearRTotal))
+		print('')
+		print('RADIUS Distribution + RTotal:')
+		for key in sorted(RadiusDictCounter.iterkeys()):
+			RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
+			print('  {} Miles....: {} [{}]'.format(key, RadiusDictCounter[key], \
+				RadiusRTotal))
+		print('')
+		print('CITY Distribution + RTotal:')
+		for key, value in sorted(CityDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
+			CityRTotal = CityRTotal + value
+			print('  {}....: {} [{}]'.format(key, value, CityRTotal))
+		print('')
+		print('MAKE Distribution + RTotal:')
+		for key, value in sorted(MakeDictCounter.iteritems(), \
+			key = lambda (k,v): (v,k), reverse = True):
+			MakeRTotal = MakeRTotal + value
+			print('  {}....: {} [{}]'.format(key, value, MakeRTotal))
+		print('')
+		sys.stdout = Report
+	print('=======================================')
+	print('............. T O T A L ............. : {}'.format(DatabaseCounter + \
+		PurchaseCounter + PennyCounter + NickelCounter - \
+		MDNQCounter - DupesCounter))
+	print('=======================================')
+	print('========== C O M P L E T E D ==========')
+	print('=======================================')
+	Upkeep() # Call Upkeep Function
+	# ============================================================ #
