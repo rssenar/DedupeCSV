@@ -32,9 +32,9 @@ def main():
 	global CurrentDateUpdate
 	global MaxSaleYear
 	global CentralZipSCFFacilityReport
+	global TOPPercentage
 	# ==================================================================== #
 	os.chdir('../../../../Desktop/') # Change PWD to Desktop
-	# ==================================================================== #
 	path = '../Dropbox/HUB/Projects/PremWorks/_Resources' # Set path to resource folder
 	MDNQFile = os.path.join(path,'MailDNQ.csv')
 	DropFile = os.path.join(path,'_DropFile.csv')
@@ -147,13 +147,13 @@ def main():
 	# ==================================================================== #
 	# Capture Input - File Name
 	IPFName = raw_input('Enter File Name ..................... : ')
-	InputFile = IPFName + '.csv'
+	InputFile = '{}.csv'.format(IPFName)
 	while os.path.isfile(InputFile) == False:
 		IPFName = raw_input('ERROR: Enter File Name .............. : ')
-		InputFile = IPFName + '.csv'
+		InputFile = '{}.csv'.format(IPFName)
 	# Capture Input - Central Zip
 	CentralZip = raw_input('Enter Central ZIP Code .............. : ')
-	while CentralZip not in ZipCoordinateDict:
+	while str(CentralZip) not in ZipCoordinateDict:
 		CentralZip = raw_input('ERROR: Enter ZIP Codes............... : ')
 	# Capture Input - Max RADIUS
 	try:
@@ -179,34 +179,30 @@ def main():
 	STATEList = raw_input('Enter Suppression List .......[STATE] : ')
 	if STATEList != '':
 		STATEList = sorted(SplitAndStripFunc(STATEList))
-		print('..STATEList :', STATEList)
+		print('..STATEList : {}'.format(STATEList))
 	else:
 		STATEList = []
-		print('..STATEList :', STATEList)
 	# Generate Suppress SCF List
 	SCFList = raw_input('Enter Suppression List .........[SCF] : ')
 	if SCFList != '':
 		SCFList = sorted(SplitAndStripFunc(SCFList))
-		print('....SCFList :', SCFList)
+		print('....SCFList : {}'.format(SCFList))
 	else:
 		SCFList = []
-		print('....SCFList :', SCFList)
 	# Generate Suppress YEAR List
 	YEARList = raw_input('Enter Suppression List ........[YEAR] : ')
 	if YEARList != '':
 		YEARList = sorted(SplitAndStripFunc(YEARList))
-		print('...YEARList :', YEARList)
+		print('...YEARList : {}'.format(YEARList))
 	else:
 		YEARList = []
-		print('...YEARList :', YEARList)
 	# Generate Suppress CITY List
 	CITYList = raw_input('Enter Suppression List ........[CITY] : ')
 	if CITYList != '':
 		CITYList = sorted(SplitAndStripFunc(CITYList))
-		print('...CITYList :', CITYList)
+		print('...CITYList : {}'.format(CITYList))
 	else:
 		CITYList =[]
-		print('...CITYList :', CITYList)
 	# Import LOCAL Suppression File for the purposes of de-duping
 	SuppressionFileName = raw_input('Enter Suppression File ....[OPTIONAL] : ')
 	SuppressionFile = SuppressionFileName + '.csv'
@@ -219,12 +215,19 @@ def main():
 					Entries.add((str.title(line[2]),str.title(line[5])))
 		except:
 			print('     ERROR: Cannot load local suppression file')
-	else:
-		print('No Suppression File Selected')
+	# Set TOP Percentage
+	TOPPercentage = raw_input('Set TOP Percentage ..............[3%] : ')
+	try:
+		TOPPercentage = int(TOPPercentage)
+	except:
+		TOPPercentage = 3
 	# Capture ReMap Header Row Selection
-	HRSelect = str.upper(raw_input('......ReMap Header Row? [Default = N] : '))
+	HRSelect = str.upper(raw_input('ReMap Header Row? ......[Default = N] : '))
 	if HRSelect == '':
 		HRSelect = 'N'
+	print('--------------------------------------- ')
+	raw_input('....... PRESS [ENTER] TO PROCEED ...... ')
+	print('')
 	# ==================================================================== #
 	ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
 	Dupes = '>>>>>>>>>> DUPES <<<<<<<<<<.csv'
@@ -608,14 +611,14 @@ def main():
 			else:
 				line[VIN] = str.upper(line[VIN])
 			# ============================================================ #
-			# Set SCF SCF Facility Location
-			ZipLen = len(str(line[Zip]))							
+			# Set SCF Facility Location
+			ZipLen = len(str(line[Zip]))				
 			if ZipLen < 5:
 				line[SCF] = (line[Zip])[:2]
 			else:
 				line[SCF] = (line[Zip])[:3]
-			if line[SCF] in SCF3DigitDict:
-				line[SCF3DFacility] = SCF3DigitDict[line[SCF]]
+			if str(line[SCF]) in SCF3DigitDict:
+				line[SCF3DFacility] = SCF3DigitDict[str(line[SCF])]
 			# ============================================================ #
 			# Set Central ZIP SCF Facility Location
 			CentralZipLen = len(str(CentralZip))
@@ -623,31 +626,30 @@ def main():
 				CentralZipSCF3Digit = str(CentralZip[:2])
 			else:
 				CentralZipSCF3Digit = str(CentralZip[:3])
-			if CentralZipSCF3Digit in SCF3DigitDict:
-				CentralZipSCFFacilityReport = SCF3DigitDict[CentralZipSCF3Digit]
+			if str(CentralZipSCF3Digit) in SCF3DigitDict:
+				CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
 			# ============================================================ #
 			# Calculate Radius from Central Zip
 			try:
-				if CentralZip in ZipCoordinateDict:
-					OriginZipCoord = ZipCoordinateDict[CentralZip]
+				line[Zip] = int(line[Zip])
 			except:
-				OriginZipCoord = ''
-			try:
-				if int(line[Zip][:1]) == 0:
-					line[Zip] = line[Zip][-4:]
-			except:
-				line[Zip] = ''
-			try:
-				if line[Zip] in ZipCoordinateDict:
-					TargetZipCoord = ZipCoordinateDict[line[Zip]]
-					line[Coordinates] = TargetZipCoord
-			except:
-				TargetZipCoord = ''
-
-			if OriginZipCoord == '' or TargetZipCoord == '':
-				line[Radius] = 9999
+				line[Zip] = 9999
+			if line[Zip] == '':
+				line[Zip] = 9999
+			# Remove Leading 0 from Zip Code
+			if str(line[Zip])[:1] == 0 and len(str(line[Zip])) == 4:
+				line[Zip] = line[Zip][-4:]
+			# Set Long & Lat Coordinates for Central Zip Code and Zip Code
+			OriginZipCoord = ZipCoordinateDict[str(CentralZip)]
+			if str(line[Zip]) in ZipCoordinateDict:
+				line[Coordinates] = ZipCoordinateDict[str(line[Zip])]
 			else:
-				line[Radius] = round(float(vincenty(OriginZipCoord,TargetZipCoord).miles),1)
+				line[Coordinates] = ''
+			# Set Radius
+			if line[Coordinates] == '':
+				line[Radius] = 9999.9999
+			else:
+				line[Radius] = round(float(vincenty(OriginZipCoord,line[Coordinates]).miles),1)
 			# ============================================================ #
 			# Convert "Date" Field to DateTime format
 			try:
@@ -708,46 +710,49 @@ def main():
 			# ============================================================ #
 			# Generate COUNTERS
 			# ============================================================ #
+			CityRadiusCounter = '{} {} ({} Miles)'.format(line[City],line[Zip],line[Radius])
+			ZipRadiusCounter = '{} ({} Miles)'.format(line[Zip],line[Radius])
+			# ============================================================ #
 			# Generate YEAR Counter
-			if line[Year] not in YearDictCounter:
-				YearDictCounter[line[Year]] = 1
+			if str(line[Year]) not in YearDictCounter:
+				YearDictCounter[str(line[Year])] = 1
 			else:
-				YearDictCounter[line[Year]] += 1
+				YearDictCounter[str(line[Year])] += 1
 			# Generate MAKE Counter
-			if line[Make] not in MakeDictCounter:
-				MakeDictCounter[line[Make]] = 1
+			if str(line[Make]) not in MakeDictCounter:
+				MakeDictCounter[str(line[Make])] = 1
 			else:
-				MakeDictCounter[line[Make]] += 1
+				MakeDictCounter[str(line[Make])] += 1
 			# Generate SCF Counter
-			if line[SCF] not in SCFDictCounter:
-				SCFDictCounter[line[SCF]] = 1
+			if str(line[SCF]) not in SCFDictCounter:
+				SCFDictCounter[str(line[SCF])] = 1
 			else:
-				SCFDictCounter[line[SCF]] += 1
+				SCFDictCounter[str(line[SCF])] += 1
 			# Generate RADIUS Counter
-			if line[Radius] not in RadiusDictCounter:
-				RadiusDictCounter[line[Radius]] = 1
+			if float(line[Radius]) not in RadiusDictCounter:
+				RadiusDictCounter[float(line[Radius])] = 1
 			else:
-				RadiusDictCounter[line[Radius]] += 1
+				RadiusDictCounter[float(line[Radius])] += 1
 			# Generate CITY Counter
-			if line[City] not in CityDictCounter:
-				CityDictCounter[line[City]] = 1
+			if str(CityRadiusCounter) not in CityDictCounter:
+				CityDictCounter[str(CityRadiusCounter)] = 1
 			else:
-				CityDictCounter[line[City]] += 1
+				CityDictCounter[str(CityRadiusCounter)] += 1
 			# Generate STATE Counter
-			if line[State] not in StateDictCounter:
-				StateDictCounter[line[State]] = 1
+			if str(line[State]) not in StateDictCounter:
+				StateDictCounter[str(line[State])] = 1
 			else:
-				StateDictCounter[line[State]] += 1
+				StateDictCounter[str(line[State])] += 1
 			# Generate SCF Facility Counter
-			if line[SCF3DFacility] not in SCF3DFacilityCounter:
-				SCF3DFacilityCounter[line[SCF3DFacility]] = 1
+			if str(line[SCF3DFacility]) not in SCF3DFacilityCounter:
+				SCF3DFacilityCounter[str(line[SCF3DFacility])] = 1
 			else:
-				SCF3DFacilityCounter[line[SCF3DFacility]] += 1
+				SCF3DFacilityCounter[str(line[SCF3DFacility])] += 1
 			# Generate Zip Counter
-			if line[Zip] not in ZipCounter:
-				ZipCounter[line[Zip]] = 1
+			if str(ZipRadiusCounter) not in ZipCounter:
+				ZipCounter[str(ZipRadiusCounter)] = 1
 			else:
-				ZipCounter[line[Zip]] += 1
+				ZipCounter[str(ZipRadiusCounter)] += 1
 			# ============================================================ #
 			# OUTPUT Generate Phone File
 			# ============================================================ #
@@ -788,8 +793,8 @@ def main():
 			# ============================================================ #
 			# OUTPUT Dupes and Mail-DNQ Files
 			# ============================================================ #
-			key = (str.title(line[AddressComb]),str.title(line[Zip]))
-			# key = (str.title(line[FirstName]),str.title(line[LastName]),str.title(line[AddressComb]),str.title(line[Zip]))
+			key = (str.title(line[AddressComb]),str(line[Zip]))
+			# key = (str.title(line[FirstName]),str.title(line[LastName]),str.title(line[AddressComb]),str(line[Zip]))
 			if key not in Entries:
 				if line[MailDNQ] == 'dnq':
 					if MDNQFirstTime:
@@ -1000,9 +1005,6 @@ def main():
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
 # ==================================================================== #
 if __name__ == '__main__':
-	# ============================================================ #
-	# Function
-	# ============================================================ #
 	def upkeep():
 		# Clean up temporary files
 		Files = glob.glob('*.csv')
@@ -1035,12 +1037,13 @@ if __name__ == '__main__':
 	with open('SUMMARY-REPORT_' + IPFName + '.md','w') as Log:
 		sys.stdout =  Log
 		print('')
-		print('-------------------------------------')
-		print('#### DATA SUMMARY REPORT')
-		print('-------------------------------------')
-		print('|Category|Description|')
+		print('------------------------------------------------------------')
+		print('**{}**'.format(str.upper(IPFName)))
+		print('Data Summary Report - as of {}'.format(datetime.datetime.now()))
+		print('------------------------------------------------------------')
+		print('')
+		print('||Description|')
 		print('|-:|:-|')
-		print('|Project Name|{}|'.format(IPFName))
 		print('|Central ZIP Code|{}|'.format(CentralZip))
 		print('|SCF Facility|{}|'.format(CentralZipSCFFacilityReport))
 		print('|Max Radius|{} Miles|'.format(MaxRadius))
@@ -1055,100 +1058,98 @@ if __name__ == '__main__':
 		print('|Less MDNQ Total|**({})**|'.format(MDNQCounter))
 		print('|Less Dupes Total|**({})**|'.format(DupesCounter))
 		GrandTotal = DatabaseCounter + PurchaseCounter + PennyCounter + NickelCounter - MDNQCounter - DupesCounter
+		print('|||')
 		print('|**GRAND TOTAL**|**{}**|'.format(GrandTotal))
 		print('')
 		SUBTotal = DatabaseCounter + PurchaseCounter + PennyCounter + NickelCounter
-		# ============================================================ #
-		# TOP Counts
-		# ============================================================ #
-		print('-------------------------------------')
-		print('#### TOP Counts')
-		print('-------------------------------------')
-		print('')
-		print('##### TOP Counts by STATE ( >5% ):')
-		print('||State|Count|RTotal|%|')
+		print('------------------------------------------------------------')
+		print('##### TOP-COUNTS')
+		print('------------------------------------------------------------')
+		print('##### TOP Counts by STATE ( > {}% ):'.format(TOPPercentage))
+		print('||State|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key, value in sorted(StateDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
 			StateRTotal = StateRTotal + value
 			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, StateRTotal, round(Prcnt,1)))
-		print('')		
-		print('##### TOP Counts by SCF ( >5% ):')
-		print('||SCF|Count|RTotal|%|')
+			if Prcnt > TOPPercentage:
+				print('||{}|{}|{}|{}%|'.format(key, value, StateRTotal, round(Prcnt,1)))
+		print('')
+		print('##### TOP Counts by 3-Digit ZIP ( > {}% ):'.format(TOPPercentage))
+		print('||3-Digit ZIP|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key, value in sorted(SCFDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
 			SCFRTotal = SCFRTotal + value
 			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, SCFRTotal, round(Prcnt,1)))
+			if Prcnt > TOPPercentage:
+				if len(str(key)) == 2:
+					print('||3-Digit ZIP 0{}|{}|{}|{}%|'.format(key, value, SCFRTotal, round(Prcnt,1)))
+				else:
+					print('||3-Digit ZIP {}|{}|{}|{}%|'.format(key, value, SCFRTotal, round(Prcnt,1)))
 		print('')
 		for key in sorted(SCFDictCounter.iterkeys()):
-			SortedSCFText = SortedSCFText + str(key) + ' | '
+			SortedSCFText = '{} {} |'.format(SortedSCFText, key)
 		print('<!--')
 		print(SortedSCFText)
 		print('-->')
-		print('')
-		print('##### TOP Counts by SCF FACILITY ( >5% ):')
-		print('||SCF Facility|Count|RTotal|%|')
+		print('##### TOP Counts by SCF FACILITY ( > {}% ):'.format(TOPPercentage))
+		print('||SCF Facility|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key, value in sorted(SCF3DFacilityCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
 			SCFFacilityRTotal = SCFFacilityRTotal + value
 			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, SCFFacilityRTotal, round(Prcnt,1)))
-		print('')
-		print('##### TOP Counts by YEAR ( >5% ):')
-		print('||Year|Count|RTotal|%|')
+			if Prcnt > TOPPercentage:
+				print('||{}|{}|{}|{}%|'.format(key, value, SCFFacilityRTotal, round(Prcnt,1)))
+		print('')	
+		if len(YearDictCounter) !=  1:
+			print('##### TOP Counts by YEAR ( > {}% ):'.format(TOPPercentage))
+			print('||Year|Count|Running Total|%|')
+			print('||-|-:|-:|-:|')
+			for key, value in sorted(YearDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+				YearRTotal = YearRTotal + value
+				Prcnt = percentage(value, SUBTotal)
+				if Prcnt > TOPPercentage:
+					print('||Yr {}|{}|{}|{}%|'.format(key, value, YearRTotal, round(Prcnt,1)))
+			print('')
+		print('##### TOP Counts by RADIUS ( > {}% ):'.format(TOPPercentage))
+		print('||Radius|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
-		for key in sorted(YearDictCounter.iterkeys(), reverse = True):
-			YearRTotal = YearRTotal + YearDictCounter[key]
-			Prcnt = percentage(YearDictCounter[key], SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, YearDictCounter[key], YearRTotal, round(Prcnt,1)))
+		for key, value in sorted(RadiusDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+			RadiusRTotal = RadiusRTotal + value
+			Prcnt = percentage(value, SUBTotal)
+			if Prcnt > TOPPercentage:
+				print('||{} Miles|{}|{}|{}%|'.format(key, value, RadiusRTotal, round(Prcnt,1)))
 		print('')
-		print('##### TOP Counts by RADIUS ( >5% ):')
-		print('||Radius|Count|RTotal|%|')
-		print('||-|-:|-:|-:|')
-		for key in sorted(RadiusDictCounter.iterkeys()):
-			RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
-			Prcnt = percentage(RadiusDictCounter[key], SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, RadiusDictCounter[key], RadiusRTotal, round(Prcnt,1)))
-		print('')
-		print('##### TOP Counts by CITY ( >5% ):')
-		print('||City|Count|RTotal|%|')
+		print('##### TOP Counts by CITY ( > {}% ):'.format(TOPPercentage))
+		print('||City|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key, value in sorted(CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
 			CityRTotal = CityRTotal + value
 			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, CityRTotal, round(Prcnt,1)))
+			if Prcnt > TOPPercentage:
+				print('||{}|{}|{}|{}%|'.format(key, value, CityRTotal, round(Prcnt,1)))
 		print('')
-		print('##### TOP Counts by ZIP ( >5% ):')
-		print('||SCF|Count|RTotal|%|')
+		print('##### TOP Counts by ZIP ( > {}%):'.format(TOPPercentage))
+		print('||Zip|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key, value in sorted(ZipCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
 			ZIPRTotal = ZIPRTotal + value
 			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, ZIPRTotal, round(Prcnt,1)))
+			if Prcnt > TOPPercentage:
+				print('||{}|{}|{}|{}%|'.format(key, value, ZIPRTotal, round(Prcnt,1)))
 		print('')
-		print('##### TOP Counts by MAKE ( >5% ):')
-		print('||Make|Count|RTotal|%|')
-		print('||-|-:|-:|-:|')
-		for key, value in sorted(MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			MakeRTotal = MakeRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, MakeRTotal, round(Prcnt,1)))
-		print('')
-		# ============================================================ #
-		# Distributions
-		# ============================================================ #
-		print('-------------------------------------')
-		print('#### Distributions')
-		print('-------------------------------------')
+		if len(MakeDictCounter) !=  1:
+			print('##### TOP Counts by MAKE ( > {}% ):'.format(TOPPercentage))
+			print('||Make|Count|Running Total|%|')
+			print('||-|-:|-:|-:|')
+			for key, value in sorted(MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
+				MakeRTotal = MakeRTotal + value
+				Prcnt = percentage(value, SUBTotal)
+				if Prcnt > TOPPercentage:
+					print('||{}|{}|{}|{}%|'.format(key, value, MakeRTotal, round(Prcnt,1)))
+			print('')
+		print('------------------------------------------------------------')
+		print('##### DISTRIBUTION')
+		print('------------------------------------------------------------')
 		print('')
 		StateRTotal = 0
 		SCFRTotal = 0
@@ -1159,92 +1160,103 @@ if __name__ == '__main__':
 		MakeRTotal = 0
 		ZIPRTotal = 0
 		print('##### Count Distribution by STATE:')
-		print('||State|Count|RTotal|%|')
+		print('||State|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
-		for key, value in sorted(StateDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			StateRTotal = StateRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, StateRTotal, round(Prcnt,1)))
+		for key in sorted(StateDictCounter.iterkeys()):
+			StateRTotal = StateRTotal + StateDictCounter[key]
+			Prcnt = percentage(StateDictCounter[key], SUBTotal)
+			if Prcnt > TOPPercentage:
+				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, StateDictCounter[key], StateRTotal, round(Prcnt,1)))
 			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, StateRTotal, round(Prcnt,1)))
+				print('||{}|{}|{}|{}%|'.format(key, StateDictCounter[key], StateRTotal, round(Prcnt,1)))
 		print('')
-		print('##### Count Distribution by SCF:')
-		print('||SCF|Count|RTotal|%|')
+		print('##### Count Distribution by 3-Digit ZIP:')
+		print('||SCF|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
-		for key, value in sorted(SCFDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			SCFRTotal = SCFRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, SCFRTotal, round(Prcnt,1)))
+		for key in sorted(SCFDictCounter.iterkeys()):
+			SCFRTotal = SCFRTotal + SCFDictCounter[key]
+			Prcnt = percentage(SCFDictCounter[key], SUBTotal)
+			if Prcnt > TOPPercentage:
+				if len(str(key)) == 2:
+					print('|**>**|**3-Digit ZIP 0{}**|**{}**|{}|{}%|'.format(key, SCFDictCounter[key], SCFRTotal, round(Prcnt,1)))
+				else:
+					print('|**>**|**3-Digit ZIP {}**|**{}**|{}|{}%|'.format(key, SCFDictCounter[key], SCFRTotal, round(Prcnt,1)))
 			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, SCFRTotal, round(Prcnt,1)))
+				if len(str(key)) == 2:
+					print('||3-Digit ZIP 0{}|{}|{}|{}%|'.format(key, SCFDictCounter[key], SCFRTotal, round(Prcnt,1)))
+				else:
+					print('||3-Digit ZIP {}|{}|{}|{}%|'.format(key, SCFDictCounter[key], SCFRTotal, round(Prcnt,1)))
 		print('')
+		print('<!--')
+		print(SortedSCFText)
+		print('-->')
 		print('##### Count Distribution by SCF FACILITY:')
-		print('||SCFFacility|Count|RTotal|%|')
+		print('||SCF Facility|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
-		for key, value in sorted(SCF3DFacilityCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			SCFFacilityRTotal = SCFFacilityRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, SCFFacilityRTotal, round(Prcnt,1)))
+		for key in sorted(SCF3DFacilityCounter.iterkeys()):
+			SCFFacilityRTotal = SCFFacilityRTotal + SCF3DFacilityCounter[key]
+			Prcnt = percentage(SCF3DFacilityCounter[key], SUBTotal)
+			if Prcnt > TOPPercentage:
+				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, SCF3DFacilityCounter[key], SCFFacilityRTotal, round(Prcnt,1)))
 			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, SCFFacilityRTotal, round(Prcnt,1)))
+				print('||{}|{}|{}|{}%|'.format(key, SCF3DFacilityCounter[key], SCFFacilityRTotal, round(Prcnt,1)))
 		print('')
-		print('##### Count Distribution by YEAR:')
-		print('||Year|Count|RTotal|%|')
+		if len(YearDictCounter) !=  1:
+			print('##### Count Distribution by YEAR:')
+			print('||Year|Count|Running Total|%|')
+			print('||-|-:|-:|-:|')
+			for key in sorted(YearDictCounter.iterkeys()):
+				YearRTotal = YearRTotal + YearDictCounter[key]
+				Prcnt = percentage(YearDictCounter[key], SUBTotal)
+				if Prcnt > TOPPercentage:
+					print('|**>**|**Yr {}**|**{}**|{}|{}%|'.format(key, YearDictCounter[key], YearRTotal, round(Prcnt,1)))
+				else:
+					print('||Yr {}|{}|{}|{}%|'.format(key, YearDictCounter[key], YearRTotal, round(Prcnt,1)))
+			print('')
+		print('##### Count Distribution by CITY:')
+		print('||City|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
-		for key in sorted(YearDictCounter.iterkeys(), reverse = True):
-			YearRTotal = YearRTotal + YearDictCounter[key]
-			Prcnt = percentage(YearDictCounter[key], SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, YearDictCounter[key], YearRTotal, round(Prcnt,1)))
+		for key in sorted(CityDictCounter.iterkeys()):
+			CityRTotal = CityRTotal + CityDictCounter[key]
+			Prcnt = percentage(CityDictCounter[key], SUBTotal)
+			if Prcnt > TOPPercentage:
+				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, CityDictCounter[key], CityRTotal, round(Prcnt,1)))
 			else:
-				print('||{}|{}|{}|{}%|'.format(key, YearDictCounter[key], YearRTotal, round(Prcnt,1)))
+				print('||{}|{}|{}|{}%|'.format(key, CityDictCounter[key], CityRTotal, round(Prcnt,1)))
+		print('')
+		if len(MakeDictCounter) !=  1:
+			print('##### Count Distribution by MAKE:')
+			print('||Make|Count|Running Total|%|')
+			print('||-|-:|-:|-:|')
+			for key in sorted(MakeDictCounter.iterkeys()):
+				MakeRTotal = MakeRTotal + MakeDictCounter[key]
+				Prcnt = percentage(MakeDictCounter[key], SUBTotal)
+				if Prcnt > TOPPercentage:
+					print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, MakeDictCounter[key], MakeRTotal, round(Prcnt,1)))
+				else:
+					print('||{}|{}|{}|{}%|'.format(key, MakeDictCounter[key], MakeRTotal, round(Prcnt,1)))
+			print('')
+		print('##### Count Distribution by ZIP:')
+		print('||Zip|Count|Running Total|%|')
+		print('||-|-:|-:|-:|')
+		for key in sorted(ZipCounter.iterkeys()):
+			ZIPRTotal = ZIPRTotal + ZipCounter[key]
+			Prcnt = percentage(ZipCounter[key], SUBTotal)
+			if Prcnt > TOPPercentage:
+				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, ZipCounter[key], ZIPRTotal, round(Prcnt,1)))
+			else:
+				print('||{}|{}|{}|{}%|'.format(key, ZipCounter[key], ZIPRTotal, round(Prcnt,1)))
 		print('')
 		print('##### Count Distribution by RADIUS:')
-		print('||Radius|Count|RTotal|%|')
+		print('||Radius|Count|Running Total|%|')
 		print('||-|-:|-:|-:|')
 		for key in sorted(RadiusDictCounter.iterkeys()):
 			RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
 			Prcnt = percentage(RadiusDictCounter[key], SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, RadiusDictCounter[key], RadiusRTotal, round(Prcnt,1)))
+			if Prcnt > TOPPercentage:
+				print('|**>**|**{} Miles**|**{}**|{}|{}%|'.format(key, RadiusDictCounter[key], RadiusRTotal, round(Prcnt,1)))
 			else:
-				print('||{}|{}|{}|{}%|'.format(key, RadiusDictCounter[key], RadiusRTotal, round(Prcnt,1)))
-		print('')
-		print('##### Count Distribution by CITY:')
-		print('||City|Count|RTotal|%|')
-		print('||-|-:|-:|-:|')
-		for key, value in sorted(CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			CityRTotal = CityRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, CityRTotal, round(Prcnt,1)))
-			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, CityRTotal, round(Prcnt,1)))
-		print('')
-		print('##### TOP Counts by ZIP ( >5% ):')
-		print('||SCF|Count|RTotal|%|')
-		print('||-|-:|-:|-:|')
-		for key, value in sorted(ZipCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			ZIPRTotal = ZIPRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, ZIPRTotal, round(Prcnt,1)))
-			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, ZIPRTotal, round(Prcnt,1)))
-		print('')
-		print('##### Count Distribution by MAKE:')
-		print('||Make|Count|RTotal|%|')
-		print('||-|-:|-:|-:|')
-		for key, value in sorted(MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True):
-			MakeRTotal = MakeRTotal + value
-			Prcnt = percentage(value, SUBTotal)
-			if Prcnt > 5:
-				print('|**>**|**{}**|**{}**|{}|{}%|'.format(key, value, MakeRTotal, round(Prcnt,1)))
-			else:
-				print('||{}|{}|{}|{}%|'.format(key, value, MakeRTotal, round(Prcnt,1)))
+				print('||{} Miles|{}|{}|{}%|'.format(key, RadiusDictCounter[key], RadiusRTotal, round(Prcnt,1)))
 		print('')
 		sys.stdout = Report
 	print('---------------------------------------')
