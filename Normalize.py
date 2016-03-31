@@ -145,65 +145,91 @@ def main():
 	# User Input
 	# ==================================================================== #
 	# Capture Input - File Name
-	IPFName = raw_input('Enter File Name ..................... : ')
+	IPFName = raw_input(
+		'Enter File Name ..................... : '
+		)
 	InputFile = '{}.csv'.format(IPFName)
 	while os.path.isfile(InputFile) == False:
-		IPFName = raw_input('ERROR: Enter File Name .............. : ')
+		IPFName = raw_input(
+			'ERROR: Enter File Name .............. : '
+			)
 		InputFile = '{}.csv'.format(IPFName)
 	# Capture Input - Central Zip
-	CentralZip = raw_input('Enter Central ZIP Code .............. : ')
+	CentralZip = raw_input(
+		'Enter Central ZIP Code .............. : '
+		)
 	while str(CentralZip) not in ZipCoordinateDict:
-		CentralZip = raw_input('ERROR: Enter ZIP Codes............... : ')
+		CentralZip = raw_input(
+			'ERROR: Enter ZIP Codes............... : '
+			)
 	# Capture Input - Max RADIUS
 	try:
-		MaxRadius = int(raw_input('Enter Max Radius ...............[100] : '))
+		MaxRadius = int(raw_input(
+			'Enter Max Radius ...............[100] : '
+			))
 	except:
 		MaxRadius = 100
 	# Capture Input - Max YEAR
 	try:
-		MaxYear = int(raw_input('Enter Max Year ................[2015] : '))
+		MaxYear = int(raw_input(
+			'Enter Max Year ................[2015] : '
+			))
 	except:
 		MaxYear = 2015
 	# Capture Input - Min YEAR
 	try:
-		MinYear = int(raw_input('Enter Min Year ................[1900] : '))
+		MinYear = int(raw_input(
+			'Enter Min Year ................[1900] : '
+			))
 	except:
 		MinYear = 1900
 	# Capture Input - Max SALE YEAR
 	try:
-		MaxSaleYear = int(raw_input('Enter Maximum Sales Year ......[2015] : '))
+		MaxSaleYear = int(raw_input(
+			'Enter Maximum Sales Year ......[2015] : '
+			))
 	except:
 		MaxSaleYear = 2015
 	# Generate Suppress STATE List
-	STATEList = raw_input('Enter Suppression List .......[STATE] : ')
+	STATEList = raw_input(
+		'Enter Suppression List .......[STATE] : '
+		)
 	if STATEList != '':
 		STATEList = sorted(SplitAndStripFunc(STATEList))
 		print('..STATEList : {}'.format(STATEList))
 	else:
 		STATEList = []
 	# Generate Suppress SCF List
-	SCFList = raw_input('Enter Suppression List .........[SCF] : ')
+	SCFList = raw_input(
+		'Enter Suppression List .........[SCF] : '
+		)
 	if SCFList != '':
 		SCFList = sorted(SplitAndStripFunc(SCFList))
 		print('....SCFList : {}'.format(SCFList))
 	else:
 		SCFList = []
 	# Generate Suppress YEAR List
-	YEARList = raw_input('Enter Suppression List ........[YEAR] : ')
+	YEARList = raw_input(
+		'Enter Suppression List ........[YEAR] : '
+		)
 	if YEARList != '':
 		YEARList = sorted(SplitAndStripFunc(YEARList))
 		print('...YEARList : {}'.format(YEARList))
 	else:
 		YEARList = []
 	# Generate Suppress CITY List
-	CITYList = raw_input('Enter Suppression List ........[CITY] : ')
+	CITYList = raw_input(
+		'Enter Suppression List ........[CITY] : '
+		)
 	if CITYList != '':
 		CITYList = sorted(SplitAndStripFunc(CITYList))
 		print('...CITYList : {}'.format(CITYList))
 	else:
 		CITYList =[]
 	# Import LOCAL Suppression File for the purposes of de-duping
-	SuppressionFileName = raw_input('Suppression File ...[ENTER File Name] : ')
+	SuppressionFileName = raw_input(
+		'Suppression File ...[ENTER File Name] : '
+		)
 	SuppressionFile = '{}.csv'.format(SuppressionFileName)
 	if SuppressionFileName != '':
 		try:
@@ -215,19 +241,27 @@ def main():
 		except:
 			print('     ERROR: Cannot load local suppression file')
 	# Set TOP Percentage
-	TOPPercentage = raw_input('Set Top % .......................[4%] : ')
+	TOPPercentage = raw_input(
+		'Set Top % .......................[4%] : '
+		)
 	try:
 		TOPPercentage = int(TOPPercentage)
 	except:
 		TOPPercentage = 4
 	# Capture ReMap Header Row Selection
-	HRSelect = str.upper(raw_input('ReMap Header Row? ................[N] : '))
+	HRSelect = str.upper(raw_input(
+		'ReMap Header Row? ................[N] : '
+		))
 	if HRSelect == '':
 		HRSelect = 'N'
 	print('------------------------------------- ')
-	VendorSelect = str.upper(raw_input('Vendor..... TheShopper[S] Platinum[P] : '))
+	VendorSelect = str.upper(raw_input(
+		'Vendor..... TheShopper[S] Platinum[P] : '
+		))
 	while VendorSelect != 'S' and VendorSelect != 'P':
-		VendorSelect = str.upper(raw_input('ERR! Select TheShopper[S] Platinum[P] : '))
+		VendorSelect = str.upper(raw_input(
+			'ERR! Select TheShopper[S] Platinum[P] : '
+			))
 	print('------------------------------------- ')
 	raw_input('....... PRESS [ENTER] TO PROCEED ...... ')
 	# ==================================================================== #
@@ -287,50 +321,50 @@ def main():
 	Misc2 = 41
 	Misc3 = 42
 	# Assign Column Names To Header Output Files
-	HeaderRowMain = [\
-		'Customer ID',\
-		'FullName',\
-		'First Name',\
-		'MI',\
-		'Last Name',\
-		'Address1',\
-		'Address2',\
-		'Address',\
-		'City',\
-		'State',\
-		'Zip',\
-		'4Zip',\
-		'SCF',\
-		'Phone',\
-		'HPH',\
-		'BPH',\
-		'CPH',\
-		'Email',\
-		'VIN',\
-		'Year',\
-		'Make',\
-		'Model',\
-		'DelDate',\
-		'Date',\
-		'Radius',\
-		'Coordinates',\
-		'VINLen',\
-		'DSF_WALK_SEQ',\
-		'Crrt',\
-		'ZipCrrt',\
-		'KBB',\
-		'Buyback Value',\
-		'Winning Number',\
-		'Mail DNQ',\
-		'Blitz DNQ',\
-		'Drop',\
-		'PURL',\
-		'YrDec',\
-		'SCF3DFacility',\
-		'Vendor',\
-		'Misc1',\
-		'Misc2',\
-		'Misc3'\
+	HeaderRowMain = [
+		'Customer ID',
+		'FullName',
+		'First Name',
+		'MI',
+		'Last Name',
+		'Address1',
+		'Address2',
+		'Address',
+		'City',
+		'State',
+		'Zip',
+		'4Zip',
+		'SCF',
+		'Phone',
+		'HPH',
+		'BPH',
+		'CPH',
+		'Email',
+		'VIN',
+		'Year',
+		'Make',
+		'Model',
+		'DelDate',
+		'Date',
+		'Radius',
+		'Coordinates',
+		'VINLen',
+		'DSF_WALK_SEQ',
+		'Crrt',
+		'ZipCrrt',
+		'KBB',
+		'Buyback Value',
+		'Winning Number',
+		'Mail DNQ',
+		'Blitz DNQ',
+		'Drop',
+		'PURL',
+		'YrDec',
+		'SCF3DFacility',
+		'Vendor',
+		'Misc1',
+		'Misc2',
+		'Misc3'
 		]
 	# ==================================================================== #
 	# ReMap Header
@@ -494,20 +528,20 @@ def main():
 		# ============================================================ #
 		Input = csv.reader(InputFile)
 		next(InputFile) # Skip Header Row
-		for line in tqdm(Input):
+		for line in tqdm(Input): # Loop thru Input File
 			# ============================================================ #
 			if VendorSelect == 'S':
-				WinningNumber = 40754
+				WinningNumber = 40754 # The Shopper Winning #
 				line[Vendor] = 'The Shopper'
 			elif VendorSelect == 'P':
-				WinningNumber = 42619
+				WinningNumber = 42619 # Platinum Plus Winning #
 				line[Vendor] = 'Platinum Plus'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
 			# ============================================================ #
 			# Parse Fullname if First & Last Name fields are missing
-			if line[FullName] != '' and (line[FirstName] == '' \
-			and line[LastName] == ''):
+			if line[FullName] != '' and \
+			(line[FirstName] == '' and line[LastName]) == '':
 				try:
 					ParsedFName = HumanName(str.title(line[FullName]))
 					line[FirstName] = ParsedFName.first.encode('utf-8')
@@ -525,15 +559,23 @@ def main():
 			# Combine ZIP + CRRT fields
 			if line[Zip] != '' and line[CRRT] != '':
 				if len(str(line[Zip])) < 5:
-					line[ZipCRRT] = '0{}{}'.format(line[Zip],line[CRRT])
+					line[ZipCRRT] = '0{}{}'.format(
+						line[Zip],
+						line[CRRT]
+						)
 				else:
-					line[ZipCRRT] = '{}{}'.format(line[Zip],line[CRRT])
+					line[ZipCRRT] = '{}{}'.format(
+						line[Zip],
+						line[CRRT]
+						)
 			# ============================================================ #
 			# Combine Address1 + Address2
 			if line[AddressComb] == '' and line[Address1] != '' and \
 			line[Address2] != '':
-				line[AddressComb] = '{} {}'.format(str.title(line[Address1]), \
-					str.title(line[Address2]))
+				line[AddressComb] = '{} {}'.format(
+					str.title(line[Address1]),
+					str.title(line[Address2])
+					)
 			elif line[Address1] != '' and line[Address2] == '':
 				line[AddressComb] = str.title(line[Address1]) 
 			else:
@@ -545,21 +587,29 @@ def main():
 				if str(line[ZipCRRT]) in DropDict:
 					line[Drop] = DropDict[str(line[ZipCRRT])]
 					if line[Drop] == 'P' or line[Drop] == 'PENNY':
-						line[CustomerID] = 'P{}'.format(str(SeqNumPurchaseP))
+						line[CustomerID] = 'P{}'.format(
+							str(SeqNumPurchaseP)
+							)
 						SeqNumPurchaseP += 1
 						PennyCounter += 1
 					elif line[Drop] == 'N' or line[Drop] == 'NICKEL':
-						line[CustomerID] = 'N{}'.format(str(SeqNumPurchaseN))
+						line[CustomerID] = 'N{}'.format(
+							str(SeqNumPurchaseN)
+							)
 						SeqNumPurchaseN += 1
 						NickelCounter += 1
 				elif line[DSF_WALK_SEQ] == '':
 					line[Drop] = 'D'
-					line[CustomerID] = 'D{}'.format(str(SeqNumDatabase))
+					line[CustomerID] = 'D{}'.format(
+						str(SeqNumDatabase)
+						)
 					SeqNumDatabase += 1
 					DatabaseCounter += 1
 				elif line[DSF_WALK_SEQ] != '':
 					line[Drop] = 'A'
-					line[CustomerID] = 'A{}'.format(str(SeqNumPurchase))
+					line[CustomerID] = 'A{}'.format(
+						str(SeqNumPurchase)
+						)
 					SeqNumPurchase += 1
 					PurchaseCounter += 1
 			else:
@@ -573,32 +623,33 @@ def main():
 					PurchaseCounter += 1
 			# ============================================================ #
 			# Parse & Format Phone #
+			def ClnPhone(Phone):
+				Phone = str(Phone).strip()
+				Phone = str(Phone).replace('-','')
+				Phone = str(Phone).replace('(','')
+				Phone = str(Phone).replace(')','')
+				return Phone
+			
 			if line[MPhone] != '' and len(str(line[MPhone])) > 6:
-				vp = str(line[MPhone]).strip()
-				vp = str(vp).replace('-','')
-				vp = str(vp).replace('(','')
-				vp = str(vp).replace(')','')
-				line[Phone] = str(vp).replace(' ','')
+				line[Phone] = ClnPhone(line[MPhone])
 			elif line[HPhone] != '' and len(str(line[HPhone])) > 6:
-				vp = str(line[HPhone]).strip()
-				vp = str(vp).replace('-','')
-				vp = str(vp).replace('(','')
-				vp = str(vp).replace(')','')
-				line[Phone] = str(vp).replace(' ','')
+				line[Phone] = ClnPhone(line[HPhone])
 			elif line[WPhone] != '' and len(str(line[WPhone])) > 6:
-				vp = str(line[WPhone]).strip()
-				vp = str(vp).replace('-','')
-				vp = str(vp).replace('(','')
-				vp = str(vp).replace(')','')
-				line[Phone] = str(vp).replace(' ','')
+				line[Phone] = ClnPhone(line[WPhone])
 			else:
 				line[Phone] = ''
+			
 			if len(str(line[Phone])) == 10:
-				line[Phone] = '(' + str(line[Phone][0:3]) + ') ' + \
-				str(line[Phone][3:6]) + '-' + str(line[Phone][6:10])
+				line[Phone] = '({}) {}-{}'.format(
+					str(line[Phone][0:3]),
+					str(line[Phone][3:6]),
+					str(line[Phone][6:10])
+					)
 			elif len(str(line[Phone])) == 7:
-				line[Phone] = str(line[Phone][0:3]) + '-' + \
-				str(line[Phone][3:7])
+				line[Phone] = '{}-{}'.format(
+					str(line[Phone][0:3]),
+					str(line[Phone][3:7])
+					)
 			else:
 				line[Phone] = ''
 			# ============================================================ #
@@ -663,8 +714,10 @@ def main():
 			if line[Coordinates] == '':
 				line[Radius] = 9999.9999
 			else:
-				line[Radius] = round(float(vincenty(OriginZipCoord, \
-					line[Coordinates]).miles),1)
+				line[Radius] = round(float(vincenty(
+					OriginZipCoord,
+					line[Coordinates]
+					).miles),1)
 			# ============================================================ #
 			# Convert "Date" Field to DateTime format
 			try:
@@ -731,8 +784,15 @@ def main():
 			# ============================================================ #
 			# Generate COUNTERS
 			# ============================================================ #
-			CityRadiusCounter = '{} {} ({} Miles)'.format(line[City],line[Zip],line[Radius])
-			ZipRadiusCounter = '{} ({} Miles)'.format(line[Zip],line[Radius])
+			CityRadiusCounter = '{} {} ({} Miles)'.format(
+				line[City],
+				line[Zip],
+				line[Radius]
+				)
+			ZipRadiusCounter = '{} ({} Miles)'.format(
+				line[Zip],
+				line[Radius]
+				)
 			# ============================================================ #
 			# Generate YEAR Counter
 			if str(line[Year]) not in YearDictCounter:
@@ -777,31 +837,32 @@ def main():
 			# ============================================================ #
 			# OUTPUT Generate Phone File
 			# ============================================================ #
-			if line[Phone] != '' and line[BlitzDNQ] != 'dnq' and \
+			if line[Phone] != '' and \
+			line[BlitzDNQ] != 'dnq' and \
 			line[MailDNQ] != 'dnq':
-				HeaderRowPhones = [\
-					'First Name',\
-					'Last Name',\
-					'Phone',\
-					'Address',\
-					'City',\
-					'State',\
-					'Zip',\
-					'Last Veh Year',\
-					'Last Veh Make',\
-					'Last Veh Model'\
+				HeaderRowPhones = [
+					'First Name',
+					'Last Name',
+					'Phone',
+					'Address',
+					'City',
+					'State',
+					'Zip',
+					'Last Veh Year',
+					'Last Veh Make',
+					'Last Veh Model'
 					]
-				HeaderRowPhonesOutput = (\
-					line[FirstName],\
-					line[LastName],\
-					line[Phone],\
-					line[AddressComb],\
-					line[City],\
-					line[State],\
-					line[Zip],\
-					line[Year],\
-					line[Make],\
-					line[Model]\
+				HeaderRowPhonesOutput = (
+					line[FirstName],
+					line[LastName],
+					line[Phone],
+					line[AddressComb],
+					line[City],
+					line[State],
+					line[Zip],
+					line[Year],
+					line[Make],
+					line[Model]
 					)
 				if PhonesFirstTime:
 					OutputPhones = csv.writer(CleanOutputPhones)
@@ -814,8 +875,7 @@ def main():
 			# ============================================================ #
 			# OUTPUT Dupes and Mail-DNQ Files
 			# ============================================================ #
-			key = (str.title(line[AddressComb]),str(line[Zip]))
-			#key = (str.title(line[FirstName]),str.title(line[LastName]),#str.title(line[AddressComb]),str(line[Zip]))
+			key = (str.title(line[AddressComb]), str(line[Zip]))
 			if key not in Entries:
 				if line[MailDNQ] == 'dnq':
 					if MDNQFirstTime:
@@ -858,22 +918,22 @@ def main():
 			# Generate Suppression File
 			# ============================================================ #
 			if line[PURL] != '':
-				HeaderRowSuppression = [\
-					'First Name',\
-					'Last Name',\
-					'Address',\
-					'City',\
-					'State',\
-					'Zip',\
-					'Campaign Name'\
+				HeaderRowSuppression = [
+					'First Name',
+					'Last Name',
+					'Address',
+					'City',
+					'State',
+					'Zip',
+					'Campaign Name'
 					]
-				HeaderRowSuppressionOutput = (\
-					line[FirstName],\
-					line[LastName],\
-					line[AddressComb],\
-					line[City],\
-					line[State],\
-					line[Zip],\
+				HeaderRowSuppressionOutput = (
+					line[FirstName],
+					line[LastName],
+					line[AddressComb],
+					line[City],
+					line[State],
+					line[Zip],
 					IPFName
 					)
 				if MonthlySuppressionFirstTime:
@@ -889,35 +949,35 @@ def main():
 			# ============================================================ #
 			# Output Database File
 			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
-				HeaderRowDatabase = [\
-					'Customer ID',\
-					'First Name',\
-					'Last Name',\
-					'Address',\
-					'City',\
-					'State',\
-					'Zip',\
-					'Phone',\
-					'Year',\
-					'Make',\
-					'Model',\
-					'Winning Number',\
-					'Position'\
+				HeaderRowDatabase = [
+					'Customer ID',
+					'First Name',
+					'Last Name',
+					'Address',
+					'City',
+					'State',
+					'Zip',
+					'Phone',
+					'Year',
+					'Make',
+					'Model',
+					'Winning Number',
+					'Position'
 					]
-				HeaderRowDatabaseOutput = (\
-					line[CustomerID],\
-					line[FirstName],\
-					line[LastName],\
-					line[AddressComb],\
-					line[City],\
-					line[State],\
-					line[Zip],\
-					line[Phone],\
-					line[Year],\
-					line[Make],\
-					line[Model],\
-					line[WinningNum],\
-					line[Drop]\
+				HeaderRowDatabaseOutput = (
+					line[CustomerID],
+					line[FirstName],
+					line[LastName],
+					line[AddressComb],
+					line[City],
+					line[State],
+					line[Zip],
+					line[Phone],
+					line[Year],
+					line[Make],
+					line[Model],
+					line[WinningNum],
+					line[Drop]
 					)
 				if DatabaseFirstTime:
 					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
@@ -930,33 +990,33 @@ def main():
 			
 			# Output Purchase File
 			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
-				HeaderRowPurchase = [\
-					'Customer ID',\
-					'First Name',\
-					'Last Name',\
-					'Address',\
-					'City',\
-					'State',\
-					'Zip',\
-					'4Zip',\
-					'DSF_WALK_SEQ',\
-					'Crrt',\
-					'Winning Number',\
-					'Position'\
+				HeaderRowPurchase = [
+					'Customer ID',
+					'First Name',
+					'Last Name',
+					'Address',
+					'City',
+					'State',
+					'Zip',
+					'4Zip',
+					'DSF_WALK_SEQ',
+					'Crrt',
+					'Winning Number',
+					'Position'
 					]
-				HeaderRowPurchaseOutput = (\
-					line[CustomerID],\
-					line[FirstName],\
-					line[LastName],\
-					line[AddressComb],\
-					line[City],\
-					line[State],\
-					line[Zip],\
-					line[Zip4],\
-					line[DSF_WALK_SEQ],\
-					line[CRRT],\
-					line[WinningNum],\
-					line[Drop]\
+				HeaderRowPurchaseOutput = (
+					line[CustomerID],
+					line[FirstName],
+					line[LastName],
+					line[AddressComb],
+					line[City],
+					line[State],
+					line[Zip],
+					line[Zip4],
+					line[DSF_WALK_SEQ],
+					line[CRRT],
+					line[WinningNum],
+					line[Drop]
 					)
 				if PurchaseFirstTimeAll:
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
@@ -967,35 +1027,35 @@ def main():
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
 					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
 			
-			# Output Appended files [ Penny / Nickel / Other ]
+			# Output Appended files [Penny/Nickel/Other]
 			else:
-				HeaderRowAppend = [\
-					'PURL',\
-					'First Name',\
-					'Last Name',\
-					'Address1',\
-					'City',\
-					'State',\
-					'Zip',\
-					'4Zip',\
-					'Crrt',\
-					'DSF_WALK_SEQ',\
-					'Customer ID',\
-					'Position'\
+				HeaderRowAppend = [
+					'PURL',
+					'First Name',
+					'Last Name',
+					'Address1',
+					'City',
+					'State',
+					'Zip',
+					'4Zip',
+					'Crrt',
+					'DSF_WALK_SEQ',
+					'Customer ID',
+					'Position'
 					]
-				HeaderRowAppendOutput = (\
-					line[PURL],\
-					line[FirstName],\
-					line[LastName],\
-					line[Address1],\
-					line[City],\
-					line[State],\
-					line[Zip],\
-					line[Zip4],\
-					line[CRRT],\
-					line[DSF_WALK_SEQ],\
-					line[CustomerID],\
-					line[Drop]\
+				HeaderRowAppendOutput = (
+					line[PURL],
+					line[FirstName],
+					line[LastName],
+					line[Address1],
+					line[City],
+					line[State],
+					line[Zip],
+					line[Zip4],
+					line[CRRT],
+					line[DSF_WALK_SEQ],
+					line[CustomerID],
+					line[Drop]
 					)
 				if line[CustomerID][:1] == 'P' or line[CustomerID][:1] == 'p':
 					if AppendFirstTimeP:
@@ -1033,7 +1093,7 @@ if __name__ == '__main__':
 		else:
 			return 100 * float(part)/float(whole)
 	# Function to Convert List to String
-	def ConvListToStringFunc(input):
+	def ConLstStr(input):
 		for item in input:
 			return item
 	# ============================================================ #
@@ -1042,20 +1102,28 @@ if __name__ == '__main__':
 	# Output Report
 	Report = sys.stdout
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
-		sys.stdout =  Log
+		HighestRadius = ConLstStr(sorted(RadiusDictCounter)[-1:]) # high Radius
+		HigherstYear = ConLstStr(sorted(YearDictCounter)[-1:]) # high year
+		LowestYear = ConLstStr(sorted(YearDictCounter)[:1]) # low year
+		TodayDateTime = datetime.datetime.now()
+		GrandTotal = (DatabaseCounter + PurchaseCounter + PennyCounter
+		 + NickelCounter - MDNQCounter - DupesCounter)
+		SUBTotal = (DatabaseCounter + PurchaseCounter
+		 + PennyCounter + NickelCounter)
+		sys.stdout = Log
 		print('')
 		print('------------------------------------------------------------')
 		print('#### {}'.format(str.upper(IPFName)))
-		print('###### Data Summary Report - as of {}'.format(datetime.datetime.now()))
+		print('###### Data Summary Report - as of {}'.format(TodayDateTime))
 		print('------------------------------------------------------------')
 		print('')
 		print('||Description|')
 		print('|-:|:-|')
 		print('|Central ZIP Code|{}|'.format(CentralZip))
 		print('|SCF Facility|{}|'.format(CentralZipSCFFacilityReport))
-		print('|Max Radius|{} Miles|'.format(ConvListToStringFunc(sorted(RadiusDictCounter)[-1:])))
-		print('|Max Year|{}|'.format(ConvListToStringFunc(sorted(YearDictCounter)[-1:])))
-		print('|Min Year|{}|'.format(ConvListToStringFunc(sorted(YearDictCounter)[:1])))
+		print('|Max Radius|{} Miles|'.format(HighestRadius))
+		print('|Max Year|{}|'.format(HigherstYear))
+		print('|Min Year|{}|'.format(LowestYear))
 		print('|Max DelDate Year|{}|'.format(MaxSaleYear))
 		print('|Vendor|{}|'.format(VendorSelected))
 		print('|Database Total|{}|'.format(DatabaseCounter))
@@ -1064,11 +1132,8 @@ if __name__ == '__main__':
 		print('|Nickel Total|{}|'.format(NickelCounter))
 		print('|Less MDNQ Total|({})|'.format(MDNQCounter))
 		print('|Less Dupes Total|({})|'.format(DupesCounter))
-		GrandTotal = DatabaseCounter + PurchaseCounter + PennyCounter + \
-		NickelCounter - MDNQCounter - DupesCounter
 		print('|**GRAND TOTAL**|**{}**|'.format(GrandTotal))
 		print('')
-		SUBTotal = DatabaseCounter + PurchaseCounter + PennyCounter + NickelCounter
 		print('------------------------------------------------------------')
 		print('###### Count Distribution by STATE:')
 		print('||State|Count|%|RTotal|%|')
@@ -1079,11 +1144,21 @@ if __name__ == '__main__':
 			ValuePrcnt = percentage(StateDictCounter[key], SUBTotal)
 			RTotalPrcnt = percentage(StateRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				print('|>|{}|{}|{}%|{}|{}%|'.format(key, StateDictCounter[key], \
-					round(ValuePrcnt,1), StateRTotal, round(RTotalPrcnt,1)))
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					StateDictCounter[key],
+					round(ValuePrcnt,1),
+					StateRTotal,
+					round(RTotalPrcnt,1))
+				)
 			else:
-				print('||{}|{}|{}%|{}|{}%|'.format(key, StateDictCounter[key], \
-					round(ValuePrcnt,1), StateRTotal, round(RTotalPrcnt,1)))
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					StateDictCounter[key],
+					round(ValuePrcnt,1),
+					StateRTotal,
+					round(RTotalPrcnt,1))
+				)
 		print('')
 		print('###### Count Distribution by SCF FACILITY and 3-Digit:')
 		print('||SCF Facilities|Count|%|RTotal|%|')
@@ -1094,11 +1169,21 @@ if __name__ == '__main__':
 			ValuePrcnt = percentage(SCF3DFacilityCounter[key], SUBTotal)
 			RTotalPrcnt = percentage(SCFFacilityRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				print('|>|{}|{}|{}%|{}|{}%|'.format(key, SCF3DFacilityCounter[key], \
-					round(ValuePrcnt,1), SCFFacilityRTotal, round(RTotalPrcnt,1)))
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					SCF3DFacilityCounter[key],
+					round(ValuePrcnt,1),
+					SCFFacilityRTotal,
+					round(RTotalPrcnt,1))
+				)
 			else:
-				print('||{}|{}|{}%|{}|{}%|'.format(key, SCF3DFacilityCounter[key], \
-					round(ValuePrcnt,1), SCFFacilityRTotal, round(RTotalPrcnt,1)))
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					SCF3DFacilityCounter[key],
+					round(ValuePrcnt,1),
+					SCFFacilityRTotal,
+					round(RTotalPrcnt,1))
+				)
 		print('')
 		print('||3-Digit|Count|%|RTotal|%|')
 		print('||-|-:|-:|-:|-:|')
@@ -1109,22 +1194,45 @@ if __name__ == '__main__':
 			RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				if len(str(key)) == 2:
-					print('|>|0{}|{}|{}%|{}|{}%|'.format(key, SCFDictCounter[key], \
-						round(ValuePrcnt,1), SCFRTotal, round(RTotalPrcnt,1)))
+					print('|>|0{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,1),
+						SCFRTotal,
+						round(RTotalPrcnt,1))
+					)
 				else:
-					print('|>|{}|{}|{}%|{}|{}%|'.format(key, SCFDictCounter[key], \
-						round(ValuePrcnt,1), SCFRTotal, round(RTotalPrcnt,1)))
+					print('|>|{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,1),
+						SCFRTotal,
+						round(RTotalPrcnt,1))
+					)
 			else:
 				if len(str(key)) == 2:
-					print('||0{}|{}|{}%|{}|{}%|'.format(key, SCFDictCounter[key], \
-						round(ValuePrcnt,1), SCFRTotal, round(RTotalPrcnt,1)))
+					print('||0{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,1),
+						SCFRTotal,
+						round(RTotalPrcnt,1))
+					)
 				else:
-					print('||{}|{}|{}%|{}|{}%|'.format(key, SCFDictCounter[key], \
-						round(ValuePrcnt,1), SCFRTotal, round(RTotalPrcnt,1)))
+					print('||{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,1),
+						SCFRTotal,
+						round(RTotalPrcnt,1))
+					)
 		print('')
 		SortedSCFText = ''
 		for key in sorted(SCFDictCounter.iterkeys()):
-			SortedSCFText = '{} {} |'.format(SortedSCFText, key)
+			SortedSCFText = '{} {} |'.format(
+				SortedSCFText,
+				key
+				)
 		print('<!--',SortedSCFText, '-->')
 		print('')	
 		if len(YearDictCounter) !=  1:
@@ -1137,11 +1245,21 @@ if __name__ == '__main__':
 				ValuePrcnt = percentage(YearDictCounter[key], SUBTotal)
 				RTotalPrcnt = percentage(YearRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
-					print('|>|{}|{}|{}%|{}|{}%|'.format(key, YearDictCounter[key], \
-						round(ValuePrcnt,1), YearRTotal, round(RTotalPrcnt,1)))
+					print('|>|{}|{}|{}%|{}|{}%|'.format(
+						key,
+						YearDictCounter[key],
+						round(ValuePrcnt,1),
+						YearRTotal,
+						round(RTotalPrcnt,1))
+					)
 				else:
-					print('||{}|{}|{}%|{}|{}%|'.format(key, YearDictCounter[key], \
-						round(ValuePrcnt,1), YearRTotal, round(RTotalPrcnt,1)))
+					print('||{}|{}|{}%|{}|{}%|'.format(
+						key,
+						YearDictCounter[key],
+						round(ValuePrcnt,1),
+						YearRTotal,
+						round(RTotalPrcnt,1))
+					)
 			print('')
 		print('###### Count Distribution by RADIUS:')
 		print('||Radius|Count|%|RTotal|%|')
@@ -1152,37 +1270,58 @@ if __name__ == '__main__':
 			ValuePrcnt = percentage(RadiusDictCounter[key], SUBTotal)
 			RTotalPrcnt = percentage(RadiusRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				print('|>|{} Miles|{}|{}%|{}|{}%|'.format(key, RadiusDictCounter[key], \
-					round(ValuePrcnt,1), RadiusRTotal, round(RTotalPrcnt,1)))
+				print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
+					key,
+					RadiusDictCounter[key],
+					round(ValuePrcnt,1),
+					RadiusRTotal,
+					round(RTotalPrcnt,1))
+				)
 			else:
-				print('||{} Miles|{}|{}%|{}|{}%|'.format(key, RadiusDictCounter[key], \
-					round(ValuePrcnt,1), RadiusRTotal, round(RTotalPrcnt,1)))
+				print('||{} Miles|{}|{}%|{}|{}%|'.format(
+					key,
+					RadiusDictCounter[key],
+					round(ValuePrcnt,1),
+					RadiusRTotal,
+					round(RTotalPrcnt,1))
+				)
 		print('')
 		if len(MakeDictCounter) !=  1:
 			print('###### Top Counts by MAKE ( > {}% ):'.format(TOPPercentage))
 			print('||Makes|Count|%|RTotal|%|')
 			print('||-|-:|-:|-:|-:|')
 			MakeRTotal = 0
-			for key, value in sorted(MakeDictCounter.iteritems(), \
-				key = lambda (k,v): (v,k), reverse = True):
+			for key, value in sorted(
+				MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
+				):
 				MakeRTotal = MakeRTotal + value
 				ValuePrcnt = percentage(value, SUBTotal)
 				RTotalPrcnt = percentage(MakeRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
-					print('|>|{}|{}|{}%|{}|{}%|'.format(key, value, \
-						round(ValuePrcnt,1), MakeRTotal, round(RTotalPrcnt,1)))
+					print('|>|{}|{}|{}%|{}|{}%|'.format(
+						key,
+						value,
+						round(ValuePrcnt,1),
+						MakeRTotal,
+						round(RTotalPrcnt,1))
+					)
 			print('')
 		print('###### Top Counts & Distributions by CITY ( > {}% ):'.format(TOPPercentage))
 		print('||Top Cities|Count|%|RTotal|')
 		print('||-|-:|-:|-:|')
 		CityRTotal = 0
-		for key, value in sorted(CityDictCounter.iteritems(), \
-			key = lambda (k,v): (v,k), reverse = True):
+		for key, value in sorted(
+			CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
+			):
 			CityRTotal = CityRTotal + value
 			ValuePrcnt = percentage(value, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				print('|>|{}|{}|{}%|{}|'.format(key, value, round(ValuePrcnt,1), \
-					CityRTotal))
+				print('|>|{}|{}|{}%|{}|'.format(
+					key,
+					value,
+					round(ValuePrcnt,1),
+					CityRTotal)
+				)
 		print('')
 		print('||Cities|Count|%|RTotal|%|')
 		print('||-|-:|-:|-:|-:|')
@@ -1192,11 +1331,21 @@ if __name__ == '__main__':
 			ValuePrcnt = percentage(CityDictCounter[key], SUBTotal)
 			RTotalPrcnt = percentage(CityRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				print('|>|{}|{}|{}%|{}|{}%|'.format(key, CityDictCounter[key], \
-					round(ValuePrcnt,1), CityRTotal, round(RTotalPrcnt,1)))
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					CityDictCounter[key],
+					round(ValuePrcnt,1),
+					CityRTotal,
+					round(RTotalPrcnt,1))
+				)
 			else:
-				print('||{}|{}|{}%|{}|{}%|'.format(key, CityDictCounter[key], \
-					round(ValuePrcnt,1), CityRTotal, round(RTotalPrcnt,1)))
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					CityDictCounter[key],
+					round(ValuePrcnt,1),
+					CityRTotal,
+					round(RTotalPrcnt,1))
+				)
 		print('')
 		sys.stdout = Report
 	print('=======================================')
@@ -1208,7 +1357,7 @@ if __name__ == '__main__':
 	for Record in Files:
 		if os.path.getsize(Record) == 0: # Delete Empty files
 			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+',Record,flags=re.I)): # Delete Re-Mapped file
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
 			os.remove(Record)
 
 # ==================================================================== #
