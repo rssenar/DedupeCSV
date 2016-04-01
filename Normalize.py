@@ -35,8 +35,8 @@ def main():
 	global TOPPercentage
 	global VendorSelected
 	# ==================================================================== #
-	os.chdir('../../../../Desktop/') # Change PWD to Desktop
-	path = '../Dropbox/HUB/Projects/PremWorks/_Resources' # Set path resource
+	os.chdir('../../../../Desktop/')
+	path = '../Dropbox/HUB/Projects/PremWorks/_Resources'
 	# ==================================================================== #
 	MDNQFile = os.path.join(path,'MailDNQ.csv')
 	DropFile = os.path.join(path,'_DropFile.csv')
@@ -570,7 +570,8 @@ def main():
 						)
 			# ============================================================ #
 			# Combine Address1 + Address2
-			if line[AddressComb] == '' and line[Address1] != '' and \
+			if line[AddressComb] == '' and \
+			line[Address1] != '' and \
 			line[Address2] != '':
 				line[AddressComb] = '{} {}'.format(
 					str.title(line[Address1]),
@@ -714,10 +715,8 @@ def main():
 			if line[Coordinates] == '':
 				line[Radius] = 9999.9999
 			else:
-				line[Radius] = round(float(vincenty(
-					OriginZipCoord,
-					line[Coordinates]
-					).miles),1)
+				line[Radius] = vincenty(OriginZipCoord,line[Coordinates]).miles
+				line[Radius] = round(float(line[Radius]),2)
 			# ============================================================ #
 			# Convert "Date" Field to DateTime format
 			try:
@@ -1102,9 +1101,9 @@ if __name__ == '__main__':
 	# Output Report
 	Report = sys.stdout
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
-		HighestRadius = ConLstStr(sorted(RadiusDictCounter)[-1:]) # high Radius
-		HigherstYear = ConLstStr(sorted(YearDictCounter)[-1:]) # high year
-		LowestYear = ConLstStr(sorted(YearDictCounter)[:1]) # low year
+		HighestRadius = ConLstStr(sorted(RadiusDictCounter)[-1:])
+		HigherstYear = ConLstStr(sorted(YearDictCounter)[-1:])
+		LowestYear = ConLstStr(sorted(YearDictCounter)[:1])
 		TodayDateTime = datetime.datetime.now()
 		GrandTotal = (DatabaseCounter + PurchaseCounter + PennyCounter
 		 + NickelCounter - MDNQCounter - DupesCounter)
@@ -1147,18 +1146,18 @@ if __name__ == '__main__':
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
 					StateDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					StateRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 			else:
 				print('||{}|{}|{}%|{}|{}%|'.format(
 					key,
 					StateDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					StateRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 		print('')
 		print('###### Count Distribution by SCF FACILITY and 3-Digit:')
 		print('||SCF Facilities|Count|%|RTotal|%|')
@@ -1172,18 +1171,18 @@ if __name__ == '__main__':
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
 					SCF3DFacilityCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					SCFFacilityRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 			else:
 				print('||{}|{}|{}%|{}|{}%|'.format(
 					key,
 					SCF3DFacilityCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					SCFFacilityRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 		print('')
 		print('||3-Digit|Count|%|RTotal|%|')
 		print('||-|-:|-:|-:|-:|')
@@ -1197,35 +1196,35 @@ if __name__ == '__main__':
 					print('|>|0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						SCFDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						SCFRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 				else:
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
 						SCFDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						SCFRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 			else:
 				if len(str(key)) == 2:
 					print('||0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						SCFDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						SCFRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 				else:
 					print('||{}|{}|{}%|{}|{}%|'.format(
 						key,
 						SCFDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						SCFRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 		print('')
 		SortedSCFText = ''
 		for key in sorted(SCFDictCounter.iterkeys()):
@@ -1233,7 +1232,7 @@ if __name__ == '__main__':
 				SortedSCFText,
 				key
 				)
-		print('<!--',SortedSCFText, '-->')
+		print('<!--',SortedSCFText,'-->')
 		print('')	
 		if len(YearDictCounter) !=  1:
 			print('###### Count Distribution by YEAR:')
@@ -1248,18 +1247,18 @@ if __name__ == '__main__':
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
 						YearDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						YearRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 				else:
 					print('||{}|{}|{}%|{}|{}%|'.format(
 						key,
 						YearDictCounter[key],
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						YearRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 			print('')
 		print('###### Count Distribution by RADIUS:')
 		print('||Radius|Count|%|RTotal|%|')
@@ -1273,18 +1272,18 @@ if __name__ == '__main__':
 				print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
 					key,
 					RadiusDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					RadiusRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 			else:
 				print('||{} Miles|{}|{}%|{}|{}%|'.format(
 					key,
 					RadiusDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					RadiusRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 		print('')
 		if len(MakeDictCounter) !=  1:
 			print('###### Top Counts by MAKE ( > {}% ):'.format(TOPPercentage))
@@ -1301,10 +1300,10 @@ if __name__ == '__main__':
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
-						round(ValuePrcnt,1),
+						round(ValuePrcnt,2),
 						MakeRTotal,
-						round(RTotalPrcnt,1))
-					)
+						round(RTotalPrcnt,2)
+						))
 			print('')
 		print('###### Top Counts & Distributions by CITY ( > {}% ):'.format(TOPPercentage))
 		print('||Top Cities|Count|%|RTotal|')
@@ -1319,9 +1318,9 @@ if __name__ == '__main__':
 				print('|>|{}|{}|{}%|{}|'.format(
 					key,
 					value,
-					round(ValuePrcnt,1),
-					CityRTotal)
-				)
+					round(ValuePrcnt,2),
+					CityRTotal
+					))
 		print('')
 		print('||Cities|Count|%|RTotal|%|')
 		print('||-|-:|-:|-:|-:|')
@@ -1334,18 +1333,18 @@ if __name__ == '__main__':
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
 					CityDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					CityRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 			else:
 				print('||{}|{}|{}%|{}|{}%|'.format(
 					key,
 					CityDictCounter[key],
-					round(ValuePrcnt,1),
+					round(ValuePrcnt,2),
 					CityRTotal,
-					round(RTotalPrcnt,1))
-				)
+					round(RTotalPrcnt,2)
+					))
 		print('')
 		sys.stdout = Report
 	print('=======================================')
