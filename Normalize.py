@@ -242,15 +242,15 @@ def main():
 			print('     ERROR: Cannot load local suppression file')
 	# Set TOP Percentage
 	TOPPercentage = raw_input(
-		'Set Top % .......................[4%] : '
+		'Set Top % .......................[2%] : '
 		)
 	try:
 		TOPPercentage = int(TOPPercentage)
 	except:
-		TOPPercentage = 4
+		TOPPercentage = 2
 	# Capture ReMap Header Row Selection
 	HRSelect = str.upper(raw_input(
-		'ReMap Header Row? ................[N] : '
+		'ReMap Header Row? ..............[Y/N] : '
 		))
 	if HRSelect == '':
 		HRSelect = 'N'
@@ -583,17 +583,18 @@ def main():
 				line[AddressComb] = str.title(line[AddressComb])
 			# ============================================================ #
 			# Set Drop Index from Drop Dictionary and Set Customer ID	
-			line[Drop] = str.upper(line[Drop])
 			if line[PURL] == '':
 				if str(line[ZipCRRT]) in DropDict:
 					line[Drop] = DropDict[str(line[ZipCRRT])]
-					if line[Drop] == 'P' or line[Drop] == 'PENNY':
+					if line[Drop] == 'P' or line[Drop] == 'Penny' or \
+					line[Drop] == 'p' or line[Drop] == 'penny':
 						line[CustomerID] = 'P{}'.format(
 							str(SeqNumPurchaseP)
 							)
 						SeqNumPurchaseP += 1
 						PennyCounter += 1
-					elif line[Drop] == 'N' or line[Drop] == 'NICKEL':
+					elif line[Drop] == 'N' or line[Drop] == 'Nickel' or \
+					line[Drop] == 'n' or line[Drop] == 'nickel':
 						line[CustomerID] = 'N{}'.format(
 							str(SeqNumPurchaseN)
 							)
@@ -614,23 +615,24 @@ def main():
 					SeqNumPurchase += 1
 					PurchaseCounter += 1
 			else:
-				if line[Drop] == 'P' or line[Drop] == 'PENNY':
+				if line[Drop] == 'P' or line[Drop] == 'Penny' or \
+				line[Drop] == 'p' or line[Drop] == 'penny':
 					PennyCounter += 1
-				elif line[Drop] == 'N' or line[Drop] == 'NICKEL':
+				elif line[Drop] == 'N' or line[Drop] == 'Nickel' or \
+				line[Drop] == 'n' or line[Drop] == 'nickel':
 					NickelCounter += 1
 				elif line[Drop] == 'D':
 					DatabaseCounter += 1
 				elif line[Drop] == 'A':
 					PurchaseCounter += 1
 			# ============================================================ #
-			# Parse & Format Phone #
 			def ClnPhone(Phone):
 				Phone = str(Phone).strip()
 				Phone = str(Phone).replace('-','')
 				Phone = str(Phone).replace('(','')
 				Phone = str(Phone).replace(')','')
 				return Phone
-			
+			# Parse & Clean up Phone #
 			if line[MPhone] != '' and len(str(line[MPhone])) > 6:
 				line[Phone] = ClnPhone(line[MPhone])
 			elif line[HPhone] != '' and len(str(line[HPhone])) > 6:
@@ -639,7 +641,7 @@ def main():
 				line[Phone] = ClnPhone(line[WPhone])
 			else:
 				line[Phone] = ''
-			
+			# Re-Format Phone #
 			if len(str(line[Phone])) == 10:
 				line[Phone] = '({}) {}-{}'.format(
 					str(line[Phone][0:3]),
@@ -729,7 +731,7 @@ def main():
 			# ============================================================ #
 			# Apply "Blitz-DNQ" Parameters
 			try:
-				if len(str(line[Phone])) < 8 or len(str(line[VIN])) < 17:
+				if len(str(line[Phone])) < 8 and len(str(line[VIN])) < 17:
 					line[BlitzDNQ] = 'dnq'
 			except:
 				line[BlitzDNQ] = ''
@@ -956,10 +958,10 @@ def main():
 					'City',
 					'State',
 					'Zip',
-					'Phone',
-					'Year',
-					'Make',
-					'Model',
+					#'Phone',
+					#'Year',
+					#'Make',
+					#'Model',
 					'Winning Number',
 					'Position'
 					]
@@ -971,10 +973,10 @@ def main():
 					line[City],
 					line[State],
 					line[Zip],
-					line[Phone],
-					line[Year],
-					line[Make],
-					line[Model],
+					#line[Phone],
+					#line[Year],
+					#line[Make],
+					#line[Model],
 					line[WinningNum],
 					line[Drop]
 					)
@@ -1064,7 +1066,7 @@ def main():
 						AppendFirstTimeP = False
 					else:
 						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-						OutputCleanAppendP.writerow(AppendOutputHeader)
+						OutputCleanAppendP.writerow(HeaderRowAppendOutput)
 				elif line[CustomerID][:1] == 'N' or line[CustomerID][:1] == 'n':
 					if AppendFirstTimeN:
 						OutputCleanAppendN = csv.writer(CleanOutputAppendN)
@@ -1557,3 +1559,4 @@ if __name__ == '__main__':
 #		else:
 #			print('||{} Miles|{}|{}%|{}|{}%|'.format(key, RadiusDictCounter[key], round(ValuePrcnt,1), RadiusRTotal, round(RTotalPrcnt,1)))
 #	print('')
+# ==================================================================== #

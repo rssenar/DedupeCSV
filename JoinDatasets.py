@@ -7,9 +7,9 @@ import os
 os.chdir('../../../../Desktop/')
 # ---------------------------------------------
 File1 = raw_input('Enter 1st Dataset: ')
-FileName1 = File1 + '.csv'
+FileName1 = '{}.csv'.format(File1)
 File2 = raw_input('Enter 2nd Dataset: ')
-FileName2 = File2 + '.csv'
+FileName2 = '{}.csv'.format(File2)
 # ---------------------------------------------
 ds1 = pd.read_csv(FileName1)
 ds2 = pd.read_csv(FileName2)
