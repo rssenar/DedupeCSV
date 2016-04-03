@@ -1,3 +1,15 @@
+commit f27ccc5e085d1fec4ebd1657b711bc31432c96e0
+Author: Richard Senar <rssenar@gmail.com>
+Date:   Sat Apr 2 22:20:30 2016 -0700
+
+    refactored code
+
+commit 944149b01f71d6b1eb0dec963b8d9fff2e194647
+Author: Richard Senar <rssenar@gmail.com>
+Date:   Sat Apr 2 21:11:11 2016 -0700
+
+    Made changes to re in header re-map function
+
 commit eb852df4ea7a1f829e5f9ccf91682009935ff2bf
 Author: Richard Senar <rssenar@gmail.com>
 Date:   Sat Apr 2 20:07:46 2016 -0700

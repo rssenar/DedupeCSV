@@ -323,14 +323,14 @@ def normalize():
 	Misc3 = 42
 	# Assign Column Names To Header Output Files
 	HeaderRowMain = [
-		'Customer ID',
+		'CustomerID',
 		'FullName',
-		'First Name',
+		'FirstName',
 		'MI',
-		'Last Name',
+		'LastName',
 		'Address1',
 		'Address2',
-		'Address',
+		'AddressFull',
 		'City',
 		'State',
 		'Zip',
@@ -354,10 +354,10 @@ def normalize():
 		'Crrt',
 		'ZipCrrt',
 		'KBB',
-		'Buyback Value',
-		'Winning Number',
-		'Mail DNQ',
-		'Blitz DNQ',
+		'BuybackValue',
+		'WinningNumber',
+		'MailDNQ',
+		'BlitzDNQ',
 		'Drop',
 		'PURL',
 		'YrDec',
@@ -374,99 +374,99 @@ def normalize():
 		HeaderDict = {}
 		def match(field): # Match Field Names using Regular Expression
 			if bool(re.search('cus.+id',field,flags=re.I)):
-				HeaderDict[CustomerID] = 'line['+str(i)+']'
+				HeaderDict[CustomerID] = 'line[{}]'.format(str(i))
 			elif bool(re.search('ful.+me',field,flags=re.I)):
-				HeaderDict[FullName] = 'line['+str(i)+']'
+				HeaderDict[FullName] = 'line[{}]'.format(str(i))
 			elif bool(re.search('fir.+me',field,flags=re.I)):
-				HeaderDict[FirstName] = 'line['+str(i)+']'
+				HeaderDict[FirstName] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bmi\b',field,flags=re.I)) or \
 			bool(re.search(r'\bmiddle\b',field,flags=re.I)):
-				HeaderDict[MI] = 'line['+str(i)+']'
+				HeaderDict[MI] = 'line[{}]'.format(str(i))
 			elif bool(re.search('las.+me',field,flags=re.I)):
-				HeaderDict[LastName] = 'line['+str(i)+']'
+				HeaderDict[LastName] = 'line[{}]'.format(str(i))
 			elif bool(re.search('addr.+1',field,flags=re.I)):
-				HeaderDict[Address1] = 'line['+str(i)+']'
+				HeaderDict[Address1] = 'line[{}]'.format(str(i))
 			elif bool(re.search('addr.+2',field,flags=re.I)):
-				HeaderDict[Address2] = 'line['+str(i)+']'
-			elif bool(re.search('addr.+',field,flags=re.I)):
-				HeaderDict[AddressComb] = 'line['+str(i)+']'
-			elif bool(re.search('city+',field,flags=re.I)):
-				HeaderDict[City] = 'line['+str(i)+']'
-			elif bool(re.search('state',field,flags=re.I)):
-				HeaderDict[State] = 'line['+str(i)+']'
-			elif bool(re.match(r'\bzip\b',field,flags=re.I)):
-				HeaderDict[Zip] = 'line['+str(i)+']'
-			elif bool(re.search('4z.+',field,flags=re.I)) or \
-			bool(re.search('zi.+4',field,flags=re.I)):
-				HeaderDict[Zip4] = 'line['+str(i)+']'
+				HeaderDict[Address2] = 'line[{}]'.format(str(i))
+			elif bool(re.search('addr.+full',field,flags=re.I)):
+				HeaderDict[AddressComb] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bcity\b',field,flags=re.I)):
+				HeaderDict[City] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bstate\b',field,flags=re.I)):
+				HeaderDict[State] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bzip\b',field,flags=re.I)):
+				HeaderDict[Zip] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or \
+			bool(re.search(r'\bzip4\b',field,flags=re.I)):
+				HeaderDict[Zip4] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bscf\b',field,flags=re.I)):
-				HeaderDict[SCF] = 'line['+str(i)+']'
+				HeaderDict[SCF] = 'line[{}]'.format(str(i))
 			elif bool(re.search('pho.+',field,flags=re.I)):
-				HeaderDict[Phone] = 'line['+str(i)+']'
+				HeaderDict[Phone] = 'line[{}]'.format(str(i))
 			elif bool(re.search('HPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bhph\b',field,flags=re.I)):
-				HeaderDict[HPhone] = 'line['+str(i)+']'
+				HeaderDict[HPhone] = 'line[{}]'.format(str(i))
 			elif bool(re.search('WPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bbph\b',field,flags=re.I)):
-				HeaderDict[WPhone] = 'line['+str(i)+']'
+				HeaderDict[WPhone] = 'line[{}]'.format(str(i))
 			elif bool(re.search('MPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bcph\b',field,flags=re.I)):
-				HeaderDict[MPhone] = 'line['+str(i)+']'
-			elif bool(re.search('email',field,flags=re.I)):
-				HeaderDict[Email] = 'line['+str(i)+']'
+				HeaderDict[MPhone] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bemail\b',field,flags=re.I)):
+				HeaderDict[Email] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bvin\b',field,flags=re.I)):
-				HeaderDict[VIN] = 'line['+str(i)+']'
+				HeaderDict[VIN] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\byear\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvyr\b',field,flags=re.I)):
-				HeaderDict[Year] = 'line['+str(i)+']'
+				HeaderDict[Year] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bmake\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvmk\b',field,flags=re.I)):
-				HeaderDict[Make] = 'line['+str(i)+']'
+				HeaderDict[Make] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvmd\b',field,flags=re.I)):
-				HeaderDict[Model] = 'line['+str(i)+']'
+				HeaderDict[Model] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
-				HeaderDict[DelDate] = 'line['+str(i)+']'
+				HeaderDict[DelDate] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bdate\b',field,flags=re.I)):
-				HeaderDict[Date] = 'line['+str(i)+']'
+				HeaderDict[Date] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bradius\b',field,flags=re.I)):
-				HeaderDict[Radius] = 'line['+str(i)+']'
+				HeaderDict[Radius] = 'line[{}]'.format(str(i))
 			elif bool(re.search('coord.+',field,flags=re.I)):
-				HeaderDict[Coordinates] = 'line['+str(i)+']'
+				HeaderDict[Coordinates] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bvinlen\b',field,flags=re.I)):
-				HeaderDict[VINLen] = 'line['+str(i)+']'
+				HeaderDict[VINLen] = 'line[{}]'.format(str(i))
 			elif bool(re.search('dsf.+seq',field,flags=re.I)):
-				HeaderDict[DSF_WALK_SEQ] = 'line['+str(i)+']'
+				HeaderDict[DSF_WALK_SEQ] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bcrrt\b',field,flags=re.I)):
-				HeaderDict[CRRT] = 'line['+str(i)+']'
+				HeaderDict[CRRT] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bzipcrrt\b',field,flags=re.I)):
-				HeaderDict[ZipCRRT] = 'line['+str(i)+']'
+				HeaderDict[ZipCRRT] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
-				HeaderDict[KBB] = 'line['+str(i)+']'
-			elif bool(re.search('buyb.+values',field,flags=re.I)):
-				HeaderDict[BuybackValues] = 'line['+str(i)+']'
-			elif bool(re.search('winn.+ber',field,flags=re.I)):
-				HeaderDict[WinningNum] = 'line['+str(i)+']'
-			elif bool(re.search('mail.+DNQ',field,flags=re.I)):
-				HeaderDict[MailDNQ] = 'line['+str(i)+']'
-			elif bool(re.search('blitz.+DNQ',field,flags=re.I)):
-				HeaderDict[BlitzDNQ] = 'line['+str(i)+']'
+				HeaderDict[KBB] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bbuybackvalue\b',field,flags=re.I)):
+				HeaderDict[BuybackValues] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bwinningnumber\b',field,flags=re.I)):
+				HeaderDict[WinningNum] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bmaildnq\b',field,flags=re.I)):
+				HeaderDict[MailDNQ] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bblitzdnq\b',field,flags=re.I)):
+				HeaderDict[BlitzDNQ] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bdrop\b',field,flags=re.I)):
-				HeaderDict[Drop] = 'line['+str(i)+']'
+				HeaderDict[Drop] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
-				HeaderDict[PURL] = 'line['+str(i)+']'
+				HeaderDict[PURL] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
-				HeaderDict[YrDec] = 'line['+str(i)+']'		
-			elif bool(re.search(r'\bSCF3DFacility\b',field,flags=re.I)):
-				HeaderDict[SCF3DFacility] = 'line['+str(i)+']'
-			elif bool(re.search(r'\bVendor\b',field,flags=re.I)):
-				HeaderDict[Vendor] = 'line['+str(i)+']'
+				HeaderDict[YrDec] = 'line[{}]'.format(str(i))		
+			elif bool(re.search(r'\bscf3dfacility\b',field,flags=re.I)):
+				HeaderDict[SCF3DFacility] = 'line[{}]'.format(str(i))
+			elif bool(re.search(r'\bvendor\b',field,flags=re.I)):
+				HeaderDict[Vendor] = 'line[{}]'.format(str(i))
 			elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
-				HeaderDict[Misc1] = 'line['+str(i)+']' 
+				HeaderDict[Misc1] = 'line[{}]'.format(str(i)) 
 			elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
-				HeaderDict[Misc2] = 'line['+str(i)+']' 
+				HeaderDict[Misc2] = 'line[{}]'.format(str(i)) 
 			elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
-				HeaderDict[Misc3] = 'line['+str(i)+']'
+				HeaderDict[Misc3] = 'line[{}]'.format(str(i))
 		# Re-Order Fields based on Header Row
 		with open(InputFile,'rU') as InputFile, \
 		open(ReMappedOutput,'ab') as ReMappedOutputFile:
