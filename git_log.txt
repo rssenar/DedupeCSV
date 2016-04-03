@@ -1,3 +1,9 @@
+commit eb852df4ea7a1f829e5f9ccf91682009935ff2bf
+Author: Richard Senar <rssenar@gmail.com>
+Date:   Sat Apr 2 20:07:46 2016 -0700
+
+    Updated Documentation
+
 commit b97f9647cac7d4d916b0fb2430a1d5b02f04b659
 Author: Richard Senar <rssenar@gmail.com>
 Date:   Fri Apr 1 14:14:30 2016 -0700

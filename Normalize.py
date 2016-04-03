@@ -384,20 +384,20 @@ def main():
 				HeaderDict[MI] = 'line['+str(i)+']'
 			elif bool(re.search('las.+me',field,flags=re.I)):
 				HeaderDict[LastName] = 'line['+str(i)+']'
-			elif bool(re.search('.ddr.+1',field,flags=re.I)):
+			elif bool(re.search('addr.+1',field,flags=re.I)):
 				HeaderDict[Address1] = 'line['+str(i)+']'
-			elif bool(re.search('.ddr.+2',field,flags=re.I)):
+			elif bool(re.search('addr.+2',field,flags=re.I)):
 				HeaderDict[Address2] = 'line['+str(i)+']'
-			elif bool(re.search('.ddr.+',field,flags=re.I)):
+			elif bool(re.search('addr.+',field,flags=re.I)):
 				HeaderDict[AddressComb] = 'line['+str(i)+']'
-			elif bool(re.search('.ity+',field,flags=re.I)):
+			elif bool(re.search('city+',field,flags=re.I)):
 				HeaderDict[City] = 'line['+str(i)+']'
-			elif bool(re.search('.tate',field,flags=re.I)):
+			elif bool(re.search('state',field,flags=re.I)):
 				HeaderDict[State] = 'line['+str(i)+']'
 			elif bool(re.match(r'\bzip\b',field,flags=re.I)):
 				HeaderDict[Zip] = 'line['+str(i)+']'
 			elif bool(re.search('4z.+',field,flags=re.I)) or \
-			bool(re.search('z.+4',field,flags=re.I)):
+			bool(re.search('zi.+4',field,flags=re.I)):
 				HeaderDict[Zip4] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bscf\b',field,flags=re.I)):
 				HeaderDict[SCF] = 'line['+str(i)+']'
@@ -412,7 +412,7 @@ def main():
 			elif bool(re.search('MPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bcph\b',field,flags=re.I)):
 				HeaderDict[MPhone] = 'line['+str(i)+']'
-			elif bool(re.search('.mail',field,flags=re.I)):
+			elif bool(re.search('email',field,flags=re.I)):
 				HeaderDict[Email] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bvin\b',field,flags=re.I)):
 				HeaderDict[VIN] = 'line['+str(i)+']'
@@ -425,31 +425,31 @@ def main():
 			elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvmd\b',field,flags=re.I)):
 				HeaderDict[Model] = 'line['+str(i)+']'
-			elif bool(re.search('de.+ate',field,flags=re.I)):
+			elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
 				HeaderDict[DelDate] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bdate\b',field,flags=re.I)):
 				HeaderDict[Date] = 'line['+str(i)+']'
-			elif bool(re.search('.adi.+',field,flags=re.I)):
+			elif bool(re.search(r'\bradius\b',field,flags=re.I)):
 				HeaderDict[Radius] = 'line['+str(i)+']'
-			elif bool(re.search('coor.+',field,flags=re.I)):
+			elif bool(re.search('coord.+',field,flags=re.I)):
 				HeaderDict[Coordinates] = 'line['+str(i)+']'
-			elif bool(re.search('v.+len',field,flags=re.I)):
+			elif bool(re.search(r'\bvinlen\b',field,flags=re.I)):
 				HeaderDict[VINLen] = 'line['+str(i)+']'
 			elif bool(re.search('dsf.+seq',field,flags=re.I)):
 				HeaderDict[DSF_WALK_SEQ] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bcrrt\b',field,flags=re.I)):
 				HeaderDict[CRRT] = 'line['+str(i)+']'
-			elif bool(re.search('zip.+rt',field,flags=re.I)):
+			elif bool(re.search(r'\bzipcrrt\b',field,flags=re.I)):
 				HeaderDict[ZipCRRT] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
 				HeaderDict[KBB] = 'line['+str(i)+']'
-			elif bool(re.search('buy.+val.+',field,flags=re.I)):
+			elif bool(re.search('buyb.+values',field,flags=re.I)):
 				HeaderDict[BuybackValues] = 'line['+str(i)+']'
-			elif bool(re.search('winn.+er',field,flags=re.I)):
+			elif bool(re.search('winn.+ber',field,flags=re.I)):
 				HeaderDict[WinningNum] = 'line['+str(i)+']'
-			elif bool(re.search('mai.+DNQ',field,flags=re.I)):
+			elif bool(re.search('mail.+DNQ',field,flags=re.I)):
 				HeaderDict[MailDNQ] = 'line['+str(i)+']'
-			elif bool(re.search('bli.+DNQ',field,flags=re.I)):
+			elif bool(re.search('blitz.+DNQ',field,flags=re.I)):
 				HeaderDict[BlitzDNQ] = 'line['+str(i)+']'
 			elif bool(re.search(r'\bdrop\b',field,flags=re.I)):
 				HeaderDict[Drop] = 'line['+str(i)+']'
@@ -786,56 +786,30 @@ def main():
 			# ============================================================ #
 			# Generate COUNTERS
 			# ============================================================ #
-			CityRadiusCounter = '{} {} ({} Miles)'.format(
+			CityRadius = '{} {} ({} Miles)'.format(
 				line[City],
 				line[Zip],
 				line[Radius]
 				)
-			ZipRadiusCounter = '{} ({} Miles)'.format(
+			ZipRadius = '{} ({} Miles)'.format(
 				line[Zip],
 				line[Radius]
 				)
 			# ============================================================ #
-			# Generate YEAR Counter
-			if str(line[Year]) not in YearDictCounter:
-				YearDictCounter[str(line[Year])] = 1
-			else:
-				YearDictCounter[str(line[Year])] += 1
-			# Generate MAKE Counter
-			if str(line[Make]) not in MakeDictCounter:
-				MakeDictCounter[str(line[Make])] = 1
-			else:
-				MakeDictCounter[str(line[Make])] += 1
-			# Generate SCF Counter
-			if str(line[SCF]) not in SCFDictCounter:
-				SCFDictCounter[str(line[SCF])] = 1
-			else:
-				SCFDictCounter[str(line[SCF])] += 1
-			# Generate RADIUS Counter
-			if float(line[Radius]) not in RadiusDictCounter:
-				RadiusDictCounter[float(line[Radius])] = 1
-			else:
-				RadiusDictCounter[float(line[Radius])] += 1
-			# Generate CITY Counter
-			if str(CityRadiusCounter) not in CityDictCounter:
-				CityDictCounter[str(CityRadiusCounter)] = 1
-			else:
-				CityDictCounter[str(CityRadiusCounter)] += 1
-			# Generate STATE Counter
-			if str(line[State]) not in StateDictCounter:
-				StateDictCounter[str(line[State])] = 1
-			else:
-				StateDictCounter[str(line[State])] += 1
-			# Generate SCF Facility Counter
-			if str(line[SCF3DFacility]) not in SCF3DFacilityCounter:
-				SCF3DFacilityCounter[str(line[SCF3DFacility])] = 1
-			else:
-				SCF3DFacilityCounter[str(line[SCF3DFacility])] += 1
-			# Generate Zip Counter
-			if str(ZipRadiusCounter) not in ZipCounter:
-				ZipCounter[str(ZipRadiusCounter)] = 1
-			else:
-				ZipCounter[str(ZipRadiusCounter)] += 1
+			def GenCounter(record, DictCntr):
+				if str(record) not in DictCntr:
+					DictCntr[str(record)] = 1
+				else:
+					DictCntr[str(record)] += 1
+			# Generate Counters
+			GenCounter(line[Year],YearDictCounter)
+			GenCounter(line[Make],MakeDictCounter)
+			GenCounter(line[SCF],SCFDictCounter)
+			GenCounter(line[Radius],RadiusDictCounter)
+			GenCounter(CityRadius,CityDictCounter)
+			GenCounter(line[State],StateDictCounter)
+			GenCounter(line[SCF3DFacility],SCF3DFacilityCounter)
+			GenCounter(ZipRadius,ZipCounter)
 			# ============================================================ #
 			# OUTPUT Generate Phone File
 			# ============================================================ #
