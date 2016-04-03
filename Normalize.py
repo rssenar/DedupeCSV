@@ -9,7 +9,7 @@ from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
 # ==================================================================== #
-def main():
+def normalize():
 	global IPFName
 	global PennyCounter
 	global NickelCounter
@@ -1073,7 +1073,7 @@ if __name__ == '__main__':
 		for item in input:
 			return item
 	# ============================================================ #
-	main() # Main Function
+	normalize() # call main program
 	# ============================================================ #
 	# Output Report
 	Report = sys.stdout
