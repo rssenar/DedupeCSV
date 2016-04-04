@@ -82,7 +82,9 @@ def normalize():
 			for line in Drop:
 				DropDict[line[0]] = line[1]
 	except:
+		print('')
 		print('ERROR: Unable to Load Drop Dictionary File')
+		print('')
 	# ==================================================================== #
 	# Import GENERAL Suppression File for the purposes of de-duping
 	try:
@@ -92,7 +94,9 @@ def normalize():
 			for line in GenSuppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
 	except:
+		print('')
 		print('ERROR: Unable to Load GENERAL Suppression File')
+		print('')
 	# ==================================================================== #
 	# Import Montly Suppression File for the purposes of de-duping
 	try:
@@ -102,7 +106,9 @@ def normalize():
 			for line in MonthlySuppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
 	except:
+		print('')
 		print('ERROR: Unable to Load Montly Suppression File')
+		print('')
 	# ==================================================================== #
 	# Import Zip Dictionary from US_ZIP_Coordinates.csv file
 	try:
@@ -112,7 +118,9 @@ def normalize():
 			for line in ZipCoordinate:
 				ZipCoordinateDict[line[0]] = (line[1], line[2])
 	except:
+		print('')
 		print('ERROR: Unable to Load Zip Dictionary File')
+		print('')
 	# ==================================================================== #
 	# Import Mail DNQ File for the purposes of de-duping
 	try:
@@ -121,7 +129,9 @@ def normalize():
 			for line in MDNQ:
 				DoNotMailFile.add(str.title(line[0]))
 	except:
+		print('')
 		print('ERROR: Unable to Load Mail DNQ File')
+		print('')
 	# ==================================================================== #
 	# Import Year Decode Dictionary from Year_Decode.csv file
 	try:
@@ -131,7 +141,9 @@ def normalize():
 			for line in YearDecode:
 				YearDecodeDict[line[0]] = (line[1])
 	except:
+		print('')
 		print('ERROR: Unable to Load Year Decode Dictionary File')
+		print('')
 	# ==================================================================== #
 	# Import SCF Dictionary from SCF Facilities.csv file
 	try:
@@ -141,7 +153,9 @@ def normalize():
 			for line in SCF3Digit:
 				SCF3DigitDict[line[0]] = (line[1])
 	except:
+		print('')
 		print('ERROR: Unable to Load SCF 3-Digit Dictionary File')
+		print('')
 	# ==================================================================== #
 	# User Input
 	# ==================================================================== #
@@ -321,7 +335,7 @@ def normalize():
 	Misc1 = 40
 	Misc2 = 41
 	Misc3 = 42
-	# Assign Column Names To Header Output Files
+	# Header Output list
 	HeaderRowMain = [
 		'CustomerID',
 		'FullName',
@@ -368,105 +382,106 @@ def normalize():
 		'Misc3'
 		]
 	# ==================================================================== #
-	# ReMap Header
+	# ReMapping Procedures
+	# ==================================================================== #
 	if HRSelect == 'Y':
 		Selection = ReMappedOutput
 		HeaderDict = {}
-		def match(field): # Match Field Names using Regular Expression
+		def match(field):
 			if bool(re.search('cus.+id',field,flags=re.I)):
-				HeaderDict[CustomerID] = 'line[{}]'.format(str(i))
+				HeaderDict[CustomerID] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('ful.+me',field,flags=re.I)):
-				HeaderDict[FullName] = 'line[{}]'.format(str(i))
+				HeaderDict[FullName] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('fir.+me',field,flags=re.I)):
-				HeaderDict[FirstName] = 'line[{}]'.format(str(i))
+				HeaderDict[FirstName] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bmi\b',field,flags=re.I)) or \
 			bool(re.search(r'\bmiddle\b',field,flags=re.I)):
-				HeaderDict[MI] = 'line[{}]'.format(str(i))
+				HeaderDict[MI] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('las.+me',field,flags=re.I)):
-				HeaderDict[LastName] = 'line[{}]'.format(str(i))
+				HeaderDict[LastName] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('addr.+1',field,flags=re.I)):
-				HeaderDict[Address1] = 'line[{}]'.format(str(i))
+				HeaderDict[Address1] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('addr.+2',field,flags=re.I)):
-				HeaderDict[Address2] = 'line[{}]'.format(str(i))
+				HeaderDict[Address2] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('addr.+full',field,flags=re.I)):
-				HeaderDict[AddressComb] = 'line[{}]'.format(str(i))
+				HeaderDict[AddressComb] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bcity\b',field,flags=re.I)):
-				HeaderDict[City] = 'line[{}]'.format(str(i))
+				HeaderDict[City] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bstate\b',field,flags=re.I)):
-				HeaderDict[State] = 'line[{}]'.format(str(i))
+				HeaderDict[State] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bzip\b',field,flags=re.I)):
-				HeaderDict[Zip] = 'line[{}]'.format(str(i))
+				HeaderDict[Zip] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or \
 			bool(re.search(r'\bzip4\b',field,flags=re.I)):
-				HeaderDict[Zip4] = 'line[{}]'.format(str(i))
+				HeaderDict[Zip4] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bscf\b',field,flags=re.I)):
-				HeaderDict[SCF] = 'line[{}]'.format(str(i))
+				HeaderDict[SCF] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('pho.+',field,flags=re.I)):
-				HeaderDict[Phone] = 'line[{}]'.format(str(i))
+				HeaderDict[Phone] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('HPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bhph\b',field,flags=re.I)):
-				HeaderDict[HPhone] = 'line[{}]'.format(str(i))
+				HeaderDict[HPhone] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('WPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bbph\b',field,flags=re.I)):
-				HeaderDict[WPhone] = 'line[{}]'.format(str(i))
+				HeaderDict[WPhone] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('MPho.+',field,flags=re.I)) or \
 			bool(re.search(r'\bcph\b',field,flags=re.I)):
-				HeaderDict[MPhone] = 'line[{}]'.format(str(i))
+				HeaderDict[MPhone] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bemail\b',field,flags=re.I)):
-				HeaderDict[Email] = 'line[{}]'.format(str(i))
+				HeaderDict[Email] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bvin\b',field,flags=re.I)):
-				HeaderDict[VIN] = 'line[{}]'.format(str(i))
+				HeaderDict[VIN] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\byear\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvyr\b',field,flags=re.I)):
-				HeaderDict[Year] = 'line[{}]'.format(str(i))
+				HeaderDict[Year] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bmake\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvmk\b',field,flags=re.I)):
-				HeaderDict[Make] = 'line[{}]'.format(str(i))
+				HeaderDict[Make] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or \
 			bool(re.search(r'\bvmd\b',field,flags=re.I)):
-				HeaderDict[Model] = 'line[{}]'.format(str(i))
+				HeaderDict[Model] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
-				HeaderDict[DelDate] = 'line[{}]'.format(str(i))
+				HeaderDict[DelDate] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bdate\b',field,flags=re.I)):
-				HeaderDict[Date] = 'line[{}]'.format(str(i))
+				HeaderDict[Date] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bradius\b',field,flags=re.I)):
-				HeaderDict[Radius] = 'line[{}]'.format(str(i))
+				HeaderDict[Radius] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('coord.+',field,flags=re.I)):
-				HeaderDict[Coordinates] = 'line[{}]'.format(str(i))
+				HeaderDict[Coordinates] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bvinlen\b',field,flags=re.I)):
-				HeaderDict[VINLen] = 'line[{}]'.format(str(i))
+				HeaderDict[VINLen] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('dsf.+seq',field,flags=re.I)):
-				HeaderDict[DSF_WALK_SEQ] = 'line[{}]'.format(str(i))
+				HeaderDict[DSF_WALK_SEQ] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bcrrt\b',field,flags=re.I)):
-				HeaderDict[CRRT] = 'line[{}]'.format(str(i))
+				HeaderDict[CRRT] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bzipcrrt\b',field,flags=re.I)):
-				HeaderDict[ZipCRRT] = 'line[{}]'.format(str(i))
+				HeaderDict[ZipCRRT] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
-				HeaderDict[KBB] = 'line[{}]'.format(str(i))
+				HeaderDict[KBB] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bbuybackvalue\b',field,flags=re.I)):
-				HeaderDict[BuybackValues] = 'line[{}]'.format(str(i))
+				HeaderDict[BuybackValues] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bwinningnumber\b',field,flags=re.I)):
-				HeaderDict[WinningNum] = 'line[{}]'.format(str(i))
+				HeaderDict[WinningNum] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bmaildnq\b',field,flags=re.I)):
-				HeaderDict[MailDNQ] = 'line[{}]'.format(str(i))
+				HeaderDict[MailDNQ] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bblitzdnq\b',field,flags=re.I)):
-				HeaderDict[BlitzDNQ] = 'line[{}]'.format(str(i))
+				HeaderDict[BlitzDNQ] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bdrop\b',field,flags=re.I)):
-				HeaderDict[Drop] = 'line[{}]'.format(str(i))
+				HeaderDict[Drop] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
-				HeaderDict[PURL] = 'line[{}]'.format(str(i))
+				HeaderDict[PURL] = 'line[{}]'.format(str(OldColumn)) 
 			elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
-				HeaderDict[YrDec] = 'line[{}]'.format(str(i))		
+				HeaderDict[YrDec] = 'line[{}]'.format(str(OldColumn))		
 			elif bool(re.search(r'\bscf3dfacility\b',field,flags=re.I)):
-				HeaderDict[SCF3DFacility] = 'line[{}]'.format(str(i))
+				HeaderDict[SCF3DFacility] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bvendor\b',field,flags=re.I)):
-				HeaderDict[Vendor] = 'line[{}]'.format(str(i))
+				HeaderDict[Vendor] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
-				HeaderDict[Misc1] = 'line[{}]'.format(str(i)) 
+				HeaderDict[Misc1] = 'line[{}]'.format(str(OldColumn)) 
 			elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
-				HeaderDict[Misc2] = 'line[{}]'.format(str(i)) 
+				HeaderDict[Misc2] = 'line[{}]'.format(str(OldColumn)) 
 			elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
-				HeaderDict[Misc3] = 'line[{}]'.format(str(i))
+				HeaderDict[Misc3] = 'line[{}]'.format(str(OldColumn))
 		# Re-Order Fields based on Header Row
 		with open(InputFile,'rU') as InputFile, \
 		open(ReMappedOutput,'ab') as ReMappedOutputFile:
@@ -475,22 +490,22 @@ def normalize():
 			Output.writerow(HeaderRowMain)
 			FirstLine = True
 			for line in tqdm(Input):
-				if FirstLine:	
-					for i in range(0,len(line)):
-						match(line[i])
+				if FirstLine:
+					for OldColumn in range(0,len(line)):
+						match(line[OldColumn])
 					FirstLine = False
 				else:
 					newline = []
-					for x in range(0,len(HeaderRowMain)):
-						if x in HeaderDict:
-							newline.append(eval(HeaderDict[x]))
+					for NewColumn in range(0,len(HeaderRowMain)):
+						if NewColumn in HeaderDict:
+							newline.append(eval(HeaderDict[NewColumn]))
 						else:
 							newline.append('')
 					Output.writerow(newline)
 	else:
 		Selection = InputFile
 	# ==================================================================== #
-	# MAIN Function
+	# Normalization Procedures
 	# ==================================================================== #
 	with open(Selection,'rU') as InputFile, \
 	open(CleanOutput,'ab') as CleanOutput, \
