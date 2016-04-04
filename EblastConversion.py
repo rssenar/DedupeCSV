@@ -66,7 +66,7 @@ for index in range(0,len(CSVFiles)):
 	FirstLine = True
 	InputFile = open(CSVFiles[index],'rU')
 	Input = csv.reader(InputFile)
-	OutputFile = open('_Eblast_' + str(CSVFiles[index]),'ab')
+	OutputFile = open('_EBLAST_' + str(CSVFiles[index]),'ab')
 	Output = csv.writer(OutputFile)
 	Output.writerow(HeaderRow)
 	PURLConversion()
