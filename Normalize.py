@@ -82,7 +82,7 @@ def normalize():
 			for line in Drop:
 				DropDict[line[0]] = line[1]
 	except:
-		print('..... ERROR: Unable to Load Drop Dictionary File')
+		print('..... ERROR: Unable to Load Drop Dictionary File\n')
 	# ==================================================================== #
 	# Import GENERAL Suppression File for the purposes of de-duping
 	try:
@@ -92,7 +92,7 @@ def normalize():
 			for line in GenSuppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
 	except:
-		print('..... ERROR: Unable to Load GENERAL Suppression File')
+		print('..... ERROR: Unable to Load GENERAL Suppression File\n')
 	# ==================================================================== #
 	# Import Montly Suppression File for the purposes of de-duping
 	try:
@@ -102,7 +102,7 @@ def normalize():
 			for line in MonthlySuppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
 	except:
-		print('..... ERROR: Unable to Load Montly Suppression File')
+		print('..... ERROR: Unable to Load Montly Suppression File\n')
 	# ==================================================================== #
 	# Import Zip Dictionary from US_ZIP_Coordinates.csv file
 	try:
@@ -112,7 +112,7 @@ def normalize():
 			for line in ZipCoordinate:
 				ZipCoordinateDict[line[0]] = (line[1], line[2])
 	except:
-		print('..... ERROR: Unable to Load Zip Dictionary File')
+		print('..... ERROR: Unable to Load Zip Dictionary File\n')
 	# ==================================================================== #
 	# Import Mail DNQ File for the purposes of de-duping
 	try:
@@ -121,7 +121,7 @@ def normalize():
 			for line in MDNQ:
 				DoNotMailFile.add(str.title(line[0]))
 	except:
-		print('..... ERROR: Unable to Load Mail DNQ File')
+		print('..... ERROR: Unable to Load Mail DNQ File\n')
 	# ==================================================================== #
 	# Import Year Decode Dictionary from Year_Decode.csv file
 	try:
@@ -131,7 +131,7 @@ def normalize():
 			for line in YearDecode:
 				YearDecodeDict[line[0]] = (line[1])
 	except:
-		print('..... ERROR: Unable to Load Year Decode Dictionary File')
+		print('..... ERROR: Unable to Load Year Decode Dictionary File\n')
 	# ==================================================================== #
 	# Import SCF Dictionary from SCF Facilities.csv file
 	try:
@@ -141,7 +141,7 @@ def normalize():
 			for line in SCF3Digit:
 				SCF3DigitDict[line[0]] = (line[1])
 	except:
-		print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
+		print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File\n')
 	# ==================================================================== #
 	# User Input
 	# ==================================================================== #
@@ -240,7 +240,7 @@ def normalize():
 				for line in Suppression:
 					Entries.add((str.title(line[2]),str.title(line[5])))
 		except:
-			print('     ERROR: Cannot load local suppression file')
+			print('ERROR: Cannot load local suppression file\n')
 	# Set TOP Percentage
 	TOPPercentage = raw_input(
 		'Set Top % .......................[2%] : '
