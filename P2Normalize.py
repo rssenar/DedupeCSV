@@ -9,6 +9,46 @@ from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
 # ==================================================================== #
+def ConvertStringToList(input):
+	AppendedList = []
+	input = input.split('|')
+	for item in input:
+		item = item.strip()
+		item = str.title(item)
+		AppendedList.append(item)
+	return AppendedList
+
+def ReformatPhoneNum(Phone):
+	Phone = str(Phone).strip()
+	Phone = str(Phone).replace('-','')
+	Phone = str(Phone).replace('(','')
+	Phone = str(Phone).replace(')','')
+	return Phone
+
+def GenCounter(record, DictCntr):
+	if str(record) not in DictCntr:
+		DictCntr[str(record)] = 1
+	else:
+		DictCntr[str(record)] += 1
+
+def percentage(part, whole):
+	if whole == 0:
+		return 0
+	else:
+		return 100 * float(part)/float(whole)
+
+def ConvListToString(input):
+	for item in input:
+		return item
+
+def DelTempFiles():
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Delete Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
+
 def normalize():
 	global IPFName
 	global PennyCounter
@@ -61,15 +101,6 @@ def normalize():
 	SCF3DigitFacility = 0
 	Entries = set()
 	DoNotMailFile = set()
-	# ==================================================================== #
-	def SplitAndStripFunc(input):
-		AppendedList = []
-		input = input.split('|')
-		for item in input:
-			item = item.strip()
-			item = str.title(item)
-			AppendedList.append(item)
-		return AppendedList
 	# ==================================================================== #
 	# Initialize Dictionaries
 	# ==================================================================== #
@@ -196,7 +227,7 @@ def normalize():
 		'Enter Suppression List .......[STATE] : '
 		)
 	if STATEList != '':
-		STATEList = sorted(SplitAndStripFunc(STATEList))
+		STATEList = sorted(ConvertStringToList(STATEList))
 		print('..STATEList : {}'.format(STATEList))
 	else:
 		STATEList = []
@@ -205,7 +236,7 @@ def normalize():
 		'Enter Suppression List .........[SCF] : '
 		)
 	if SCFList != '':
-		SCFList = sorted(SplitAndStripFunc(SCFList))
+		SCFList = sorted(ConvertStringToList(SCFList))
 		print('....SCFList : {}'.format(SCFList))
 	else:
 		SCFList = []
@@ -214,7 +245,7 @@ def normalize():
 		'Enter Suppression List ........[YEAR] : '
 		)
 	if YEARList != '':
-		YEARList = sorted(SplitAndStripFunc(YEARList))
+		YEARList = sorted(ConvertStringToList(YEARList))
 		print('...YEARList : {}'.format(YEARList))
 	else:
 		YEARList = []
@@ -223,7 +254,7 @@ def normalize():
 		'Enter Suppression List ........[CITY] : '
 		)
 	if CITYList != '':
-		CITYList = sorted(SplitAndStripFunc(CITYList))
+		CITYList = sorted(ConvertStringToList(CITYList))
 		print('...CITYList : {}'.format(CITYList))
 	else:
 		CITYList =[]
@@ -628,19 +659,13 @@ def normalize():
 				elif line[Drop] == 'A':
 					PurchaseCounter += 1
 			# ============================================================ #
-			def ClnPhone(Phone):
-				Phone = str(Phone).strip()
-				Phone = str(Phone).replace('-','')
-				Phone = str(Phone).replace('(','')
-				Phone = str(Phone).replace(')','')
-				return Phone
 			# Parse & Clean up Phone #
 			if line[MPhone] != '' and len(str(line[MPhone])) > 6:
-				line[Phone] = ClnPhone(line[MPhone])
+				line[Phone] = ReformatPhoneNum(line[MPhone])
 			elif line[HPhone] != '' and len(str(line[HPhone])) > 6:
-				line[Phone] = ClnPhone(line[HPhone])
+				line[Phone] = ReformatPhoneNum(line[HPhone])
 			elif line[WPhone] != '' and len(str(line[WPhone])) > 6:
-				line[Phone] = ClnPhone(line[WPhone])
+				line[Phone] = ReformatPhoneNum(line[WPhone])
 			else:
 				line[Phone] = ''
 			# Re-Format Phone #
@@ -797,11 +822,6 @@ def normalize():
 				line[Radius]
 				)
 			# ============================================================ #
-			def GenCounter(record, DictCntr):
-				if str(record) not in DictCntr:
-					DictCntr[str(record)] = 1
-				else:
-					DictCntr[str(record)] += 1
 			# Generate Counters
 			GenCounter(line[Year],YearDictCounter)
 			GenCounter(line[Make],MakeDictCounter)
@@ -1063,284 +1083,259 @@ def normalize():
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
 # ==================================================================== #
 if __name__ == '__main__':
-	# Function to Generate Percentage
-	def percentage(part, whole):
-		if whole == 0:
-			return 0
-		else:
-			return 100 * float(part)/float(whole)
-	# Function to Convert List to String
-	def ConLstStr(input):
-		for item in input:
-			return item
-	# Upkeep
-	def upkeep():
-		Files = glob.glob('*.csv')
-		for Record in Files:
-			if os.path.getsize(Record) == 0: # Delete Empty files
-				os.remove(Record)
-			if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-				os.remove(Record)
-	# ============================================================ #
-	try:
-		normalize() # call main program
-		# Output Report
-		Report = sys.stdout
-		with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
-			HighestRadius = ConLstStr(sorted(RadiusDictCounter)[-1:])
-			HigherstYear = ConLstStr(sorted(YearDictCounter)[-1:])
-			LowestYear = ConLstStr(sorted(YearDictCounter)[:1])
-			TodayDateTime = datetime.datetime.now()
-			GrandTotal = (DatabaseCounter + PurchaseCounter + PennyCounter
-			 + NickelCounter - MDNQCounter - DupesCounter)
-			SUBTotal = (DatabaseCounter + PurchaseCounter
-			 + PennyCounter + NickelCounter)
-			sys.stdout = Log
-			print('')
-			print('------------------------------------------------------------')
-			print('#### {}'.format(str.upper(IPFName)))
-			print('###### Data Summary Report - as of {}'.format(TodayDateTime))
-			print('------------------------------------------------------------')
-			print('')
-			print('||Description|')
-			print('|-:|:-|')
-			print('|Central ZIP Code|{}|'.format(CentralZip))
-			print('|SCF Facility|{}|'.format(CentralZipSCFFacilityReport))
-			print('|Max Radius|{} Miles|'.format(HighestRadius))
-			print('|Max Year|{}|'.format(HigherstYear))
-			print('|Min Year|{}|'.format(LowestYear))
-			print('|Max DelDate Year|{}|'.format(MaxSaleYear))
-			print('|Vendor|{}|'.format(VendorSelected))
-			print('|Database Total|{}|'.format(DatabaseCounter))
-			print('|Purchase Total|{}|'.format(PurchaseCounter))
-			print('|Penny Total|{}|'.format(PennyCounter))
-			print('|Nickel Total|{}|'.format(NickelCounter))
-			print('|Less MDNQ Total|({})|'.format(MDNQCounter))
-			print('|Less Dupes Total|({})|'.format(DupesCounter))
-			print('|**GRAND TOTAL**|**{}**|'.format(GrandTotal))
-			print('')
-			print('------------------------------------------------------------')
-			print('###### Count Distribution by STATE:')
-			print('||State|Count|%|RTotal|%|')
-			print('||-|-:|-:|-:|-:|')
-			StateRTotal = 0
-			for key in sorted(StateDictCounter.iterkeys()):
-				StateRTotal = StateRTotal + StateDictCounter[key]
-				ValuePrcnt = percentage(StateDictCounter[key], SUBTotal)
-				RTotalPrcnt = percentage(StateRTotal, SUBTotal)
-				if ValuePrcnt > TOPPercentage:
+	normalize() # Main Program
+	Report = sys.stdout # Output Report
+	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
+		HighestRadius = ConvListToString(sorted(RadiusDictCounter)[-1:])
+		HigherstYear = ConvListToString(sorted(YearDictCounter)[-1:])
+		LowestYear = ConvListToString(sorted(YearDictCounter)[:1])
+		TodayDateTime = datetime.datetime.now()
+		GrandTotal = (DatabaseCounter + PurchaseCounter + PennyCounter
+			+ NickelCounter - MDNQCounter - DupesCounter)
+		SUBTotal = (DatabaseCounter + PurchaseCounter
+			+ PennyCounter + NickelCounter)
+		sys.stdout = Log
+		print('\n------------------------------------------------------------')
+		print('#### {}'.format(str.upper(IPFName)))
+		print('###### Data Summary Report - as of {}'.format(TodayDateTime))
+		print('------------------------------------------------------------\n')
+		print('||Description|')
+		print('|-:|:-|')
+		print('|Central ZIP Code|{}|'.format(CentralZip))
+		print('|SCF Facility|{}|'.format(CentralZipSCFFacilityReport))
+		print('|Max Radius|{} Miles|'.format(HighestRadius))
+		print('|Max Year|{}|'.format(HigherstYear))
+		print('|Min Year|{}|'.format(LowestYear))
+		print('|Max DelDate Year|{}|'.format(MaxSaleYear))
+		print('|Vendor|{}|'.format(VendorSelected))
+		print('|Database Total|{}|'.format(DatabaseCounter))
+		print('|Purchase Total|{}|'.format(PurchaseCounter))
+		print('|Penny Total|{}|'.format(PennyCounter))
+		print('|Nickel Total|{}|'.format(NickelCounter))
+		print('|Less MDNQ Total|({})|'.format(MDNQCounter))
+		print('|Less Dupes Total|({})|'.format(DupesCounter))
+		print('|**GRAND TOTAL**|**{}**|'.format(GrandTotal))
+		print()
+		print('------------------------------------------------------------')
+		print('###### Count Distribution by STATE:')
+		print('||State|Count|%|RTotal|%|')
+		print('||-|-:|-:|-:|-:|')
+		StateRTotal = 0
+		for key in sorted(StateDictCounter.iterkeys()): # Python 2.7 Sort by Key
+			StateRTotal = StateRTotal + StateDictCounter[key]
+			ValuePrcnt = percentage(StateDictCounter[key], SUBTotal)
+			RTotalPrcnt = percentage(StateRTotal, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					StateDictCounter[key],
+					round(ValuePrcnt,2),
+					StateRTotal,
+					round(RTotalPrcnt,2)
+					))
+			else:
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					StateDictCounter[key],
+					round(ValuePrcnt,2),
+					StateRTotal,
+					round(RTotalPrcnt,2)
+					))
+		print('')
+		print('###### Count Distribution by SCF FACILITY and 3-Digit:')
+		print('||SCF Facilities|Count|%|RTotal|%|')
+		print('||-|-:|-:|-:|-:|')
+		SCFFacilityRTotal = 0
+		for key in sorted(SCF3DFacilityCounter.iterkeys()): # Python 2.7 Sort by Key
+			SCFFacilityRTotal = SCFFacilityRTotal + SCF3DFacilityCounter[key]
+			ValuePrcnt = percentage(SCF3DFacilityCounter[key], SUBTotal)
+			RTotalPrcnt = percentage(SCFFacilityRTotal, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					SCF3DFacilityCounter[key],
+					round(ValuePrcnt,2),
+					SCFFacilityRTotal,
+					round(RTotalPrcnt,2)
+					))
+			else:
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					SCF3DFacilityCounter[key],
+					round(ValuePrcnt,2),
+					SCFFacilityRTotal,
+					round(RTotalPrcnt,2)
+					))
+		print('')
+		print('||3-Digit|Count|%|RTotal|%|')
+		print('||-|-:|-:|-:|-:|')
+		SCFRTotal = 0
+		for key in sorted(SCFDictCounter.iterkeys()): # Python 2.7 Sort by Key
+			SCFRTotal = SCFRTotal + SCFDictCounter[key]
+			ValuePrcnt = percentage(SCFDictCounter[key], SUBTotal)
+			RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				if len(str(key)) == 2:
+					print('|>|0{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,2),
+						SCFRTotal,
+						round(RTotalPrcnt,2)
+						))
+				else:
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
-						StateDictCounter[key],
+						SCFDictCounter[key],
 						round(ValuePrcnt,2),
-						StateRTotal,
+						SCFRTotal,
+						round(RTotalPrcnt,2)
+						))
+			else:
+				if len(str(key)) == 2:
+					print('||0{}|{}|{}%|{}|{}%|'.format(
+						key,
+						SCFDictCounter[key],
+						round(ValuePrcnt,2),
+						SCFRTotal,
 						round(RTotalPrcnt,2)
 						))
 				else:
 					print('||{}|{}|{}%|{}|{}%|'.format(
 						key,
-						StateDictCounter[key],
+						SCFDictCounter[key],
 						round(ValuePrcnt,2),
-						StateRTotal,
+						SCFRTotal,
 						round(RTotalPrcnt,2)
 						))
-			print('')
-			print('###### Count Distribution by SCF FACILITY and 3-Digit:')
-			print('||SCF Facilities|Count|%|RTotal|%|')
+		print('')
+		SortedSCFText = ''
+		for key in sorted(SCFDictCounter.iterkeys()):
+			SortedSCFText = '{} {} |'.format(
+				SortedSCFText,
+				key
+				)
+		print('<!--',SortedSCFText,'-->')
+		print('')	
+		if len(YearDictCounter) !=  1:
+			print('###### Count Distribution by YEAR:')
+			print('||Years|Count|%|RTotal|%|')
 			print('||-|-:|-:|-:|-:|')
-			SCFFacilityRTotal = 0
-			for key in sorted(SCF3DFacilityCounter.iterkeys()):
-				SCFFacilityRTotal = SCFFacilityRTotal + SCF3DFacilityCounter[key]
-				ValuePrcnt = percentage(SCF3DFacilityCounter[key], SUBTotal)
-				RTotalPrcnt = percentage(SCFFacilityRTotal, SUBTotal)
+			YearRTotal = 0
+			for key in sorted(YearDictCounter.iterkeys(), reverse = True): # Python 2.7 Sort by Key
+				YearRTotal = YearRTotal + YearDictCounter[key]
+				ValuePrcnt = percentage(YearDictCounter[key], SUBTotal)
+				RTotalPrcnt = percentage(YearRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
-						SCF3DFacilityCounter[key],
+						YearDictCounter[key],
 						round(ValuePrcnt,2),
-						SCFFacilityRTotal,
+						YearRTotal,
 						round(RTotalPrcnt,2)
 						))
 				else:
 					print('||{}|{}|{}%|{}|{}%|'.format(
 						key,
-						SCF3DFacilityCounter[key],
+						YearDictCounter[key],
 						round(ValuePrcnt,2),
-						SCFFacilityRTotal,
+						YearRTotal,
 						round(RTotalPrcnt,2)
 						))
 			print('')
-			print('||3-Digit|Count|%|RTotal|%|')
+		print('###### Count Distribution by RADIUS:')
+		print('||Radius|Count|%|RTotal|%|')
+		print('||-|-:|-:|-:|-:|')
+		RadiusRTotal = 0
+		for key in sorted(RadiusDictCounter.iterkeys()): # Python 2.7 Sort by Key
+			RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
+			ValuePrcnt = percentage(RadiusDictCounter[key], SUBTotal)
+			RTotalPrcnt = percentage(RadiusRTotal, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
+					key,
+					RadiusDictCounter[key],
+					round(ValuePrcnt,2),
+					RadiusRTotal,
+					round(RTotalPrcnt,2)
+					))
+			else:
+				print('||{} Miles|{}|{}%|{}|{}%|'.format(
+					key,
+					RadiusDictCounter[key],
+					round(ValuePrcnt,2),
+					RadiusRTotal,
+					round(RTotalPrcnt,2)
+					))
+		print('')
+		if len(MakeDictCounter) !=  1:
+			print('###### Top Counts by MAKE ( > {}% ):'.format(TOPPercentage))
+			print('||Makes|Count|%|RTotal|%|')
 			print('||-|-:|-:|-:|-:|')
-			SCFRTotal = 0
-			for key in sorted(SCFDictCounter.iterkeys()):
-				SCFRTotal = SCFRTotal + SCFDictCounter[key]
-				ValuePrcnt = percentage(SCFDictCounter[key], SUBTotal)
-				RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
-				if ValuePrcnt > TOPPercentage:
-					if len(str(key)) == 2:
-						print('|>|0{}|{}|{}%|{}|{}%|'.format(
-							key,
-							SCFDictCounter[key],
-							round(ValuePrcnt,2),
-							SCFRTotal,
-							round(RTotalPrcnt,2)
-							))
-					else:
-						print('|>|{}|{}|{}%|{}|{}%|'.format(
-							key,
-							SCFDictCounter[key],
-							round(ValuePrcnt,2),
-							SCFRTotal,
-							round(RTotalPrcnt,2)
-							))
-				else:
-					if len(str(key)) == 2:
-						print('||0{}|{}|{}%|{}|{}%|'.format(
-							key,
-							SCFDictCounter[key],
-							round(ValuePrcnt,2),
-							SCFRTotal,
-							round(RTotalPrcnt,2)
-							))
-					else:
-						print('||{}|{}|{}%|{}|{}%|'.format(
-							key,
-							SCFDictCounter[key],
-							round(ValuePrcnt,2),
-							SCFRTotal,
-							round(RTotalPrcnt,2)
-							))
-			print('')
-			SortedSCFText = ''
-			for key in sorted(SCFDictCounter.iterkeys()):
-				SortedSCFText = '{} {} |'.format(
-					SortedSCFText,
-					key
-					)
-			print('<!--',SortedSCFText,'-->')
-			print('')	
-			if len(YearDictCounter) !=  1:
-				print('###### Count Distribution by YEAR:')
-				print('||Years|Count|%|RTotal|%|')
-				print('||-|-:|-:|-:|-:|')
-				YearRTotal = 0
-				for key in sorted(YearDictCounter.iterkeys(), reverse = True):
-					YearRTotal = YearRTotal + YearDictCounter[key]
-					ValuePrcnt = percentage(YearDictCounter[key], SUBTotal)
-					RTotalPrcnt = percentage(YearRTotal, SUBTotal)
-					if ValuePrcnt > TOPPercentage:
-						print('|>|{}|{}|{}%|{}|{}%|'.format(
-							key,
-							YearDictCounter[key],
-							round(ValuePrcnt,2),
-							YearRTotal,
-							round(RTotalPrcnt,2)
-							))
-					else:
-						print('||{}|{}|{}%|{}|{}%|'.format(
-							key,
-							YearDictCounter[key],
-							round(ValuePrcnt,2),
-							YearRTotal,
-							round(RTotalPrcnt,2)
-							))
-				print('')
-			print('###### Count Distribution by RADIUS:')
-			print('||Radius|Count|%|RTotal|%|')
-			print('||-|-:|-:|-:|-:|')
-			RadiusRTotal = 0
-			for key in sorted(RadiusDictCounter.iterkeys()):
-				RadiusRTotal = RadiusRTotal + RadiusDictCounter[key]
-				ValuePrcnt = percentage(RadiusDictCounter[key], SUBTotal)
-				RTotalPrcnt = percentage(RadiusRTotal, SUBTotal)
-				if ValuePrcnt > TOPPercentage:
-					print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
-						key,
-						RadiusDictCounter[key],
-						round(ValuePrcnt,2),
-						RadiusRTotal,
-						round(RTotalPrcnt,2)
-						))
-				else:
-					print('||{} Miles|{}|{}%|{}|{}%|'.format(
-						key,
-						RadiusDictCounter[key],
-						round(ValuePrcnt,2),
-						RadiusRTotal,
-						round(RTotalPrcnt,2)
-						))
-			print('')
-			if len(MakeDictCounter) !=  1:
-				print('###### Top Counts by MAKE ( > {}% ):'.format(TOPPercentage))
-				print('||Makes|Count|%|RTotal|%|')
-				print('||-|-:|-:|-:|-:|')
-				MakeRTotal = 0
-				for key, value in sorted(
-					MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
-					):
-					MakeRTotal = MakeRTotal + value
-					ValuePrcnt = percentage(value, SUBTotal)
-					RTotalPrcnt = percentage(MakeRTotal, SUBTotal)
-					if ValuePrcnt > TOPPercentage:
-						print('|>|{}|{}|{}%|{}|{}%|'.format(
-							key,
-							value,
-							round(ValuePrcnt,2),
-							MakeRTotal,
-							round(RTotalPrcnt,2)
-							))
-				print('')
-			print('###### Top Counts & Distributions by CITY ( > {}% ):'.format(TOPPercentage))
-			print('||Top Cities|Count|%|RTotal|')
-			print('||-|-:|-:|-:|')
-			CityRTotal = 0
+			MakeRTotal = 0
 			for key, value in sorted(
-				CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
-				):
-				CityRTotal = CityRTotal + value
+				MakeDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
+				): # Python 2.7 Sort by Value
+				MakeRTotal = MakeRTotal + value
 				ValuePrcnt = percentage(value, SUBTotal)
+				RTotalPrcnt = percentage(MakeRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
-					print('|>|{}|{}|{}%|{}|'.format(
+					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
 						round(ValuePrcnt,2),
-						CityRTotal
-						))
-			print('')
-			print('||Cities|Count|%|RTotal|%|')
-			print('||-|-:|-:|-:|-:|')
-			CityRTotal = 0
-			for key in sorted(CityDictCounter.iterkeys()):
-				CityRTotal = CityRTotal + CityDictCounter[key]
-				ValuePrcnt = percentage(CityDictCounter[key], SUBTotal)
-				RTotalPrcnt = percentage(CityRTotal, SUBTotal)
-				if ValuePrcnt > TOPPercentage:
-					print('|>|{}|{}|{}%|{}|{}%|'.format(
-						key,
-						CityDictCounter[key],
-						round(ValuePrcnt,2),
-						CityRTotal,
-						round(RTotalPrcnt,2)
-						))
-				else:
-					print('||{}|{}|{}%|{}|{}%|'.format(
-						key,
-						CityDictCounter[key],
-						round(ValuePrcnt,2),
-						CityRTotal,
+						MakeRTotal,
 						round(RTotalPrcnt,2)
 						))
 			print('')
-			sys.stdout = Report
-		print('=======================================')
-		print('.....  T     O     T     A     L  ..... : {}'.format(GrandTotal))
-		print('============== COMPLETED ==============')
+		print('###### Top Counts & Distributions by CITY ( > {}% ):'.format(TOPPercentage))
+		print('||Top Cities|Count|%|RTotal|')
+		print('||-|-:|-:|-:|')
+		CityRTotal = 0
+		for key, value in sorted(
+			CityDictCounter.iteritems(), key = lambda (k,v): (v,k), reverse = True
+			): # Python 2.7 Sort by Value
+			CityRTotal = CityRTotal + value
+			ValuePrcnt = percentage(value, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				print('|>|{}|{}|{}%|{}|'.format(
+					key,
+					value,
+					round(ValuePrcnt,2),
+					CityRTotal
+					))
 		print('')
-		upkeep()
-	except:
-		print('........ ERROR! Please Re-Map File! ........')
-		upkeep()
+		print('||Cities|Count|%|RTotal|%|')
+		print('||-|-:|-:|-:|-:|')
+		CityRTotal = 0
+		for key in sorted(CityDictCounter.iterkeys()): # Python 2.7 Sort by Key
+			CityRTotal = CityRTotal + CityDictCounter[key]
+			ValuePrcnt = percentage(CityDictCounter[key], SUBTotal)
+			RTotalPrcnt = percentage(CityRTotal, SUBTotal)
+			if ValuePrcnt > TOPPercentage:
+				print('|>|{}|{}|{}%|{}|{}%|'.format(
+					key,
+					CityDictCounter[key],
+					round(ValuePrcnt,2),
+					CityRTotal,
+					round(RTotalPrcnt,2)
+					))
+			else:
+				print('||{}|{}|{}%|{}|{}%|'.format(
+					key,
+					CityDictCounter[key],
+					round(ValuePrcnt,2),
+					CityRTotal,
+					round(RTotalPrcnt,2)
+					))
+		print('')
+		sys.stdout = Report
+	print('=======================================')
+	print('.....  T     O     T     A     L  ..... : {}'.format(GrandTotal))
+	print('============== COMPLETED ==============')
+	print('')
+	DelTempFiles()
+	
 # ==================================================================== #
 #	print('##### TOP Counts by STATE ( > {}% ):'.format(TOPPercentage))
 #	print('||State|Count|%|R-Total|%|')
