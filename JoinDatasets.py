@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+
+#!/usr/bin/env python3.4
 # ---------------------------------------------
-from __future__ import division, print_function
 import pandas as pd
 import os
 # ---------------------------------------------
@@ -15,4 +15,4 @@ ds1 = pd.read_csv(FileName1)
 ds2 = pd.read_csv(FileName2)
 # ---------------------------------------------
 merged = ds1.merge(ds2, how='inner')
-merged.to_csv('__Joined.csv', encoding='utf-8')
+merged.to_csv('__JOINED.csv', encoding='utf-8')
