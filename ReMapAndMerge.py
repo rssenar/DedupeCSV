@@ -50,6 +50,7 @@ Vendor = 39
 Misc1 = 40
 Misc2 = 41
 Misc3 = 42
+
 # Header Output list
 HeaderRowMain = [
 	'CustomerID',
@@ -194,11 +195,12 @@ def ReMapHeaderFields():
 			HeaderDict[Misc2] = 'line[{}]'.format(str(OldColumn)) 
 		elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 			HeaderDict[Misc3] = 'line[{}]'.format(str(OldColumn))
+
 	for index in range(0,len(CSVFiles)):
 		global OldColumn
 		global NewColumn
 		with open(CSVFiles[index],'rU') as InputFile,\
-		open('__ReMapped_' + str(CSVFiles[index]),'at') as OutputFile:
+		open('___ReMapped--' + str(CSVFiles[index]),'at') as OutputFile:
 			Input = csv.reader(InputFile)
 			Output = csv.writer(OutputFile)
 			Output.writerow(HeaderRowMain)
@@ -209,20 +211,20 @@ def ReMapHeaderFields():
 						match(line[OldColumn])
 					FirstLine = False
 				else:
-					newline = []
+					Newline = []
 					for NewColumn in range(0,len(HeaderRowMain)):
 						if NewColumn in HeaderDict:
-							newline.append(eval(HeaderDict[NewColumn]))
+							Newline.append(eval(HeaderDict[NewColumn]))
 						else:
-							newline.append('')
-					Output.writerow(newline)
+							Newline.append('')
+					Output.writerow(Newline)
 
 def MultiFileMarge():
 	FirstFileUseHeaderRow = True
-	CSVFiles = glob.glob('__*.csv')
+	CSVFiles = glob.glob('___*.csv')
 	for line in tqdm(CSVFiles):
 		with open(line,'rU') as File,\
-		open('___MergeFile.csv','at') as Merge:
+		open('>>>> MERGED_FILE <<<<.csv','at') as Merge:
 			OutputClean = csv.writer(Merge)
 			Input = csv.reader(File)
 			if FirstFileUseHeaderRow:

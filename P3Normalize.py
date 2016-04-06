@@ -8,6 +8,7 @@ from dateutil.parser import *
 from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
+import USTerritories
 # ==================================================================== #
 def Normalize():
 	global IPFName
@@ -1355,4 +1356,3 @@ if __name__ == '__main__':
 	print('============== COMPLETED ==============')
 	print('')
 	DelTempFiles()
-	

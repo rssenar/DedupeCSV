@@ -1,18 +1,19 @@
 
 #!/usr/bin/env python3.4
+# Modified code by Sebastian Raschka, 2015 to import a CSV to an SQLite3 Database
+# https://github.com/rasbt/python_reference/blob/master/useful_scripts/large_csv_to_sqlite.py
 # ---------------------------------------------
 import pandas as pd
 import sqlite3
+import os, glob
 from pandas.io import sql
 import subprocess
+from tqdm import tqdm
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
-input_csv = 'large.csv'
-output_sqlite = 'my.sqlite'
-# ---------------------------------------------
-table_name = 'new_table' # name for the SQLite database table
+table_name = 'Premierworks' # name table
 itersize = 100000 # number of lines to process at each iteration
 # ---------------------------------------------
 columns = [
@@ -61,29 +62,30 @@ columns = [
     'Misc3'
     ]
 # ---------------------------------------------
-NumOfLines = subprocess.check_output(['wc','-l',input_csv])
-NumOfLines = int(NumOfLines.split()[0]) 
-# ---------------------------------------------
-ConSQLiteDB = sqlite3.connect(output_sqlite)
-# ---------------------------------------------
-for file in tqdm(CSVFiles):
-    for i in range(0, NumOfLines, itersize): # change 0 -> 1 if your csv contains header
-        DataFrame = pd.read_csv(
-            file,
-            header = None,
-            nrows = itersize,
-            skiprows = i
-            )
-        DataFrame.columns = columns # columns to read
-        sql.to_sql(
-            DataFrame,
-            name = table_name,
-            con = ConSQLiteDB,
-            index = False, # don't use CSV file index
-            index_label = 'CustomerID', # use a unique column from DataFrame as index
-            if_exists = 'append'
-            )
-    ConSQLiteDB.close()
+def CSVtoSQLiteImport():
+    for file in tqdm(CSVFiles):
+        CSVLineCount = subprocess.check_output(['wc','-l',file]) # CSV line count
+        CSVLineCount = int(CSVLineCount.split()[0]) # extract count value
+        filename = file.strip('.csv') # strip .csv from filename
+        ConSQLiteDB = sqlite3.connect('{}_SQLite3.db'.format(filename))
+        for row in tqdm(range(1,CSVLineCount,itersize)): #skip header row
+            DataFrame = pd.read_csv(
+                file,
+                header = None,
+                nrows = itersize,
+                skiprows = row,
+                low_memory = False
+                )
+            DataFrame.columns = columns
+            sql.to_sql(
+                DataFrame,
+                name = table_name,
+                con = ConSQLiteDB,
+                index = False,
+                index_label = 'CustomerID',
+                if_exists = 'append'
+                )
+        ConSQLiteDB.close()
 
 if __name__ == '__main__':
     CSVtoSQLiteImport()
