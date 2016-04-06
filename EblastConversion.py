@@ -1,90 +1,91 @@
+
 #!/usr/bin/env python3.4
 # ---------------------------------------------
-from __future__ import division, print_function
 import csv, os, glob, requests
 from tqdm import tqdm
 # ---------------------------------------------
-CSVFilesHaveHeaderRow = True
-# ---------------------------------------------
 os.chdir('../../../../Desktop/')
-# ---------------------------------------------
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
-HeaderRow = [\
-	'PURL',\
-	'First Name',\
-	'Last Name',\
-	'Address',\
-	'City',\
-	'State',\
-	'Zip',\
+Website = 0
+FirstName = 1
+LastName = 2
+Address = 3
+City = 4
+State = 5
+Zip = 6
+
+HeaderRow = [
+	'PURL',
+	'First Name',
+	'Last Name',
+	'Address',
+	'City',
+	'State',
+	'Zip'
 	]
 # ---------------------------------------------
 def PURLConversion():
 	global FirstTime
-	global FirstLine
-	global HeaderURL
-	global FooterURL
 	for line in tqdm(Input):
-		if CSVFilesHaveHeaderRow and FirstLine:
-			FirstLine = False
+		if FirstTime:
+			PURL = '{}{}'.format(
+				'http://',
+				line[Website]
+				)
+			F_PURL = requests.get(PURL)
+			F_PURL = '{}{}'.format(
+				str(F_PURL.url),
+				'8'
+				)
+			FirstLastName = '{}{}'.format(
+				line[FirstName],
+				line[LastName]
+				)
+			URL = F_PURL.split(FirstLastName)
+			HeaderURL = URL[Website]
+			FooterURL = URL[FirstName]
+			New_PURL = '{}{}{}'.format(
+				HeaderURL,
+				FirstLastName,
+				FooterURL
+				)
+			Output.writerow((
+				New_PURL,
+				line[FirstName],
+				line[LastName],
+				line[Address],
+				line[City],
+				line[State],
+				line[Zip]
+				))
+			FirstTime = False
 		else:
-			if FirstTime is True:
-				PURL = '{}{}'.format(
-					'http://',
-					line[0]
-					)
-				F_PURL = requests.get(PURL)
-				F_PURL = '{}{}'.format(str(F_PURL.url),'8')
-				FName = '{}{}'.format(
-					line[1],
-					line[2]
-					)
-				URL = F_PURL.split(FName)
-				HeaderURL = URL[0]
-				FooterURL = URL[1]
-				New_PURL = '{}{}{}'.format(
-					HeaderURL,
-					FName,
-					FooterURL
-					)
-				Output.writerow((
-					New_PURL,
-					line[1],
-					line[2],
-					line[3],
-					line[4],
-					line[5],
-					line[6]
-					))
-				FirstTime = False
-			else:
-				FName = '{}{}'.format(
-					line[1],
-					line[2]
-					)
-				New_PURL = '{}{}{}'.format(
-					HeaderURL,
-					FName,
-					FooterURL
-					)
-				Output.writerow((
-					New_PURL,
-					line[1],
-					line[2],
-					line[3],
-					line[4],
-					line[5],
-					line[6]
-					))
+			FirstLastName = '{}{}'.format(
+				line[FirstName],
+				line[LastName]
+				)
+			New_PURL = '{}{}{}'.format(
+				HeaderURL,
+				FirstLastName,
+				FooterURL
+				)
+			Output.writerow((
+				New_PURL,
+				line[FirstName],
+				line[LastName],
+				line[Address],
+				line[City],
+				line[State],
+				line[Zip]
+				))
 # ---------------------------------------------
 for index in range(0,len(CSVFiles)):
 	FirstTime = True
-	FirstLine = True
-	with open(CSVFiles[index],'rU') as InputFile, \
+	with open(CSVFiles[index],'rU') as InputFile,\
 	open('EBLAST_' + str(CSVFiles[index]),'at') as OutputFile:
 		Input = csv.reader(InputFile)
+		next(InputFile) # skip header row
 		Output = csv.writer(OutputFile)
-		next(InputFile)
 		Output.writerow(HeaderRow)
 		PURLConversion()
