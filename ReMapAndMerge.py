@@ -1,13 +1,10 @@
-#!/usr/bin/env python
+
+#!/usr/bin/env python3.4
 # ---------------------------------------------
-from __future__ import division, print_function
 import csv, os, glob, re
 from tqdm import tqdm
 # ---------------------------------------------
 os.chdir('../../../../Desktop/')
-# ---------------------------------------------
-CSVFilesHaveHeaderRow = True
-# ---------------------------------------------
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
 CustomerID = 0
@@ -48,54 +45,56 @@ BlitzDNQ = 34
 Drop = 35
 PURL = 36
 YrDec = 37
-SCF3DigitAddr = 38
-Misc1 = 39
-Misc2 = 40
-Misc3 = 41
-
-HeaderRow = [\
-	'Customer ID',\
-	'FullName',\
-	'First Name',\
-	'MI',\
-	'Last Name',\
-	'Address1',\
-	'Address2',\
-	'Address',\
-	'City',\
-	'State',\
-	'Zip',\
-	'4Zip',\
-	'SCF',\
-	'Phone',\
-	'HPH',\
-	'BPH',\
-	'CPH',\
-	'Email',\
-	'VIN',\
-	'Year',\
-	'Make',\
-	'Model',\
-	'DelDate',\
-	'Date',\
-	'Radius',\
-	'Coordinates',\
-	'VINLen',\
-	'DSF_WALK_SEQ',\
-	'Crrt',\
-	'ZipCrrt',\
-	'KBB',\
-	'Buyback Value',\
-	'Winning Number',\
-	'Mail DNQ',\
-	'Blitz DNQ',\
-	'Drop',\
-	'PURL',\
-	'YrDec',\
-	'SCF3DigitAddr',\
-	'Misc1',\
-	'Misc2',\
-	'Misc3'\
+SCF3DFacility = 38
+Vendor = 39
+Misc1 = 40
+Misc2 = 41
+Misc3 = 42
+# Header Output list
+HeaderRowMain = [
+	'CustomerID',
+	'FullName',
+	'FirstName',
+	'MI',
+	'LastName',
+	'Address1',
+	'Address2',
+	'AddressFull',
+	'City',
+	'State',
+	'Zip',
+	'4Zip',
+	'SCF',
+	'Phone',
+	'HPH',
+	'BPH',
+	'CPH',
+	'Email',
+	'VIN',
+	'Year',
+	'Make',
+	'Model',
+	'DelDate',
+	'Date',
+	'Radius',
+	'Coordinates',
+	'VINLen',
+	'DSF_WALK_SEQ',
+	'Crrt',
+	'ZipCrrt',
+	'KBB',
+	'BuybackValue',
+	'WinningNumber',
+	'MailDNQ',
+	'BlitzDNQ',
+	'Drop',
+	'PURL',
+	'YrDec',
+	'SCF3DFacility',
+	'Vendor',
+	'Misc1',
+	'Misc2',
+	'Misc3'
 	]
 # ---------------------------------------------
 # Re-Map Column Fields
@@ -103,116 +102,117 @@ def ReMapHeaderFields():
 	HeaderDict = {}
 	def match(field):
 		if bool(re.search('cus.+id',field,flags=re.I)):
-			HeaderDict[CustomerID] = 'line['+str(i)+']'
+			HeaderDict[CustomerID] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search('ful.+me',field,flags=re.I)):
-			HeaderDict[FullName] = 'line['+str(i)+']'		
+			HeaderDict[FullName] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search('fir.+me',field,flags=re.I)):
-			HeaderDict[FirstName] = 'line['+str(i)+']'
-		elif bool(re.search(r'\bmi\b',field,flags=re.I)) or\
-			bool(re.search(r'\bmiddle\b',field,flags=re.I)):
-			HeaderDict[MI] = 'line['+str(i)+']' 
+			HeaderDict[FirstName] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bmi\b',field,flags=re.I)):
+			HeaderDict[MI] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search('las.+me',field,flags=re.I)):
-			HeaderDict[LastName] = 'line['+str(i)+']' 
-		elif bool(re.search('.ddr.+1',field,flags=re.I)):
-			HeaderDict[Address1] = 'line['+str(i)+']' 
-		elif bool(re.search('.ddr.+2',field,flags=re.I)):
-			HeaderDict[Address2] = 'line['+str(i)+']' 
-		elif bool(re.search('.ddr.+',field,flags=re.I)):
-			HeaderDict[AddressComb] = 'line['+str(i)+']' 
-		elif bool(re.search('.ity+',field,flags=re.I)):
-			HeaderDict[City] = 'line['+str(i)+']' 
-		elif bool(re.search('.tate',field,flags=re.I)):
-			HeaderDict[State] = 'line['+str(i)+']' 
-		elif bool(re.match(r'\bzip\b',field,flags=re.I)):
-			HeaderDict[Zip] = 'line['+str(i)+']' 
-		elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or\
-			bool(re.search(r'\bzip4\b',field,flags=re.I)) :
-			HeaderDict[Zip4] = 'line['+str(i)+']' 
+			HeaderDict[LastName] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('addr.+1',field,flags=re.I)):
+			HeaderDict[Address1] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('addr.+2',field,flags=re.I)):
+			HeaderDict[Address2] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('addr.+full',field,flags=re.I)):
+			HeaderDict[AddressComb] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bcity\b',field,flags=re.I)):
+			HeaderDict[City] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bstate\b',field,flags=re.I)):
+			HeaderDict[State] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bzip\b',field,flags=re.I)):
+			HeaderDict[Zip] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or \
+		bool(re.search(r'\bzip4\b',field,flags=re.I)):
+			HeaderDict[Zip4] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bscf\b',field,flags=re.I)):
-			HeaderDict[SCF] = 'line['+str(i)+']' 
+			HeaderDict[SCF] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search('pho.+',field,flags=re.I)):
-			HeaderDict[Phone] = 'line['+str(i)+']' 
-		elif bool(re.search('HPho.+',field,flags=re.I)) or\
-			bool(re.search(r'\bhph\b',field,flags=re.I)):
-			HeaderDict[HPhone] = 'line['+str(i)+']' 
-		elif bool(re.search('WPho.+',field,flags=re.I)) or\
-			bool(re.search(r'\bbph\b',field,flags=re.I)):
-			HeaderDict[WPhone] = 'line['+str(i)+']' 
-		elif bool(re.search('MPho.+',field,flags=re.I)) or\
-			bool(re.search(r'\bcph\b',field,flags=re.I)):
-			HeaderDict[MPhone] = 'line['+str(i)+']'
-		elif bool(re.search('.mail',field,flags=re.I)):
-			HeaderDict[Email] = 'line['+str(i)+']' 
+			HeaderDict[Phone] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('HPho.+',field,flags=re.I)) or \
+		bool(re.search(r'\bhph\b',field,flags=re.I)):
+			HeaderDict[HPhone] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('WPho.+',field,flags=re.I)) or \
+		bool(re.search(r'\bbph\b',field,flags=re.I)):
+			HeaderDict[WPhone] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('MPho.+',field,flags=re.I)) or \
+		bool(re.search(r'\bcph\b',field,flags=re.I)):
+			HeaderDict[MPhone] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bemail\b',field,flags=re.I)):
+			HeaderDict[Email] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bvin\b',field,flags=re.I)):
-			HeaderDict[VIN] = 'line['+str(i)+']' 
-		elif bool(re.search(r'\byear\b',field,flags=re.I)) or\
-			bool(re.search(r'\bvyr\b',field,flags=re.I)):
-			HeaderDict[Year] = 'line['+str(i)+']' 
-		elif bool(re.search(r'\bmake\b',field,flags=re.I)) or\
-			bool(re.search(r'\bvmk\b',field,flags=re.I)):
-			HeaderDict[Make] = 'line['+str(i)+']' 
-		elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or\
-			bool(re.search(r'\bvmd\b',field,flags=re.I)):
-			HeaderDict[Model] = 'line['+str(i)+']' 
-		elif bool(re.search('de.+ate',field,flags=re.I)):
-			HeaderDict[DelDate] = 'line['+str(i)+']' 
+			HeaderDict[VIN] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\byear\b',field,flags=re.I)) or \
+		bool(re.search(r'\bvyr\b',field,flags=re.I)):
+			HeaderDict[Year] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bmake\b',field,flags=re.I)) or \
+		bool(re.search(r'\bvmk\b',field,flags=re.I)):
+			HeaderDict[Make] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or \
+		bool(re.search(r'\bvmd\b',field,flags=re.I)):
+			HeaderDict[Model] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
+			HeaderDict[DelDate] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bdate\b',field,flags=re.I)):
-			HeaderDict[Date] = 'line['+str(i)+']' 
-		elif bool(re.search('.adi.+',field,flags=re.I)):
-			HeaderDict[Radius] = 'line['+str(i)+']' 
-		elif bool(re.search('coor.+',field,flags=re.I)):
-			HeaderDict[Coordinates] = 'line['+str(i)+']' 
-		elif bool(re.search('v.+len',field,flags=re.I)):
-			HeaderDict[VINLen] = 'line['+str(i)+']' 
+			HeaderDict[Date] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bradius\b',field,flags=re.I)):
+			HeaderDict[Radius] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search('coord.+',field,flags=re.I)):
+			HeaderDict[Coordinates] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bvinlen\b',field,flags=re.I)):
+			HeaderDict[VINLen] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search('dsf.+seq',field,flags=re.I)):
-			HeaderDict[DSF_WALK_SEQ] = 'line['+str(i)+']' 
+			HeaderDict[DSF_WALK_SEQ] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bcrrt\b',field,flags=re.I)):
-			HeaderDict[CRRT] = 'line['+str(i)+']' 
-		elif bool(re.search('zip.+rt',field,flags=re.I)):
-			HeaderDict[ZipCRRT] = 'line['+str(i)+']' 
+			HeaderDict[CRRT] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bzipcrrt\b',field,flags=re.I)):
+			HeaderDict[ZipCRRT] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
-			HeaderDict[KBB] = 'line['+str(i)+']' 
-		elif bool(re.search('buy.+val.+',field,flags=re.I)):
-			HeaderDict[BuybackValues] = 'line['+str(i)+']' 
-		elif bool(re.search('winn.+er',field,flags=re.I)):
-			HeaderDict[WinningNum] = 'line['+str(i)+']' 
-		elif bool(re.search('mai.+DNQ',field,flags=re.I)):
-			HeaderDict[MailDNQ] = 'line['+str(i)+']' 
-		elif bool(re.search('bli.+DNQ',field,flags=re.I)):
-			HeaderDict[BlitzDNQ] = 'line['+str(i)+']' 
+			HeaderDict[KBB] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bbuybackvalue\b',field,flags=re.I)):
+			HeaderDict[BuybackValues] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bwinningnumber\b',field,flags=re.I)):
+			HeaderDict[WinningNum] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bmaildnq\b',field,flags=re.I)):
+			HeaderDict[MailDNQ] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bblitzdnq\b',field,flags=re.I)):
+			HeaderDict[BlitzDNQ] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bdrop\b',field,flags=re.I)):
-			HeaderDict[DropVal] = 'line['+str(i)+']' 
+			HeaderDict[Drop] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
-			HeaderDict[PURL] = 'line['+str(i)+']'
+			HeaderDict[PURL] = 'line[{}]'.format(str(OldColumn)) 
 		elif bool(re.search(r'\byrdec\b',field,flags=re.I)):
-			HeaderDict[YearDec] = 'line['+str(i)+']'
-		elif bool(re.search(r'\bSCF3DigitAddr\b',field,flags=re.I)):
-				HeaderDict[SCF3DigitAddr] = 'line['+str(i)+']'
+			HeaderDict[YrDec] = 'line[{}]'.format(str(OldColumn))		
+		elif bool(re.search(r'\bscf3dfacility\b',field,flags=re.I)):
+			HeaderDict[SCF3DFacility] = 'line[{}]'.format(str(OldColumn))
+		elif bool(re.search(r'\bvendor\b',field,flags=re.I)):
+			HeaderDict[Vendor] = 'line[{}]'.format(str(OldColumn))
 		elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
-			HeaderDict[Misc1] = 'line['+str(i)+']' 
+			HeaderDict[Misc1] = 'line[{}]'.format(str(OldColumn)) 
 		elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
-			HeaderDict[Misc2] = 'line['+str(i)+']' 
+			HeaderDict[Misc2] = 'line[{}]'.format(str(OldColumn)) 
 		elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
-			HeaderDict[Misc3] = 'line['+str(i)+']'
+			HeaderDict[Misc3] = 'line[{}]'.format(str(OldColumn))
 	for index in range(0,len(CSVFiles)):
-		global i
-		global x
+		global OldColumn
+		global NewColumn
 		with open(CSVFiles[index],'rU') as InputFile,\
-		open('__ReMapped_' + str(CSVFiles[index]),'ab') as OutputFile:
+		open('__ReMapped_' + str(CSVFiles[index]),'at') as OutputFile:
 			Input = csv.reader(InputFile)
 			Output = csv.writer(OutputFile)
-			Output.writerow(HeaderRow)
+			Output.writerow(HeaderRowMain)
 			FirstLine = True
 			for line in tqdm(Input):
-				if CSVFilesHaveHeaderRow and FirstLine:	
-					for i in range(0,len(line)):
-						match(line[i])
+				if FirstLine:	
+					for OldColumn in range(0,len(line)):
+						match(line[OldColumn])
 					FirstLine = False
 				else:
 					newline = []
-					for x in range(0,len(HeaderRow)):
-						if x in HeaderDict:
-							newline.append(eval(HeaderDict[x]))
+					for NewColumn in range(0,len(HeaderRowMain)):
+						if NewColumn in HeaderDict:
+							newline.append(eval(HeaderDict[NewColumn]))
 						else:
 							newline.append('')
 					Output.writerow(newline)
@@ -220,10 +220,9 @@ def ReMapHeaderFields():
 def MultiFileMarge():
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('__*.csv')
-	for line in CSVFiles:
+	for line in tqdm(CSVFiles):
 		with open(line,'rU') as File,\
-		open('___MergeFile.csv','ab') as Merge:
-			File = open(line,'rU')
+		open('___MergeFile.csv','at') as Merge:
 			OutputClean = csv.writer(Merge)
 			Input = csv.reader(File)
 			if FirstFileUseHeaderRow:
@@ -231,13 +230,10 @@ def MultiFileMarge():
 					OutputClean.writerow(line)
 				FirstFileUseHeaderRow = False
 			else:
-				FirstLine = True
+				next(File) # Skip Header Row
 				for line in tqdm(Input):
-					if CSVFilesHaveHeaderRow and FirstLine:
-						FirstLine = False
-					else:
-						OutputClean.writerow(line)
-# ---------------------------------------------
-ReMapHeaderFields()
-MultiFileMarge()
-# ---------------------------------------------
+					OutputClean.writerow(line)
+
+if __name__ == '__main__':
+	ReMapHeaderFields()
+	MultiFileMarge()

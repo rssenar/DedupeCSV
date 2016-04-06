@@ -14,7 +14,6 @@ Address = 3
 City = 4
 State = 5
 Zip = 6
-
 HeaderRow = [
 	'PURL',
 	'First Name',
@@ -80,7 +79,8 @@ def PURLConversion():
 				line[Zip]
 				))
 # ---------------------------------------------
-for index in range(0,len(CSVFiles)):
+if __name__ == '__main__':
+	for index in range(0,len(CSVFiles)):
 	FirstTime = True
 	with open(CSVFiles[index],'rU') as InputFile,\
 	open('EBLAST_' + str(CSVFiles[index]),'at') as OutputFile:

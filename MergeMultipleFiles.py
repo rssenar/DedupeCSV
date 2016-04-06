@@ -1,40 +1,28 @@
 
 #!/usr/bin/env python3.4
 # ---------------------------------------------
-from __future__ import division, print_function
 import csv, os, glob, re
 from tqdm import tqdm
 # ---------------------------------------------
-CSVFilesHaveHeaderRow = True
-FirstTime = True
-NewHeaderRowFirstTime = True
-# ---------------------------------------------
 os.chdir('../../../../Desktop/')
-# ---------------------------------------------
 CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------
 def MultiFileMarge():
-	CSVFilesHaveHeaderRow = True
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('*.csv')
-	for line in CSVFiles:
-		with open(line,'rU') as File, open('___MergedFile.csv','ab') as Merge:
-			File = open(line,'rU')
+	for line in tqdm(CSVFiles):
+		with open(line,'rU') as File,\
+		open('_MERGED_File.csv','at') as Merge:
+			Input = csv.reader(File)			
 			OutputClean = csv.writer(Merge)
-			Input = csv.reader(File)
-			if FirstFileUseHeaderRow == True:
+			if FirstFileUseHeaderRow:
 				for line in tqdm(Input):
 					OutputClean.writerow(line)
 				FirstFileUseHeaderRow = False
 			else:
-				FirstLine = True
+				next(File) # Skip Header Row
 				for line in tqdm(Input):
-					if CSVFilesHaveHeaderRow and FirstLine:
-						FirstLine = False
-					else:
-						OutputClean.writerow(line)
-# ---------------------------------------------
-MultiFileMarge()
-# ---------------------------------------------
+					OutputClean.writerow(line)
 
-
+if __name__ == '__main__':
+	MultiFileMarge()

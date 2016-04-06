@@ -1,5 +1,5 @@
 
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3.4.3
 # ==================================================================== #
 import csv, os, sys, re, glob
 import collections
@@ -9,46 +9,6 @@ from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
 # ==================================================================== #
-def ConvertStringToList(input):
-	AppendedList = []
-	input = input.split('|')
-	for item in input:
-		item = item.strip()
-		item = str.title(item)
-		AppendedList.append(item)
-	return AppendedList
-
-def ReformatPhoneNum(Phone):
-	Phone = str(Phone).strip()
-	Phone = str(Phone).replace('-','')
-	Phone = str(Phone).replace('(','')
-	Phone = str(Phone).replace(')','')
-	return Phone
-
-def GenCounter(record, DictCntr):
-	if str(record) not in DictCntr:
-		DictCntr[str(record)] = 1
-	else:
-		DictCntr[str(record)] += 1
-
-def percentage(part, whole):
-	if whole == 0:
-		return 0
-	else:
-		return 100 * float(part)/float(whole)
-
-def ConvListToString(input):
-	for item in input:
-		return item
-
-def DelTempFiles():
-	Files = glob.glob('*.csv')
-	for Record in Files:
-		if os.path.getsize(Record) == 0: # Delete Empty files
-			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-			os.remove(Record)
-
 def Normalize():
 	global IPFName
 	global PennyCounter
@@ -290,10 +250,6 @@ def Normalize():
 	VendorSelect = str.upper(input(
 		'Vendor..... TheShopper[S] Platinum[P] : '
 		))
-	while VendorSelect != 'S' and VendorSelect != 'P':
-		VendorSelect = str.upper(input(
-			'ERR! Select TheShopper[S] Platinum[P] : '
-			))
 	print('------------------------------------- ')
 	input('....... PRESS [ENTER] TO PROCEED ...... ')
 	# ==================================================================== #
@@ -560,14 +516,16 @@ def Normalize():
 		# ============================================================ #
 		Input = csv.reader(InputFile)
 		next(InputFile) # Skip Header Row
-		for line in tqdm(Input): # Loop thru Input File
-			# ============================================================ #
-			if VendorSelect == 'S':
-				WinningNumber = 40754 # The Shopper Winning #
-				line[Vendor] = 'The Shopper'
-			elif VendorSelect == 'P':
-				WinningNumber = 42619 # Platinum Plus Winning #
+		for line in tqdm(Input):
+			if VendorSelect == 'P':
+				WinningNumber = 42619 # Platinum Plus Winning#
 				line[Vendor] = 'Platinum Plus'
+			elif VendorSelect == 'S':
+				WinningNumber = 40754 # Platinum Plus Winning#
+				line[Vendor] = 'The Shopper'
+			else:
+				WinningNumber = 40754 # Set Default Zolton
+				line[Vendor] = 'Zolton'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
 			# ============================================================ #
@@ -1022,7 +980,7 @@ def Normalize():
 				else:
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
 					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
-			
+		
 			# Output Appended files [Penny/Nickel/Other]
 			else:
 				HeaderRowAppend = [
@@ -1080,7 +1038,47 @@ def Normalize():
 					else:
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
-# ==================================================================== #
+
+def ConvertStringToList(input):
+	AppendedList = []
+	input = input.split('|')
+	for item in input:
+		item = item.strip()
+		item = str.title(item)
+		AppendedList.append(item)
+	return AppendedList
+
+def ReformatPhoneNum(Phone):
+	Phone = str(Phone).strip()
+	Phone = str(Phone).replace('-','')
+	Phone = str(Phone).replace('(','')
+	Phone = str(Phone).replace(')','')
+	return Phone
+
+def GenCounter(record, DictCntr):
+	if str(record) not in DictCntr:
+		DictCntr[str(record)] = 1
+	else:
+		DictCntr[str(record)] += 1
+
+def percentage(part, whole):
+	if whole == 0:
+		return 0
+	else:
+		return 100 * float(part)/float(whole)
+
+def ConvListToString(input):
+	for item in input:
+		return item
+
+def DelTempFiles():
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Delete Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
+
 if __name__ == '__main__':
 	Normalize()
 	Report = sys.stdout # Output Report
@@ -1183,7 +1181,7 @@ if __name__ == '__main__':
 			ValuePrcnt = percentage(value, SUBTotal)
 			RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				if len(str(key)) == 2:
+				if len(str(key)) == 2: # Add leading 0 to 3-Digit
 					print('|>|0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
@@ -1200,7 +1198,7 @@ if __name__ == '__main__':
 						round(RTotalPrcnt,2)
 						))
 			else:
-				if len(str(key)) == 2:
+				if len(str(key)) == 2: # Add leading 0 to 3-Digit
 					print('||0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
