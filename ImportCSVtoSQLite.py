@@ -63,12 +63,13 @@ columns = [
 # ---------------------------------------------
 NumOfLines = subprocess.check_output(['wc','-l',input_csv])
 NumOfLines = int(NumOfLines.split()[0]) 
+# ---------------------------------------------
 ConSQLiteDB = sqlite3.connect(output_sqlite)
 # ---------------------------------------------
-def CSVtoSQLiteImport():
+for file in tqdm(CSVFiles):
     for i in range(0, NumOfLines, itersize): # change 0 -> 1 if your csv contains header
         DataFrame = pd.read_csv(
-            input_csv,
+            file,
             header = None,
             nrows = itersize,
             skiprows = i
