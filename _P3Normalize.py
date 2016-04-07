@@ -9,324 +9,354 @@ from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
 # ==================================================================== #
-os.chdir('../../../../Desktop/')
-path = '../Dropbox/HUB/Projects/PyToolkit/_Resources'
-# ==================================================================== #
-MDNQFile = os.path.join(path,'MailDNQ.csv')
-DropFile = os.path.join(path,'_DropFile.csv')
-ZipCoordFile = os.path.join(path,'USZIPCoordinates.csv')
-YearDecodeFile = os.path.join(path,'YearDecode.csv')
-GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
-MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
-SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
-# ==================================================================== #
-# Set Initial Variables
-SeqNumDatabase = 10000
-SeqNumPurchaseP = 30000
-SeqNumPurchaseN = 40000
-SeqNumPurchase = 50000
-PennyCounter = 0
-NickelCounter = 0
-DatabaseCounter = 0
-PurchaseCounter = 0
-MDNQCounter = 0
-DupesCounter = 0
-Entries = set()
-DoNotMailFile = set()
-# ==================================================================== #
-# Import Drop Dictionary from Drop_File.csv file
-try:
-	DropDict = {}
-	with open(DropFile,'rU') as DropFile:
-		Drop = csv.reader(DropFile)
-		next(DropFile)
-		for line in Drop:
-			DropDict[line[0]] = line[1]
-except:
-	print('..... ERROR: Unable to Load Drop Dictionary File\n')
-# ==================================================================== #
-# Import General Suppression File
-try:
-	with open(GenSuppressionFile,'rU') as GenSuppressionFile:
-		GenSuppression = csv.reader(GenSuppressionFile)
-		next(GenSuppressionFile)
-		for line in GenSuppression:
-			Entries.add((str.title(line[2]),str.title(line[5])))
-except:
-	print('..... ERROR: Unable to Load GENERAL Suppression File\n')
-# ==================================================================== #
-# Import Montly Suppression File
-try:
-	with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
-		MonthlySuppression = csv.reader(MonthlySuppressionFile)
-		next(MonthlySuppressionFile)
-		for line in MonthlySuppression:
-			Entries.add((str.title(line[2]),str.title(line[5])))
-except:
-	print('..... ERROR: Unable to Load Montly Suppression File\n')
-# ==================================================================== #
-# Import Zip Dictionary from US_ZIP_Coordinates.csv file
-try:
-	ZipCoordinateDict = {}
-	with open(ZipCoordFile,'rU') as ZipCoord:
-		ZipCoordinate = csv.reader(ZipCoord)
-		for line in ZipCoordinate:
-			ZipCoordinateDict[line[0]] = (line[1], line[2])
-except:
-	print('..... ERROR: Unable to Load Zip Dictionary File\n')
-# ==================================================================== #
-# Import Mail DNQ File for the purposes of de-duping
-try:
-	with open(MDNQFile,'rU') as MDNQFile:
-		MDNQ = csv.reader(MDNQFile)
-		for line in MDNQ:
-			DoNotMailFile.add(str.title(line[0]))
-except:
-	print('..... ERROR: Unable to Load Mail DNQ File\n')
-# ==================================================================== #
-# Import Year Decode Dictionary from Year_Decode.csv file
-try:
-	YearDecodeDict = {}
-	with open(YearDecodeFile,'rU') as YearDecodeFile:
-		YearDecode = csv.reader(YearDecodeFile)
-		for line in YearDecode:
-			YearDecodeDict[line[0]] = (line[1])
-except:
-	print('..... ERROR: Unable to Load Year Decode Dictionary File\n')
-# ==================================================================== #
-# Import SCF Dictionary from SCF Facilities.csv file
-try:
-	SCF3DigitDict = {}
-	with open(SCF3DigitFile,'rU') as SCF3DigitFile:
-		SCF3Digit = csv.reader(SCF3DigitFile)
-		for line in SCF3Digit:
-			SCF3DigitDict[line[0]] = (line[1])
-except:
-	print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File\n')
-# ==================================================================== #
-# Capture Input - File Name
-IPFName = input(
-	'Enter File Name ..................... : '
-	)
-InputFile = '{}.csv'.format(IPFName)
-while os.path.isfile(InputFile) == False:
-	IPFName = input(
-		'ERROR: Enter File Name .............. : '
-		)
-	InputFile = '{}.csv'.format(IPFName)
-# Capture Input - Central Zip
-CentralZip = input(
-	'Enter Central ZIP Code .............. : '
-	)
-while str(CentralZip) not in ZipCoordinateDict:
-	CentralZip = input(
-		'ERROR: Enter ZIP Codes............... : '
-		)
-# Capture Input - Max RADIUS
-try:
-	MaxRadius = int(input(
-		'Enter Max Radius ...............[100] : '
-		))
-except:
-	MaxRadius = 100
-# Capture Input - Max YEAR
-try:
-	MaxYear = int(input(
-		'Enter Max Year ................[2015] : '
-		))
-except:
-	MaxYear = 2015
-# Capture Input - Min YEAR
-try:
-	MinYear = int(input(
-		'Enter Min Year ................[1900] : '
-		))
-except:
-	MinYear = 1900
-# Capture Input - Max SALE YEAR
-try:
-	MaxSaleYear = int(input(
-		'Enter Maximum Sales Year ......[2015] : '
-		))
-except:
-	MaxSaleYear = 2015
-# Generate Suppress STATE List
-STATEList = input(
-	'Enter Suppression List .......[STATE] : '
-	)
-if STATEList != '':
-	STATEList = sorted(ConvertStringToList(STATEList))
-	print('..STATEList : {}'.format(STATEList))
-else:
-	STATEList = []
-# Generate Suppress SCF List
-SCFList = input(
-	'Enter Suppression List .........[SCF] : '
-	)
-if SCFList != '':
-	SCFList = sorted(ConvertStringToList(SCFList))
-	print('....SCFList : {}'.format(SCFList))
-else:
-	SCFList = []
-# Generate Suppress YEAR List
-YEARList = input(
-	'Enter Suppression List ........[YEAR] : '
-	)
-if YEARList != '':
-	YEARList = sorted(ConvertStringToList(YEARList))
-	print('...YEARList : {}'.format(YEARList))
-else:
-	YEARList = []
-# Generate Suppress CITY List
-CITYList = input(
-	'Enter Suppression List ........[CITY] : '
-	)
-if CITYList != '':
-	CITYList = sorted(ConvertStringToList(CITYList))
-	print('...CITYList : {}'.format(CITYList))
-else:
-	CITYList =[]
-# Import LOCAL Suppression File for the purposes of de-duping
-SuppressionFileName = input(
-	'Suppression File ...[ENTER File Name] : '
-	)
-SuppressionFile = '{}.csv'.format(SuppressionFileName)
-if SuppressionFileName != '':
+def Normalize():
+	global IPFName
+	global PennyCounter
+	global NickelCounter
+	global DatabaseCounter
+	global PurchaseCounter
+	global MDNQCounter
+	global DupesCounter
+	global YearDictCounter
+	global MakeDictCounter
+	global SCFDictCounter
+	global RadiusDictCounter
+	global CityDictCounter
+	global StateDictCounter
+	global SCF3DFacilityCounter
+	global ZipCounter
+	global IPFName
+	global CentralZip
+	global MaxRadius
+	global MaxYear
+	global MinYear
+	global CurrentDateUpdate
+	global MaxSaleYear
+	global CentralZipSCFFacilityReport
+	global TOPPercentage
+	global VendorSelected
+	# ==================================================================== #
+	os.chdir('../../../../Desktop/')
+	path = '../Dropbox/HUB/Projects/PremWorks/_Resources'
+	# ==================================================================== #
+	MDNQFile = os.path.join(path,'MailDNQ.csv')
+	DropFile = os.path.join(path,'_DropFile.csv')
+	ZipCoordFile = os.path.join(path,'USZIPCoordinates.csv')
+	YearDecodeFile = os.path.join(path,'YearDecode.csv')
+	GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
+	MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
+	SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
+	# ==================================================================== #
+	# Set Initial Variables
+	SeqNumDatabase = 10000
+	SeqNumPurchaseP = 30000
+	SeqNumPurchaseN = 40000
+	SeqNumPurchase = 50000
+	PennyCounter = 0
+	NickelCounter = 0
+	DatabaseCounter = 0
+	PurchaseCounter = 0
+	MDNQCounter = 0
+	DupesCounter = 0
+	SCF3DigitFacility = 0
+	Entries = set()
+	DoNotMailFile = set()
+	# ==================================================================== #
+	# Initialize Dictionaries
+	# ==================================================================== #
+	# Import Drop Dictionary from Drop_File.csv file
 	try:
-		with open(SuppressionFile,'rU') as SuppressionFile:
-			Suppression = csv.reader(SuppressionFile)
-			next(SuppressionFile)
-			for line in Suppression:
+		DropDict = {}
+		with open(DropFile,'rU') as DropFile:
+			Drop = csv.reader(DropFile)
+			next(DropFile)
+			for line in Drop:
+				DropDict[line[0]] = line[1]
+	except:
+		print('..... ERROR: Unable to Load Drop Dictionary File\n')
+	# ==================================================================== #
+	# Import General Suppression File
+	try:
+		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
+			GenSuppression = csv.reader(GenSuppressionFile)
+			next(GenSuppressionFile)
+			for line in GenSuppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
 	except:
-		print('ERROR: Cannot load local suppression file\n')
-# Set TOP Percentage
-TOPPercentage = input(
-	'Set Top % .......................[2%] : '
-	)
-try:
-	TOPPercentage = int(TOPPercentage)
-except:
-	TOPPercentage = 2
-# Capture ReMap Header Row Selection
-HRSelect = str.upper(input(
-	'ReMap Header Row? ..............[Y/N] : '
-	))
-if HRSelect == '':
-	HRSelect = 'N'
-print('------------------------------------- ')
-VendorSelect = str.upper(input(
-	'Vendor..... TheShopper[S] Platinum[P] : '
-	))
-print('------------------------------------- ')
-input('....... PRESS [ENTER] TO PROCEED ...... ')
-# ==================================================================== #
-ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
-Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
-MDNQ = '>>>>>>>>>> M-DNQ <<<<<<<<<<.csv'
-CleanOutput = '{}_UpdatedOutputMain.csv'.format(IPFName)
-AppendMonthlySuppFile = '{}_AddMonthlySuppression.csv'.format(IPFName)
-CleanOutputPhones = '{}_PHONES.csv'.format(IPFName)
-CleanOutputDatabase = '{}_UPLOAD DATA.csv'.format(IPFName)
-CleanOutputPurchaseAll = '{}_UPLOAD.csv'.format(IPFName)
-CleanOutputAppendP = '{}_PENNY.csv'.format(IPFName)
-CleanOutputAppendN = '{}_NICKEL.csv'.format(IPFName)
-CleanOutputAppendR = '{}_OTHER.csv'.format(IPFName)
-# ==================================================================== #
-CustomerID = 0
-FullName = 1
-FirstName = 2
-MI = 3
-LastName = 4
-Address1 = 5
-Address2 = 6
-AddressComb = 7
-City = 8
-State = 9
-Zip = 10
-Zip4 = 11
-SCF = 12
-Phone = 13
-HPhone = 14
-WPhone = 15
-MPhone = 16
-Email = 17
-VIN = 18
-Year = 19
-Make = 20
-Model = 21
-DelDate = 22
-Date = 23
-Radius = 24
-Coordinates = 25
-VINLen = 26
-DSF_WALK_SEQ = 27
-CRRT = 28
-ZipCRRT = 29
-KBB = 30
-BuybackValues = 31
-WinningNum = 32
-MailDNQ = 33
-BlitzDNQ = 34
-Drop = 35
-PURL = 36
-YrDec = 37
-SCF3DFacility = 38
-Vendor = 39
-Misc1 = 40
-Misc2 = 41
-Misc3 = 42
-# Header Output list
-HeaderRowMain = [
-	'CustomerID',
-	'FullName',
-	'FirstName',
-	'MI',
-	'LastName',
-	'Address1',
-	'Address2',
-	'AddressFull',
-	'City',
-	'State',
-	'Zip',
-	'4Zip',
-	'SCF',
-	'Phone',
-	'HPH',
-	'BPH',
-	'CPH',
-	'Email',
-	'VIN',
-	'Year',
-	'Make',
-	'Model',
-	'DelDate',
-	'Date',
-	'Radius',
-	'Coordinates',
-	'VINLen',
-	'DSF_WALK_SEQ',
-	'Crrt',
-	'ZipCrrt',
-	'KBB',
-	'BuybackValue',
-	'WinningNumber',
-	'MailDNQ',
-	'BlitzDNQ',
-	'Drop',
-	'PURL',
-	'YrDec',
-	'SCF3DFacility',
-	'Vendor',
-	'Misc1',
-	'Misc2',
-	'Misc3'
-	]
-# ==================================================================== #
-def ReMapFunc():
-	global InputFile
-	global ReMappedOutputFile
-	global Selection
+		print('..... ERROR: Unable to Load GENERAL Suppression File\n')
+	# ==================================================================== #
+	# Import Montly Suppression File
+	try:
+		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
+			MonthlySuppression = csv.reader(MonthlySuppressionFile)
+			next(MonthlySuppressionFile)
+			for line in MonthlySuppression:
+				Entries.add((str.title(line[2]),str.title(line[5])))
+	except:
+		print('..... ERROR: Unable to Load Montly Suppression File\n')
+	# ==================================================================== #
+	# Import Zip Dictionary from US_ZIP_Coordinates.csv file
+	try:
+		ZipCoordinateDict = {}
+		with open(ZipCoordFile,'rU') as ZipCoord:
+			ZipCoordinate = csv.reader(ZipCoord)
+			for line in ZipCoordinate:
+				ZipCoordinateDict[line[0]] = (line[1], line[2])
+	except:
+		print('..... ERROR: Unable to Load Zip Dictionary File\n')
+	# ==================================================================== #
+	# Import Mail DNQ File for the purposes of de-duping
+	try:
+		with open(MDNQFile,'rU') as MDNQFile:
+			MDNQ = csv.reader(MDNQFile)
+			for line in MDNQ:
+				DoNotMailFile.add(str.title(line[0]))
+	except:
+		print('..... ERROR: Unable to Load Mail DNQ File\n')
+	# ==================================================================== #
+	# Import Year Decode Dictionary from Year_Decode.csv file
+	try:
+		YearDecodeDict = {}
+		with open(YearDecodeFile,'rU') as YearDecodeFile:
+			YearDecode = csv.reader(YearDecodeFile)
+			for line in YearDecode:
+				YearDecodeDict[line[0]] = (line[1])
+	except:
+		print('..... ERROR: Unable to Load Year Decode Dictionary File\n')
+	# ==================================================================== #
+	# Import SCF Dictionary from SCF Facilities.csv file
+	try:
+		SCF3DigitDict = {}
+		with open(SCF3DigitFile,'rU') as SCF3DigitFile:
+			SCF3Digit = csv.reader(SCF3DigitFile)
+			for line in SCF3Digit:
+				SCF3DigitDict[line[0]] = (line[1])
+	except:
+		print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File\n')
+	# ==================================================================== #
+	# User Input
+	# ==================================================================== #
+	# Capture Input - File Name
+	IPFName = input(
+		'Enter File Name ..................... : '
+		)
+	InputFile = '{}.csv'.format(IPFName)
+	while os.path.isfile(InputFile) == False:
+		IPFName = input(
+			'ERROR: Enter File Name .............. : '
+			)
+		InputFile = '{}.csv'.format(IPFName)
+	# Capture Input - Central Zip
+	CentralZip = input(
+		'Enter Central ZIP Code .............. : '
+		)
+	while str(CentralZip) not in ZipCoordinateDict:
+		CentralZip = input(
+			'ERROR: Enter ZIP Codes............... : '
+			)
+	# Capture Input - Max RADIUS
+	try:
+		MaxRadius = int(input(
+			'Enter Max Radius ...............[100] : '
+			))
+	except:
+		MaxRadius = 100
+	# Capture Input - Max YEAR
+	try:
+		MaxYear = int(input(
+			'Enter Max Year ................[2015] : '
+			))
+	except:
+		MaxYear = 2015
+	# Capture Input - Min YEAR
+	try:
+		MinYear = int(input(
+			'Enter Min Year ................[1900] : '
+			))
+	except:
+		MinYear = 1900
+	# Capture Input - Max SALE YEAR
+	try:
+		MaxSaleYear = int(input(
+			'Enter Maximum Sales Year ......[2015] : '
+			))
+	except:
+		MaxSaleYear = 2015
+	# Generate Suppress STATE List
+	STATEList = input(
+		'Enter Suppression List .......[STATE] : '
+		)
+	if STATEList != '':
+		STATEList = sorted(ConvertStringToList(STATEList))
+		print('..STATEList : {}'.format(STATEList))
+	else:
+		STATEList = []
+	# Generate Suppress SCF List
+	SCFList = input(
+		'Enter Suppression List .........[SCF] : '
+		)
+	if SCFList != '':
+		SCFList = sorted(ConvertStringToList(SCFList))
+		print('....SCFList : {}'.format(SCFList))
+	else:
+		SCFList = []
+	# Generate Suppress YEAR List
+	YEARList = input(
+		'Enter Suppression List ........[YEAR] : '
+		)
+	if YEARList != '':
+		YEARList = sorted(ConvertStringToList(YEARList))
+		print('...YEARList : {}'.format(YEARList))
+	else:
+		YEARList = []
+	# Generate Suppress CITY List
+	CITYList = input(
+		'Enter Suppression List ........[CITY] : '
+		)
+	if CITYList != '':
+		CITYList = sorted(ConvertStringToList(CITYList))
+		print('...CITYList : {}'.format(CITYList))
+	else:
+		CITYList =[]
+	# Import LOCAL Suppression File for the purposes of de-duping
+	SuppressionFileName = input(
+		'Suppression File ...[ENTER File Name] : '
+		)
+	SuppressionFile = '{}.csv'.format(SuppressionFileName)
+	if SuppressionFileName != '':
+		try:
+			with open(SuppressionFile,'rU') as SuppressionFile:
+				Suppression = csv.reader(SuppressionFile)
+				next(SuppressionFile)
+				for line in Suppression:
+					Entries.add((str.title(line[2]),str.title(line[5])))
+		except:
+			print('ERROR: Cannot load local suppression file\n')
+	# Set TOP Percentage
+	TOPPercentage = input(
+		'Set Top % .......................[2%] : '
+		)
+	try:
+		TOPPercentage = int(TOPPercentage)
+	except:
+		TOPPercentage = 2
+	# Capture ReMap Header Row Selection
+	HRSelect = str.upper(input(
+		'ReMap Header Row? ..............[Y/N] : '
+		))
+	if HRSelect == '':
+		HRSelect = 'N'
+	print('------------------------------------- ')
+	VendorSelect = str.upper(input(
+		'Vendor..... TheShopper[S] Platinum[P] : '
+		))
+	print('------------------------------------- ')
+	input('....... PRESS [ENTER] TO PROCEED ...... ')
+	# ==================================================================== #
+	ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
+	Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
+	MDNQ = '>>>>>>>>>> M-DNQ <<<<<<<<<<.csv'
+	CleanOutput = '{}_UpdatedOutputMain.csv'.format(IPFName)
+	AppendMonthlySuppFile = '{}_AddMonthlySuppression.csv'.format(IPFName)
+	CleanOutputPhones = '{}_PHONES.csv'.format(IPFName)
+	CleanOutputDatabase = '{}_UPLOAD DATA.csv'.format(IPFName)
+	CleanOutputPurchaseAll = '{}_UPLOAD.csv'.format(IPFName)
+	CleanOutputAppendP = '{}_PENNY.csv'.format(IPFName)
+	CleanOutputAppendN = '{}_NICKEL.csv'.format(IPFName)
+	CleanOutputAppendR = '{}_OTHER.csv'.format(IPFName)
+	# ==================================================================== #
+	CustomerID = 0
+	FullName = 1
+	FirstName = 2
+	MI = 3
+	LastName = 4
+	Address1 = 5
+	Address2 = 6
+	AddressComb = 7
+	City = 8
+	State = 9
+	Zip = 10
+	Zip4 = 11
+	SCF = 12
+	Phone = 13
+	HPhone = 14
+	WPhone = 15
+	MPhone = 16
+	Email = 17
+	VIN = 18
+	Year = 19
+	Make = 20
+	Model = 21
+	DelDate = 22
+	Date = 23
+	Radius = 24
+	Coordinates = 25
+	VINLen = 26
+	DSF_WALK_SEQ = 27
+	CRRT = 28
+	ZipCRRT = 29
+	KBB = 30
+	BuybackValues = 31
+	WinningNum = 32
+	MailDNQ = 33
+	BlitzDNQ = 34
+	Drop = 35
+	PURL = 36
+	YrDec = 37
+	SCF3DFacility = 38
+	Vendor = 39
+	Misc1 = 40
+	Misc2 = 41
+	Misc3 = 42
+	# Header Output list
+	HeaderRowMain = [
+		'CustomerID',
+		'FullName',
+		'FirstName',
+		'MI',
+		'LastName',
+		'Address1',
+		'Address2',
+		'AddressFull',
+		'City',
+		'State',
+		'Zip',
+		'4Zip',
+		'SCF',
+		'Phone',
+		'HPH',
+		'BPH',
+		'CPH',
+		'Email',
+		'VIN',
+		'Year',
+		'Make',
+		'Model',
+		'DelDate',
+		'Date',
+		'Radius',
+		'Coordinates',
+		'VINLen',
+		'DSF_WALK_SEQ',
+		'Crrt',
+		'ZipCrrt',
+		'KBB',
+		'BuybackValue',
+		'WinningNumber',
+		'MailDNQ',
+		'BlitzDNQ',
+		'Drop',
+		'PURL',
+		'YrDec',
+		'SCF3DFacility',
+		'Vendor',
+		'Misc1',
+		'Misc2',
+		'Misc3'
+		]
+	# ==================================================================== #
+	# ReMapping Procedures
+	# ==================================================================== #
 	if HRSelect == 'Y':
 		Selection = ReMappedOutput
 		HeaderDict = {}
@@ -424,7 +454,8 @@ def ReMapFunc():
 				HeaderDict[Misc2] = 'line[{}]'.format(str(OldColumn)) 
 			elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 				HeaderDict[Misc3] = 'line[{}]'.format(str(OldColumn))
-		with open(InputFile,'rU') as InputFile,\
+		# Re-Order Fields based on Header Row
+		with open(InputFile,'rU') as InputFile, \
 		open(ReMappedOutput,'at') as ReMappedOutputFile:
 			Input = csv.reader(InputFile)
 			Output = csv.writer(ReMappedOutputFile)
@@ -445,52 +476,19 @@ def ReMapFunc():
 					Output.writerow(newline)
 	else:
 		Selection = InputFile
-# ==================================================================== #
-def NormalizeFunc():
-	global AppendMonthlySupp
-	global CentralZip
-	global CentralZipSCFFacilityReport
-	global CityDictCounter
-	global CleanOutput
-	global CleanOutputAppendN
-	global CleanOutputAppendP
-	global CleanOutputAppendR
-	global CleanOutputDatabase
-	global CleanOutputPhones
-	global CleanOutputPurchaseAll
-	global DatabaseCounter
-	global Dupes
-	global DupesCounter
-	global InputFile
-	global IPFName
-	global MakeDictCounter
-	global MaxSaleYear
-	global MDNQ
-	global MDNQCounter
-	global NickelCounter
-	global PennyCounter
-	global PurchaseCounter
-	global RadiusDictCounter
-	global SCF3DFacilityCounter
-	global SCFDictCounter
-	global SeqNumDatabase
-	global SeqNumPurchase
-	global SeqNumPurchaseN
-	global SeqNumPurchaseP
-	global StateDictCounter
-	global TOPPercentage
-	global VendorSelected
-	global YearDictCounter
-	with open(Selection,'rU') as InputFile,\
-	open(CleanOutput,'at') as CleanOutput,\
-	open(Dupes,'at') as Dupes,\
-	open(MDNQ,'at') as MDNQ,\
-	open(CleanOutputPhones,'at') as CleanOutputPhones,\
-	open(CleanOutputDatabase,'at') as CleanOutputDatabase,\
-	open(CleanOutputPurchaseAll,'at') as CleanOutputPurchaseAll,\
-	open(CleanOutputAppendP,'at') as CleanOutputAppendP,\
-	open(CleanOutputAppendN,'at') as CleanOutputAppendN,\
-	open(CleanOutputAppendR,'at') as CleanOutputAppendR,\
+	# ==================================================================== #
+	# Normalization Procedures
+	# ==================================================================== #
+	with open(Selection,'rU') as InputFile, \
+	open(CleanOutput,'at') as CleanOutput, \
+	open(Dupes,'at') as Dupes, \
+	open(MDNQ,'at') as MDNQ, \
+	open(CleanOutputPhones,'at') as CleanOutputPhones, \
+	open(CleanOutputDatabase,'at') as CleanOutputDatabase, \
+	open(CleanOutputPurchaseAll,'at') as CleanOutputPurchaseAll, \
+	open(CleanOutputAppendP,'at') as CleanOutputAppendP, \
+	open(CleanOutputAppendN,'at') as CleanOutputAppendN, \
+	open(CleanOutputAppendR,'at') as CleanOutputAppendR, \
 	open(AppendMonthlySuppFile,'at') as AppendMonthlySupp:
 		CleanOutputFirstTime = True
 		DatabaseFirstTime = True
@@ -505,6 +503,7 @@ def NormalizeFunc():
 		AppendFirstTimeR = True
 		MDNQFirstTime = True
 		MonthlySuppressionFirstTime = True
+		# ============================================================ #
 		YearDictCounter = {}
 		MakeDictCounter = {}
 		ModelDictCounter = {}
@@ -514,6 +513,7 @@ def NormalizeFunc():
 		StateDictCounter = {}
 		SCF3DFacilityCounter = {}
 		ZipCounter = {}
+		# ============================================================ #
 		Input = csv.reader(InputFile)
 		next(InputFile) # Skip Header Row
 		for line in tqdm(Input):
@@ -528,6 +528,7 @@ def NormalizeFunc():
 				line[Vendor] = 'Zolton'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
+			# ============================================================ #
 			# Parse Fullname if First & Last Name fields are missing
 			if line[FullName] != '' and \
 			(line[FirstName] == '' and line[LastName]) == '':
@@ -538,11 +539,13 @@ def NormalizeFunc():
 					line[LastName] = ParsedFName.last.encode('utf-8')
 				except:
 					line[FullName] = ''
+			# ============================================================ #
 			# Parse ZIP to ZIP & ZIP4 components (when possible)
 			if len(str(line[Zip])) > 5 and (str(line[Zip]).find('-') == 5):
 				FullZip = line[Zip].split('-')
 				line[Zip] = FullZip[0]
 				line[Zip4] = FullZip[1]
+			# ============================================================ #
 			# Combine ZIP + CRRT fields
 			if line[Zip] != '' and line[CRRT] != '':
 				if len(str(line[Zip])) < 5:
@@ -555,6 +558,7 @@ def NormalizeFunc():
 						line[Zip],
 						line[CRRT]
 						)
+			# ============================================================ #
 			# Combine Address1 + Address2
 			if line[AddressComb] == '' and \
 			line[Address1] != '' and \
@@ -567,6 +571,7 @@ def NormalizeFunc():
 				line[AddressComb] = str.title(line[Address1]) 
 			else:
 				line[AddressComb] = str.title(line[AddressComb])
+			# ============================================================ #
 			# Set Drop Index from Drop Dictionary and Set Customer ID	
 			if line[PURL] == '':
 				if str(line[ZipCRRT]) in DropDict:
@@ -610,6 +615,7 @@ def NormalizeFunc():
 					DatabaseCounter += 1
 				elif line[Drop] == 'A':
 					PurchaseCounter += 1
+			# ============================================================ #
 			# Parse & Clean up Phone #
 			if line[MPhone] != '' and len(str(line[MPhone])) > 6:
 				line[Phone] = ReformatPhoneNum(line[MPhone])
@@ -633,6 +639,7 @@ def NormalizeFunc():
 					)
 			else:
 				line[Phone] = ''
+			# ============================================================ #
 			# Set Case for data fields
 			line[FullName] = str.title(line[FullName])
 			line[FirstName] = str.title(line[FirstName])
@@ -648,12 +655,14 @@ def NormalizeFunc():
 			line[Model] = str.title(line[Model])
 			line[Email] = str.lower(line[Email])
 			line[State] = str.upper(line[State])
+			# ============================================================ #
 			# Set VIN Length
 			line[VINLen] = len(str(line[VIN]))
 			if line[VINLen] < 17:
 				line[VIN] = ''
 			else:
 				line[VIN] = str.upper(line[VIN])
+			# ============================================================ #
 			# Set SCF Facility Location
 			ZipLen = len(str(line[Zip]))				
 			if ZipLen < 5:
@@ -662,6 +671,7 @@ def NormalizeFunc():
 				line[SCF] = (line[Zip])[:3]
 			if str(line[SCF]) in SCF3DigitDict:
 				line[SCF3DFacility] = SCF3DigitDict[str(line[SCF])]
+			# ============================================================ #
 			# Set Central ZIP SCF Facility Location
 			CentralZipLen = len(str(CentralZip))
 			if CentralZipLen < 5:
@@ -670,6 +680,7 @@ def NormalizeFunc():
 				CentralZipSCF3Digit = str(CentralZip[:3])
 			if str(CentralZipSCF3Digit) in SCF3DigitDict:
 				CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
+			# ============================================================ #
 			# Calculate Radius from Central Zip
 			try:
 				line[Zip] = int(line[Zip])
@@ -692,6 +703,7 @@ def NormalizeFunc():
 			else:
 				line[Radius] = vincenty(OriginZipCoord,line[Coordinates]).miles
 				line[Radius] = round(float(line[Radius]),2)
+			# ============================================================ #
 			# Convert "Date" Field to DateTime format
 			try:
 				line[Date] = parse(line[Date])
@@ -700,12 +712,16 @@ def NormalizeFunc():
 					line[Date] = ''
 			except:
 				line[Date] = ''
+			# ============================================================ #
 			# Apply "Blitz-DNQ" Parameters
 			try:
 				if len(str(line[Phone])) < 8 and len(str(line[VIN])) < 17:
 					line[BlitzDNQ] = 'dnq'
 			except:
 				line[BlitzDNQ] = ''
+			# ============================================================ #
+			# Generate "MAIL-DNQ" Tags
+			# ============================================================ #
 			# Apply Universal MAIL-DNQ Parameters
 			if line[FirstName] == '' or line[LastName] == '' or \
 			(line[Address1] == '' and line[Address2] == '') or \
@@ -744,12 +760,15 @@ def NormalizeFunc():
 			str(line[Year]) in YEARList or \
 			str.title(line[City]) in CITYList:
 				line[MailDNQ] = 'dnq'
+			# ============================================================ #
 			# Set 'n/a' for Make & Model Fields if blank
 			if line[Make] == '':
 				line[Make] = 'n/a'
 			if line[Model] == '':
 				line[Model] = 'n/a'
+			# ============================================================ #
 			# Generate COUNTERS
+			# ============================================================ #
 			CityRadius = '{} {} ({} Miles)'.format(
 				line[City],
 				line[Zip],
@@ -759,6 +778,8 @@ def NormalizeFunc():
 				line[Zip],
 				line[Radius]
 				)
+			# ============================================================ #
+			# Generate Counters
 			GenCounter(line[Year],YearDictCounter)
 			GenCounter(line[Make],MakeDictCounter)
 			GenCounter(line[SCF],SCFDictCounter)
@@ -767,7 +788,9 @@ def NormalizeFunc():
 			GenCounter(line[State],StateDictCounter)
 			GenCounter(line[SCF3DFacility],SCF3DFacilityCounter)
 			GenCounter(ZipRadius,ZipCounter)
+			# ============================================================ #
 			# OUTPUT Generate Phone File
+			# ============================================================ #
 			if line[Phone] != '' and \
 			line[BlitzDNQ] != 'dnq' and \
 			line[MailDNQ] != 'dnq':
@@ -803,7 +826,9 @@ def NormalizeFunc():
 				else:
 					OutputPhones = csv.writer(CleanOutputPhones)
 					OutputPhones.writerow(HeaderRowPhonesOutput)
+			# ============================================================ #
 			# OUTPUT Dupes and Mail-DNQ Files
+			# ============================================================ #
 			key = (str.title(line[AddressComb]), str(line[Zip]))
 			if key not in Entries:
 				if line[MailDNQ] == 'dnq':
@@ -843,7 +868,9 @@ def NormalizeFunc():
 					OutDupes.writerow(line)
 					Entries.add(key)
 					DupesCounter += 1
+			# ============================================================ #
 			# Generate Suppression File
+			# ============================================================ #
 			if line[PURL] != '':
 				HeaderRowSuppression = [
 					'First Name',
@@ -871,6 +898,9 @@ def NormalizeFunc():
 				else:
 					MonthlySupp = csv.writer(AppendMonthlySupp)
 					MonthlySupp.writerow(HeaderRowSuppressionOutput)
+			# ============================================================ #
+			# Genrate Secondary Output Files
+			# ============================================================ #
 			# Output Database File
 			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
 				HeaderRowDatabase = [
@@ -911,6 +941,7 @@ def NormalizeFunc():
 				else:
 					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
 					OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
+			
 			# Output Purchase File
 			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
 				HeaderRowPurchase = [
@@ -949,6 +980,7 @@ def NormalizeFunc():
 				else:
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
 					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
+		
 			# Output Appended files [Penny/Nickel/Other]
 			else:
 				HeaderRowAppend = [
@@ -1006,8 +1038,49 @@ def NormalizeFunc():
 					else:
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
-# ==================================================================== #
-def OutputFileFunc():
+
+def ConvertStringToList(input):
+	AppendedList = []
+	input = input.split('|')
+	for item in input:
+		item = item.strip()
+		item = str.title(item)
+		AppendedList.append(item)
+	return AppendedList
+
+def ReformatPhoneNum(Phone):
+	Phone = str(Phone).strip()
+	Phone = str(Phone).replace('-','')
+	Phone = str(Phone).replace('(','')
+	Phone = str(Phone).replace(')','')
+	return Phone
+
+def GenCounter(record, DictCntr):
+	if str(record) not in DictCntr:
+		DictCntr[str(record)] = 1
+	else:
+		DictCntr[str(record)] += 1
+
+def percentage(part, whole):
+	if whole == 0:
+		return 0
+	else:
+		return 100 * float(part)/float(whole)
+
+def ConvListToString(input):
+	for item in input:
+		return item
+
+def DelTempFiles():
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Delete Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
+
+if __name__ == '__main__':
+	Normalize()
 	Report = sys.stdout # Output Report
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
 		HighestRadius = ConvListToString(sorted(RadiusDictCounter)[-1:])
@@ -1275,50 +1348,10 @@ def OutputFileFunc():
 					CityRTotal,
 					round(RTotalPrcnt,2)
 					))
+		print()
 		sys.stdout = Report
 	print('=======================================')
 	print('.....  T     O     T     A     L  ..... : {}'.format(GrandTotal))
-	print('============== COMPLETED ==============\n')
-	Files = glob.glob('*.csv')
-	for Record in Files:
-		if os.path.getsize(Record) == 0: # Delete Empty files
-			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-			os.remove(Record)
-# ==================================================================== #
-def ConvertStringToList(input):
-	AppendedList = []
-	input = input.split('|')
-	for item in input:
-		item = item.strip()
-		item = str.title(item)
-		AppendedList.append(item)
-	return AppendedList
-# ==================================================================== #
-def ReformatPhoneNum(Phone):
-	Phone = str(Phone).strip()
-	Phone = str(Phone).replace('-','')
-	Phone = str(Phone).replace('(','')
-	Phone = str(Phone).replace(')','')
-	return Phone
-# ==================================================================== #
-def GenCounter(record, DictCntr):
-	if str(record) not in DictCntr:
-		DictCntr[str(record)] = 1
-	else:
-		DictCntr[str(record)] += 1
-# ==================================================================== #
-def percentage(part, whole):
-	if whole == 0:
-		return 0
-	else:
-		return 100 * float(part)/float(whole)
-# ==================================================================== #
-def ConvListToString(input):
-	for item in input:
-		return item
-# ==================================================================== #
-if __name__ == '__main__':
-	ReMapFunc()
-	NormalizeFunc()
-	OutputFileFunc()
+	print('============== COMPLETED ==============')
+	print()
+	DelTempFiles()
