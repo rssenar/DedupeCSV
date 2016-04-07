@@ -10,7 +10,7 @@ from nameparser import HumanName
 from tqdm import tqdm
 # ==================================================================== #
 os.chdir('../../../../Desktop/')
-path = '../Dropbox/HUB/Projects/PremWorks/_Resources'
+path = '../Dropbox/HUB/Projects/PyToolkit/_Resources'
 # ==================================================================== #
 MDNQFile = os.path.join(path,'MailDNQ.csv')
 DropFile = os.path.join(path,'_DropFile.csv')
@@ -323,7 +323,7 @@ HeaderRowMain = [
 	'Misc3'
 	]
 # ==================================================================== #
-def ReMapFile():
+def ReMapFunc():
 	global InputFile
 	global ReMappedOutputFile
 	global Selection
@@ -446,7 +446,7 @@ def ReMapFile():
 	else:
 		Selection = InputFile
 # ==================================================================== #
-def NormalizeFile():
+def NormalizeFunc():
 	global AppendMonthlySupp
 	global CentralZip
 	global CentralZipSCFFacilityReport
@@ -1007,7 +1007,7 @@ def NormalizeFile():
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
 # ==================================================================== #
-def OutputFile():
+def OutputFileFunc():
 	Report = sys.stdout # Output Report
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
 		HighestRadius = ConvListToString(sorted(RadiusDictCounter)[-1:])
@@ -1279,7 +1279,12 @@ def OutputFile():
 	print('=======================================')
 	print('.....  T     O     T     A     L  ..... : {}'.format(GrandTotal))
 	print('============== COMPLETED ==============\n')
-	DelTempFiles()
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Delete Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
 # ==================================================================== #
 def ConvertStringToList(input):
 	AppendedList = []
@@ -1313,15 +1318,7 @@ def ConvListToString(input):
 	for item in input:
 		return item
 # ==================================================================== #
-def DelTempFiles():
-	Files = glob.glob('*.csv')
-	for Record in Files:
-		if os.path.getsize(Record) == 0: # Delete Empty files
-			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-			os.remove(Record)
-# ==================================================================== #
 if __name__ == '__main__':
-	ReMapFile()
-	NormalizeFile()
-	OutputFile()
+	ReMapFunc()
+	NormalizeFunc()
+	OutputFileFunc()
