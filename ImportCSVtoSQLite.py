@@ -1,7 +1,6 @@
 
 #!/usr/bin/env python3.4
 # Modified code by Sebastian Raschka, 2015 to import a CSV to an SQLite3 Database
-# https://github.com/rasbt/python_reference/blob/master/useful_scripts/large_csv_to_sqlite.py
 # ---------------------------------------------
 import pandas as pd
 import sqlite3
