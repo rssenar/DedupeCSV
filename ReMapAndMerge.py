@@ -1,12 +1,12 @@
 
 #!/usr/bin/env python3.4
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 import csv, os, glob, re
 from tqdm import tqdm
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
 CSVFiles = glob.glob('*.csv')
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 CustomerID = 0
 FullName = 1
 FirstName = 2
@@ -97,7 +97,7 @@ HeaderRowMain = [
 	'Misc2',
 	'Misc3'
 	]
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 # Re-Map Column Fields
 def ReMapHeaderFields():
 	HeaderDict = {}
@@ -196,7 +196,7 @@ def ReMapHeaderFields():
 		elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 			HeaderDict[Misc3] = 'line[{}]'.format(str(OldColumn))
 
-	for index in range(0,len(CSVFiles)):
+	for index in tqdm(range(0,len(CSVFiles))):
 		global OldColumn
 		global NewColumn
 		with open(CSVFiles[index],'rU') as InputFile,\
@@ -232,10 +232,10 @@ def MultiFileMarge():
 					OutputClean.writerow(line)
 				FirstFileUseHeaderRow = False
 			else:
-				next(File) # Skip Header Row
+				next(File)
 				for line in tqdm(Input):
 					OutputClean.writerow(line)
-
+# ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	ReMapHeaderFields()
 	MultiFileMarge()

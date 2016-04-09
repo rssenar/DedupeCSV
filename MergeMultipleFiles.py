@@ -1,12 +1,12 @@
 
 #!/usr/bin/env python3.4
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 import csv, os, glob, re
 from tqdm import tqdm
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
 CSVFiles = glob.glob('*.csv')
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 def MultiFileMarge():
 	FirstFileUseHeaderRow = True
 	CSVFiles = glob.glob('*.csv')
@@ -20,9 +20,9 @@ def MultiFileMarge():
 					OutputClean.writerow(line)
 				FirstFileUseHeaderRow = False
 			else:
-				next(File) # Skip Header Row
+				next(File)
 				for line in tqdm(Input):
 					OutputClean.writerow(line)
-
+# ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	MultiFileMarge()

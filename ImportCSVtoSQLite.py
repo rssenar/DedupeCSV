@@ -1,20 +1,17 @@
 
 #!/usr/bin/env python3.4
-# Modified code by Sebastian Raschka, 2015 to import a CSV to an SQLite3 Database
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
+import os, glob, sqlite3, subprocess
 import pandas as pd
-import sqlite3
-import os, glob
 from pandas.io import sql
-import subprocess
 from tqdm import tqdm
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
 CSVFiles = glob.glob('*.csv')
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 table_name = 'Premierworks' # name table
 itersize = 100000 # number of lines to process at each iteration
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 columns = [
     'CustomerID',
     'FullName',
@@ -60,7 +57,7 @@ columns = [
     'Misc2',
     'Misc3'
     ]
-# ---------------------------------------------
+# ---------------------------------------------------------------------------- #
 def CSVtoSQLiteImport():
     for file in tqdm(CSVFiles):
         CSVLineCount = subprocess.check_output(['wc','-l',file]) # CSV line count
@@ -85,6 +82,6 @@ def CSVtoSQLiteImport():
                 if_exists = 'append'
                 )
         ConSQLiteDB.close()
-
+# ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
     CSVtoSQLiteImport()
