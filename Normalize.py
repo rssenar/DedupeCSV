@@ -9,7 +9,7 @@ from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
-path = '../Dropbox/HUB/Projects/PyToolkit/_Resources'
+path = '../Dropbox/HUB/Projects/PyToolkit/Resources'
 # ---------------------------------------------------------------------------- #
 MDNQFile = os.path.join(path,'MailDNQ.csv')
 DropFile = os.path.join(path,'_DropFile.csv')
