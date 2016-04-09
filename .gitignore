@@ -7,6 +7,7 @@
 *.csv
 log/*.log
 log/*.log.[0-9]
+_*.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
