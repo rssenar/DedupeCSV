@@ -187,7 +187,7 @@ if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
 			'Enter MAX Radius ................[50] : '
-			)).strip()
+			).strip())
 	except:
 		MaxRadius = 50
 else:
@@ -197,7 +197,7 @@ if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
 			'Enter MAX Year ................[2014] : '
-			)).strip()
+			).strip())
 	except:
 		MaxYear = 2014
 else:
@@ -207,7 +207,7 @@ if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
 			'Enter MIN Year ................[1990] : '
-			)).strip()
+			).strip())
 	except:
 		MinYear = 1990
 else:
@@ -217,7 +217,7 @@ if SuppSelect == 'S':
 	try:
 		MaxSaleYear = int(input(
 			'Enter SOLD Years up to ........[2014] : '
-			)).strip()
+			).strip())
 	except:
 		MaxSaleYear = 2014
 else:
@@ -297,12 +297,12 @@ if SuppressionFileName != '':
 	except:
 		print('ERROR: Cannot load local suppression file\n')
 else:
-	print('\nNo Suppression File Loaded\n')
+	print('\n..... No Suppression File Loaded .....\n')
 # Set Vendor
 if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
-		'  (S)hopper | (P)latinum | (Z)olton '
-		)).strip()
+		'       (S)hopper | (P)latinum       '
+		).strip())
 	print()
 else:
 	VendorSelect = ''
@@ -610,17 +610,14 @@ def NormalizeFunc():
 		next(InputFile) # Skip Header Row
 		for line in tqdm(Input):
 			if VendorSelect == 'P':
-				WinningNumber = 42619 # Platinum Plus Winning#
+				WinningNumber = 42619 # Platinum Winning#
 				line[Vendor] = 'Platinum'
 			elif VendorSelect == 'S':
-				WinningNumber = 40754 # Platinum Plus Winning#
+				WinningNumber = 40754 # Shopper Winning#
 				line[Vendor] = 'Shopper'
-			elif VendorSelect == 'Z':
-				WinningNumber = 40754 # Platinum Plus Winning#
-				line[Vendor] = 'Zolton'
 			else:
-				WinningNumber = 40754 # Set Default Zolton
-				line[Vendor] = 'Premier'
+				WinningNumber = 40754 # Set Default
+				line[Vendor] = 'N/A'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
 			# Parse Fullname if First & Last Name fields are missing
@@ -1109,7 +1106,11 @@ def NormalizeFunc():
 def OutputFileFunc():
 	Report = sys.stdout # Output Report
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
-		HighestRadius = ConvListToString(sorted(RadiusDictCounter)[-1:])
+		RadiusKeyList = sorted(RadiusDictCounter)
+		NewRadiusList = []
+		for item in RadiusKeyList:
+			NewRadiusList.append(float(item))
+		HighestRadius = ConvListToString(sorted(NewRadiusList)[-1:])
 		HigherstYear = ConvListToString(sorted(YearDictCounter)[-1:])
 		LowestYear = ConvListToString(sorted(YearDictCounter)[:1])
 		TodayDateTime = datetime.datetime.now()
@@ -1129,7 +1130,7 @@ def OutputFileFunc():
 		print('|Max Radius|{} Miles|'.format(HighestRadius))
 		print('|Max Year|{}|'.format(HigherstYear))
 		print('|Min Year|{}|'.format(LowestYear))
-		print('|Max DelDate Year|{}|'.format(MaxSaleYear))
+		print('|Sold Years up to|{}|'.format(MaxSaleYear))
 		print('|Vendor|{}|'.format(VendorSelected))
 		print('|Database Total|{}|'.format(DatabaseCounter))
 		print('|Purchase Total|{}|'.format(PurchaseCounter))
