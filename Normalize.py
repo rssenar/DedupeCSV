@@ -34,16 +34,16 @@ DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
 # Capture Input - File Name
 SuppSelect = input(
-	'Process ... STD | FDA : '
+	'Method.... (S)tandard | (B)asic : '
 	)
 if SuppSelect == '':
-	SuppSelect = 'STD'
+	SuppSelect = 'S'
 	print('=======================================')
 	print('STANDARD PROCESSING')
 	print('=======================================')
 else:
 	print('=======================================')
-	print('FINAL DATA ANALYSIS PROCESSING')
+	print('BASIC PROCESSING')
 	print('=======================================')
 # ---------------------------------------------------------------------------- #
 # Import Drop Dictionary from Drop_File.csv file
@@ -58,7 +58,7 @@ except:
 	print('..... ERROR: Unable to Load Drop Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import General Suppression File
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
 			GenSuppression = csv.reader(GenSuppressionFile)
@@ -71,7 +71,7 @@ else:
 	print('... General Suppression File Not Loaded')
 # ---------------------------------------------------------------------------- #
 # Import Montly Suppression File
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
 			MonthlySuppression = csv.reader(MonthlySuppressionFile)
@@ -94,7 +94,7 @@ except:
 	print('..... ERROR: Unable to Load Zip Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import Mail DNQ File for the purposes of de-duping
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		with open(MDNQFile,'rU') as MDNQFile:
 			MDNQ = csv.reader(MDNQFile)
@@ -184,7 +184,7 @@ while str(CentralZip) not in ZipCoordinateDict:
 		'ERROR: Enter ZIP Codes............... : '
 		)
 # Capture Input - Max RADIUS
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
 			'Enter Max Radius ................[50] : '
@@ -194,7 +194,7 @@ if SuppSelect == 'STD':
 else:
 	MaxRadius = 9999
 # Capture Input - Max YEAR
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
 			'Enter Max Year ................[2014] : '
@@ -204,7 +204,7 @@ if SuppSelect == 'STD':
 else:
 	MaxYear = 9999
 # Capture Input - Min YEAR
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
 			'Enter Min Year ................[1990] : '
@@ -214,7 +214,7 @@ if SuppSelect == 'STD':
 else:
 	MinYear = 1
 # Capture Input - Max SALE YEAR
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	try:
 		MaxSaleYear = int(input(
 			'Enter Maximum Sales Year ......[2015] : '
@@ -224,7 +224,7 @@ if SuppSelect == 'STD':
 else:
 	MaxSaleYear = 9999
 # Generate Suppress STATE List
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	STATEList = input(
 		'Enter Suppression List .......[STATE] : '
 		)
@@ -236,7 +236,7 @@ if SuppSelect == 'STD':
 else:
 	STATEList = []
 # Generate Suppress SCF List
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	SCFList = input(
 		'Enter Suppression List .........[SCF] : '
 		)
@@ -248,7 +248,7 @@ if SuppSelect == 'STD':
 else:
 	SCFList = []
 # Generate Suppress YEAR List
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	YEARList = input(
 		'Enter Suppression List ........[YEAR] : '
 		)
@@ -260,7 +260,7 @@ if SuppSelect == 'STD':
 else:
 	YEARList = []
 # Generate Suppress CITY List
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	CITYList = input(
 		'Enter Suppression List ........[CITY] : '
 		)
@@ -286,7 +286,7 @@ if SuppressionFileName != '':
 	except:
 		print('ERROR: Cannot load local suppression file\n')
 # Set TOP Percentage
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	TOPPercentage = input(
 		'Set Top % .......................[3%] : '
 		)
@@ -297,19 +297,19 @@ if SuppSelect == 'STD':
 else:
 	TOPPercentage = 0
 # Set HD Select
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	HRSelect = 'N'
 else:
 	HRSelect = 'Y'
 # Set Vendor
-if SuppSelect == 'STD':
+if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
-		' Shopper[S]   Platinum[P]   Zolton[Z] : '
+		'  (S)hopper | (P)latinum | (Z)olton '
 		))
 	print()
 else:
 	VendorSelect = ''
-input('....... PRESS [ENTER] TO PROCEED ...... ')
+input('...... PRESS [ENTER] TO PROCEED ...... ')
 # ---------------------------------------------------------------------------- #
 ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
 Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
@@ -609,13 +609,16 @@ def NormalizeFunc():
 		for line in tqdm(Input):
 			if VendorSelect == 'P':
 				WinningNumber = 42619 # Platinum Plus Winning#
-				line[Vendor] = 'Platinum Plus'
+				line[Vendor] = 'Platinum'
 			elif VendorSelect == 'S':
 				WinningNumber = 40754 # Platinum Plus Winning#
-				line[Vendor] = 'The Shopper'
+				line[Vendor] = 'Shopper'
+			elif VendorSelect == 'Z':
+				WinningNumber = 40754 # Platinum Plus Winning#
+				line[Vendor] = 'Zolton'
 			else:
 				WinningNumber = 40754 # Set Default Zolton
-				line[Vendor] = 'Zolton'
+				line[Vendor] = 'Premier'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
 			# Parse Fullname if First & Last Name fields are missing
