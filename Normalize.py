@@ -8,6 +8,7 @@ from nameparser import HumanName
 from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
+CSVFile = glob.glob('*.csv')
 path = '../Dropbox/HUB/Projects/PyToolkit/_Resources'
 # ---------------------------------------------------------------------------- #
 MDNQFile = os.path.join(path,'MailDNQ.csv')
@@ -18,7 +19,7 @@ GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
 SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
 # ---------------------------------------------------------------------------- #
-# Set Initial Variables
+# Variables
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
@@ -33,18 +34,26 @@ Entries = set()
 DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
 # Capture Input - File Name
-SuppSelect = input(
-	'Method.... (S)tandard | (B)asic : '
-	)
-if SuppSelect == '':
+SuppSelect = str.upper(input(
+	'Method.... (B)asic | (S)tandard: '
+	))
+while SuppSelect != 'S' and SuppSelect != 'B':
+	SuppSelect = str.upper(input(
+		'ERROR! Enter Valid Selection... : '
+		))
+if SuppSelect == 'B':
+	print('=======================================')
+	print('BASIC PROCESSING')
+	print('=======================================')
+else:
 	SuppSelect = 'S'
 	print('=======================================')
 	print('STANDARD PROCESSING')
 	print('=======================================')
-else:
-	print('=======================================')
-	print('BASIC PROCESSING')
-	print('=======================================')
+# ---------------------------------------------------------------------------- #
+for file in CSVFile:
+	IPFName = file.strip('.csv')
+	InputFile = file
 # ---------------------------------------------------------------------------- #
 # Import Drop Dictionary from Drop_File.csv file
 try:
@@ -165,30 +174,20 @@ def Upkeep():
 		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
 			os.remove(Record)
 # ---------------------------------------------------------------------------- #
-# Capture Input - File Name
-IPFName = input(
-	'Enter File Name ..................... : '
-	)
-InputFile = '{}.csv'.format(IPFName)
-while os.path.isfile(InputFile) == False:
-	IPFName = input(
-		'ERROR: Enter File Name .............. : '
-		)
-	InputFile = '{}.csv'.format(IPFName)
-# Capture Input - Central Zip
+print('File Name ........................... : {}'.format(InputFile))
 CentralZip = input(
 	'Enter Central ZIP Code .............. : '
-	)
+	).strip()
 while str(CentralZip) not in ZipCoordinateDict:
 	CentralZip = input(
 		'ERROR: Enter ZIP Codes............... : '
-		)
+		).strip()
 # Capture Input - Max RADIUS
 if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
-			'Enter Max Radius ................[50] : '
-			))
+			'Enter MAX Radius ................[50] : '
+			)).strip()
 	except:
 		MaxRadius = 50
 else:
@@ -197,8 +196,8 @@ else:
 if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
-			'Enter Max Year ................[2014] : '
-			))
+			'Enter MAX Year ................[2014] : '
+			)).strip()
 	except:
 		MaxYear = 2014
 else:
@@ -207,8 +206,8 @@ else:
 if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
-			'Enter Min Year ................[1990] : '
-			))
+			'Enter MIN Year ................[1990] : '
+			)).strip()
 	except:
 		MinYear = 1990
 else:
@@ -217,10 +216,10 @@ else:
 if SuppSelect == 'S':
 	try:
 		MaxSaleYear = int(input(
-			'Enter Maximum Sales Year ......[2015] : '
-			))
+			'Enter SOLD Years up to ........[2014] : '
+			)).strip()
 	except:
-		MaxSaleYear = 2015
+		MaxSaleYear = 2014
 else:
 	MaxSaleYear = 9999
 # Generate Suppress STATE List
@@ -271,10 +270,21 @@ if SuppSelect == 'S':
 		CITYList =[]
 else:
 	CITYList =[]
+# Set TOP Percentage
+if SuppSelect == 'S':
+	TOPPercentage = input(
+		'Set Top % .......................[3%] : '
+		).strip()
+	try:
+		TOPPercentage = int(TOPPercentage)
+	except:
+		TOPPercentage = 3
+else:
+	TOPPercentage = 0
 # Import LOCAL Suppression File for the purposes of de-duping
 SuppressionFileName = input(
-	'Suppression File ...[ENTER File Name] : '
-	)
+	'Enter Suppression File Name ......... : '
+	).strip()
 SuppressionFile = '{}.csv'.format(SuppressionFileName)
 if SuppressionFileName != '':
 	try:
@@ -283,33 +293,25 @@ if SuppressionFileName != '':
 			next(SuppressionFile)
 			for line in Suppression:
 				Entries.add((str.title(line[2]),str.title(line[5])))
+			print('\n{}.csv File Loaded\n'.format(SuppressionFileName))
 	except:
 		print('ERROR: Cannot load local suppression file\n')
-# Set TOP Percentage
-if SuppSelect == 'S':
-	TOPPercentage = input(
-		'Set Top % .......................[3%] : '
-		)
-	try:
-		TOPPercentage = int(TOPPercentage)
-	except:
-		TOPPercentage = 3
 else:
-	TOPPercentage = 0
-# Set HD Select
-if SuppSelect == 'S':
-	HRSelect = 'N'
-else:
-	HRSelect = 'Y'
+	print('\nNo Suppression File Loaded\n')
 # Set Vendor
 if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
 		'  (S)hopper | (P)latinum | (Z)olton '
-		))
+		)).strip()
 	print()
 else:
 	VendorSelect = ''
 input('...... PRESS [ENTER] TO PROCEED ...... ')
+# Set HRSelect
+if SuppSelect == 'S':
+	HRSelect = 'N'
+else:
+	HRSelect = 'Y'
 # ---------------------------------------------------------------------------- #
 ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
 Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
@@ -830,7 +832,7 @@ def NormalizeFunc():
 			except:
 				line[DelDate] = ''
 			if line[DelDate] != '':
-				if int(line[DelDate].year) >= MaxSaleYear:
+				if int(line[DelDate].year) > MaxSaleYear:
 					line[MailDNQ] = 'dnq'
 			# Process againts Suppression files
 			if str.title(line[FirstName]) in DoNotMailFile or \

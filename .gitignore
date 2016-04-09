@@ -1,0 +1,10 @@
+# Git Ignore File
+
+.DS_Store
+__*.txt
+*.txt
+*.zip
+*.gz
+log/*.log
+log/*.log.[0-9]
+_Resources/
