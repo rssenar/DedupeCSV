@@ -5,6 +5,7 @@ __*.txt
 *.txt
 *.zip
 *.gz
+*.csv
 log/*.log
 log/*.log.[0-9]
 _Resources/
