@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python3.4.3
 # ---------------------------------------------------------------------------- #
-import csv, os, sys, re, glob, collections, datetime
+import csv, os, sys, re, glob, collections, datetime, subprocess
 from dateutil.parser import *
 from geopy.distance import vincenty
 from nameparser import HumanName
@@ -43,12 +43,12 @@ while SuppSelect != 'S' and SuppSelect != 'B':
 		))
 if SuppSelect == 'B':
 	print('=======================================')
-	print('BASIC PROCESSING')
+	print('             B  A  S  I  C             ')
 	print('=======================================')
 else:
 	SuppSelect = 'S'
 	print('=======================================')
-	print('STANDARD PROCESSING')
+	print('         S  T  A  N  D  A  R  D        ')
 	print('=======================================')
 # ---------------------------------------------------------------------------- #
 for file in CSVFile:
@@ -297,21 +297,15 @@ if SuppressionFileName != '':
 	except:
 		print('ERROR: Cannot load local suppression file\n')
 else:
-	print('\n..... No Suppression File Loaded .....\n')
+	print('     No Suppression File Selected     ')
 # Set Vendor
 if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
-		'       (S)hopper | (P)latinum       '
+		'....... (S)hopper | (P)latinum .......'
 		).strip())
-	print()
 else:
 	VendorSelect = ''
-input('...... PRESS [ENTER] TO PROCEED ...... ')
-# Set HRSelect
-if SuppSelect == 'S':
-	HRSelect = 'N'
-else:
-	HRSelect = 'Y'
+input('       PRESS [ENTER] TO PROCEED        ')
 # ---------------------------------------------------------------------------- #
 ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
 Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
@@ -415,11 +409,21 @@ HeaderRowMain = [
 	'Misc3'
 	]
 # ---------------------------------------------------------------------------- #
+# Compare File Header row to HeaderRowMain to determin if re-mapping required
+ExtractCSVHeader = subprocess.check_output(['head','-n','1',InputFile])
+ExtractCSVHeader = ExtractCSVHeader.decode("utf-8").split(',')
+ExtractCSVHeader = [x.replace("\r\n","") for x in ExtractCSVHeader]
+if ExtractCSVHeader == HeaderRowMain:
+	HRSelect = 'N'
+else:
+	HRSelect = 'Y'
+# ---------------------------------------------------------------------------- #
 def ReMapFunc():
-	global InputFile
-	global ReMappedOutputFile
-	global Selection
 	if HRSelect == 'Y':
+		print('------------- RE-MAPPING -------------')
+		global InputFile
+		global ReMappedOutputFile
+		global Selection
 		Selection = ReMappedOutput
 		HeaderDict = {}
 		def match(field):
@@ -539,6 +543,7 @@ def ReMapFunc():
 		Selection = InputFile
 # ---------------------------------------------------------------------------- #
 def NormalizeFunc():
+	print('------------- NORMALIZING ------------')
 	global AppendMonthlySupp
 	global CentralZip
 	global CentralZipSCFFacilityReport
@@ -607,7 +612,7 @@ def NormalizeFunc():
 		SCF3DFacilityCounter = {}
 		ZipCounter = {}
 		Input = csv.reader(InputFile)
-		next(InputFile) # Skip Header Row
+		next(InputFile)
 		for line in tqdm(Input):
 			if VendorSelect == 'P':
 				WinningNumber = 42619 # Platinum Winning#
@@ -616,7 +621,7 @@ def NormalizeFunc():
 				WinningNumber = 40754 # Shopper Winning#
 				line[Vendor] = 'Shopper'
 			else:
-				WinningNumber = 40754 # Set Default
+				WinningNumber = 40754 # Default
 				line[Vendor] = 'N/A'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
@@ -1376,9 +1381,10 @@ def OutputFileFunc():
 					round(RTotalPrcnt,2)
 					))
 		sys.stdout = Report
+	print('================ TOTAL ================ : {}'.format(GrandTotal))
+	print('=====  C  O  M  P  L  E  T  E  D  =====')
 	print('=======================================')
-	print('.....  T     O     T     A     L  ..... : {}'.format(GrandTotal))
-	print('============== COMPLETED ==============\n')
+	print()
 	Upkeep()
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
