@@ -10,20 +10,18 @@ os.chdir('../../../../Desktop/')
 File1 = 'a.csv'
 File2 = 'b.csv'
 
-Seq = 0
-ziproute = 1
-Description = 2
-Records = 3
-total = 4
-dfo = 5
-Percentage = 6
-RTotal = 7
-AdjRec = 8
-AdjRecPerc = 9
-RecRTotal = 10
+ziproute = 0
+Description = 1
+Records = 2
+total = 3
+dfo = 4
+Percentage = 5
+RTotal = 6
+AdjRec = 7
+AdjRecPerc = 8
+RecRTotal = 9
 
 OutputHeaderRow = [
-	'SeqNum',
 	'ziproute',
 	'Description',
 	'Records',
@@ -51,7 +49,7 @@ def Join():
 	merged['AdjRec'] = ''
 	merged['AdjRecPerc'] = '' 
 	merged['AdjRecRTotal'] = '' 
-	merged.to_csv('temp.csv', encoding = 'utf-8')
+	merged.to_csv('temp.csv', encoding = 'utf-8', index=False)
 	
 def ReformatOutputReport():
 	CSVFiles = glob.glob('temp.csv')
