@@ -51,6 +51,7 @@ else:
 	print('         S  T  A  N  D  A  R  D        ')
 	print('=======================================')
 # ---------------------------------------------------------------------------- #
+# Select Input File from Database
 for file in CSVFile:
 	IPFName = file.strip('.csv')
 	InputFile = file
@@ -134,6 +135,7 @@ try:
 except:
 	print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
 # ---------------------------------------------------------------------------- #
+# Function to Convert String To List
 def ConvertStringToList(input):
 	AppendedList = []
 	input = input.split('|')
@@ -143,6 +145,7 @@ def ConvertStringToList(input):
 		AppendedList.append(item)
 	return AppendedList
 # ---------------------------------------------------------------------------- #
+# Function to Reformat Phone Number and strip white space and extra char
 def ReformatPhoneNum(Phone):
 	Phone = str(Phone).strip()
 	Phone = str(Phone).replace('-','')
@@ -150,30 +153,35 @@ def ReformatPhoneNum(Phone):
 	Phone = str(Phone).replace(')','')
 	return Phone
 # ---------------------------------------------------------------------------- #
+# Counter Function
 def GenCounter(record, DictCntr):
 	if str(record) not in DictCntr:
 		DictCntr[str(record)] = 1
 	else:
 		DictCntr[str(record)] += 1
 # ---------------------------------------------------------------------------- #
+# Function to Generate Percentage
 def percentage(part, whole):
 	if whole == 0:
 		return 0
 	else:
 		return 100 * float(part)/float(whole)
 # ---------------------------------------------------------------------------- #
+# Convert list item to string
 def ConvListToString(input):
 	for item in input:
 		return item
 # ---------------------------------------------------------------------------- #
+# Remove temporary files
 def Upkeep():
 	Files = glob.glob('*.csv')
 	for Record in Files:
-		if os.path.getsize(Record) == 0: # Delete Empty files
+		if os.path.getsize(Record) == 0: # Empty files
 			os.remove(Record)
 		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
 			os.remove(Record)
 # ---------------------------------------------------------------------------- #
+# Print captured input file
 print('File Name ........................... : {}'.format(InputFile))
 CentralZip = input(
 	'Enter Central ZIP Code .............. : '
@@ -182,6 +190,7 @@ while str(CentralZip) not in ZipCoordinateDict:
 	CentralZip = input(
 		'ERROR: Enter ZIP Codes............... : '
 		).strip()
+
 # Capture Input - Max RADIUS
 if SuppSelect == 'S':
 	try:
@@ -192,6 +201,7 @@ if SuppSelect == 'S':
 		MaxRadius = 50
 else:
 	MaxRadius = 9999
+
 # Capture Input - Max YEAR
 if SuppSelect == 'S':
 	try:
@@ -202,6 +212,7 @@ if SuppSelect == 'S':
 		MaxYear = 2014
 else:
 	MaxYear = 9999
+
 # Capture Input - Min YEAR
 if SuppSelect == 'S':
 	try:
@@ -212,6 +223,7 @@ if SuppSelect == 'S':
 		MinYear = 1990
 else:
 	MinYear = 1
+
 # Capture Input - Max SALE YEAR
 if SuppSelect == 'S':
 	try:
@@ -222,6 +234,7 @@ if SuppSelect == 'S':
 		MaxSaleYear = 2014
 else:
 	MaxSaleYear = 9999
+
 # Generate Suppress STATE List
 if SuppSelect == 'S':
 	STATEList = input(
@@ -234,6 +247,7 @@ if SuppSelect == 'S':
 		STATEList = []
 else:
 	STATEList = []
+
 # Generate Suppress SCF List
 if SuppSelect == 'S':
 	SCFList = input(
@@ -246,6 +260,7 @@ if SuppSelect == 'S':
 		SCFList = []
 else:
 	SCFList = []
+
 # Generate Suppress YEAR List
 if SuppSelect == 'S':
 	YEARList = input(
@@ -258,6 +273,7 @@ if SuppSelect == 'S':
 		YEARList = []
 else:
 	YEARList = []
+
 # Generate Suppress CITY List
 if SuppSelect == 'S':
 	CITYList = input(
@@ -270,6 +286,7 @@ if SuppSelect == 'S':
 		CITYList =[]
 else:
 	CITYList =[]
+
 # Set TOP Percentage
 if SuppSelect == 'S':
 	TOPPercentage = input(
@@ -281,6 +298,7 @@ if SuppSelect == 'S':
 		TOPPercentage = 3
 else:
 	TOPPercentage = 0
+
 # Import LOCAL Suppression File for the purposes of de-duping
 SuppressionFileName = input(
 	'Enter Suppression File Name ......... : '
@@ -298,7 +316,8 @@ if SuppressionFileName != '':
 		print('ERROR: Cannot load local suppression file\n')
 else:
 	print('     No Suppression File Selected     ')
-# Set Vendor
+
+# Set Vendor Selection
 if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
 		'....... (S)hopper | (P)latinum .......'
@@ -362,6 +381,7 @@ Vendor = 39
 Misc1 = 40
 Misc2 = 41
 Misc3 = 42
+
 # Header Output list
 HeaderRowMain = [
 	'CustomerID',
@@ -418,6 +438,7 @@ if ExtractCSVHeader == HeaderRowMain:
 else:
 	HRSelect = 'Y'
 # ---------------------------------------------------------------------------- #
+# Function to re-map header rows and transpose csv data
 def ReMapFunc():
 	if HRSelect == 'Y':
 		print('------------- RE-MAPPING -------------')
@@ -449,33 +470,33 @@ def ReMapFunc():
 				HeaderDict[State] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bzip\b',field,flags=re.I)):
 				HeaderDict[Zip] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or \
+			elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or\
 			bool(re.search(r'\bzip4\b',field,flags=re.I)):
 				HeaderDict[Zip4] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bscf\b',field,flags=re.I)):
 				HeaderDict[SCF] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search('pho.+',field,flags=re.I)):
 				HeaderDict[Phone] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search('HPho.+',field,flags=re.I)) or \
+			elif bool(re.search('HPho.+',field,flags=re.I)) or\
 			bool(re.search(r'\bhph\b',field,flags=re.I)):
 				HeaderDict[HPhone] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search('WPho.+',field,flags=re.I)) or \
+			elif bool(re.search('WPho.+',field,flags=re.I)) or\
 			bool(re.search(r'\bbph\b',field,flags=re.I)):
 				HeaderDict[WPhone] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search('MPho.+',field,flags=re.I)) or \
+			elif bool(re.search('MPho.+',field,flags=re.I)) or\
 			bool(re.search(r'\bcph\b',field,flags=re.I)):
 				HeaderDict[MPhone] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bemail\b',field,flags=re.I)):
 				HeaderDict[Email] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bvin\b',field,flags=re.I)):
 				HeaderDict[VIN] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search(r'\byear\b',field,flags=re.I)) or \
+			elif bool(re.search(r'\byear\b',field,flags=re.I)) or\
 			bool(re.search(r'\bvyr\b',field,flags=re.I)):
 				HeaderDict[Year] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search(r'\bmake\b',field,flags=re.I)) or \
+			elif bool(re.search(r'\bmake\b',field,flags=re.I)) or\
 			bool(re.search(r'\bvmk\b',field,flags=re.I)):
 				HeaderDict[Make] = 'line[{}]'.format(str(OldColumn))
-			elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or \
+			elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or\
 			bool(re.search(r'\bvmd\b',field,flags=re.I)):
 				HeaderDict[Model] = 'line[{}]'.format(str(OldColumn))
 			elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
@@ -542,6 +563,7 @@ def ReMapFunc():
 	else:
 		Selection = InputFile
 # ---------------------------------------------------------------------------- #
+# Main function to normalize file
 def NormalizeFunc():
 	print('------------- NORMALIZING ------------')
 	global AppendMonthlySupp
@@ -615,16 +637,17 @@ def NormalizeFunc():
 		next(InputFile)
 		for line in tqdm(Input):
 			if VendorSelect == 'P':
-				WinningNumber = 42619 # Platinum Winning#
+				WinningNumber = 42619 # Platinum
 				line[Vendor] = 'Platinum'
 			elif VendorSelect == 'S':
-				WinningNumber = 40754 # Shopper Winning#
+				WinningNumber = 40754 # Shopper
 				line[Vendor] = 'Shopper'
 			else:
 				WinningNumber = 40754 # Default
-				line[Vendor] = 'N/A'
+				line[Vendor] = 'Premierworks'
 			line[WinningNum] = WinningNumber
 			VendorSelected = line[Vendor] 
+			
 			# Parse Fullname if First & Last Name fields are missing
 			if line[FullName] != '' and \
 			line[FirstName] == '' and line[LastName] == '':
@@ -635,11 +658,13 @@ def NormalizeFunc():
 					line[LastName] = ParsedFName.last
 				except:
 					line[FullName] = ''
+			
 			# Parse ZIP to ZIP & ZIP4 components (when possible)
 			if len(str(line[Zip])) > 5 and (str(line[Zip]).find('-') == 5):
 				FullZip = line[Zip].split('-')
 				line[Zip] = FullZip[0]
 				line[Zip4] = FullZip[1]
+			
 			# Combine ZIP + CRRT fields
 			if line[Zip] != '' and line[CRRT] != '':
 				if len(str(line[Zip])) < 5:
@@ -652,9 +677,10 @@ def NormalizeFunc():
 						line[Zip],
 						line[CRRT]
 						)
+			
 			# Combine Address1 + Address2
-			if line[AddressComb] == '' and \
-			line[Address1] != '' and \
+			if line[AddressComb] == '' and\
+			line[Address1] != '' and\
 			line[Address2] != '':
 				line[AddressComb] = '{} {}'.format(
 					str.title(line[Address1]),
@@ -664,18 +690,19 @@ def NormalizeFunc():
 				line[AddressComb] = str.title(line[Address1]) 
 			else:
 				line[AddressComb] = str.title(line[AddressComb])
+			
 			# Set Drop Index from Drop Dictionary and Set Customer ID	
 			if line[PURL] == '':
 				if str(line[ZipCRRT]) in DropDict:
 					line[Drop] = DropDict[str(line[ZipCRRT])]
-					if line[Drop] == 'P' or line[Drop] == 'Penny' or \
+					if line[Drop] == 'P' or line[Drop] == 'Penny' or\
 					line[Drop] == 'p' or line[Drop] == 'penny':
 						line[CustomerID] = 'P{}'.format(
 							str(SeqNumPurchaseP)
 							)
 						SeqNumPurchaseP += 1
 						PennyCounter += 1
-					elif line[Drop] == 'N' or line[Drop] == 'Nickel' or \
+					elif line[Drop] == 'N' or line[Drop] == 'Nickel' or\
 					line[Drop] == 'n' or line[Drop] == 'nickel':
 						line[CustomerID] = 'N{}'.format(
 							str(SeqNumPurchaseN)
@@ -697,16 +724,17 @@ def NormalizeFunc():
 					SeqNumPurchase += 1
 					PurchaseCounter += 1
 			else:
-				if line[Drop] == 'P' or line[Drop] == 'Penny' or \
+				if line[Drop] == 'P' or line[Drop] == 'Penny' or\
 				line[Drop] == 'p' or line[Drop] == 'penny':
 					PennyCounter += 1
-				elif line[Drop] == 'N' or line[Drop] == 'Nickel' or \
+				elif line[Drop] == 'N' or line[Drop] == 'Nickel' or\
 				line[Drop] == 'n' or line[Drop] == 'nickel':
 					NickelCounter += 1
 				elif line[Drop] == 'D':
 					DatabaseCounter += 1
 				elif line[Drop] == 'A':
 					PurchaseCounter += 1
+			
 			# Parse & Clean up Phone #
 			if line[MPhone] != '' and len(str(line[MPhone])) > 6:
 				line[Phone] = ReformatPhoneNum(line[MPhone])
@@ -716,7 +744,8 @@ def NormalizeFunc():
 				line[Phone] = ReformatPhoneNum(line[WPhone])
 			else:
 				line[Phone] = ''
-			# Re-Format Phone #
+			
+			# Re-Format Phone#
 			if len(str(line[Phone])) == 10:
 				line[Phone] = '({}) {}-{}'.format(
 					str(line[Phone][0:3]),
@@ -730,6 +759,7 @@ def NormalizeFunc():
 					)
 			else:
 				line[Phone] = ''
+			
 			# Set Case for data fields
 			line[FullName] = str.title(line[FullName])
 			line[FirstName] = str.title(line[FirstName])
@@ -747,12 +777,14 @@ def NormalizeFunc():
 			line[Model] = str.title(line[Model])
 			line[Email] = str.lower(line[Email])
 			line[State] = str.upper(line[State])
+			
 			# Set VIN Length
 			line[VINLen] = len(str(line[VIN]))
 			if line[VINLen] < 17:
 				line[VIN] = ''
 			else:
 				line[VIN] = str.upper(line[VIN])
+			
 			# Set SCF Facility Location
 			ZipLen = len(str(line[Zip]))				
 			if ZipLen < 5:
@@ -761,7 +793,8 @@ def NormalizeFunc():
 				line[SCF] = (line[Zip])[:3]
 			if str(line[SCF]) in SCF3DigitDict:
 				line[SCF3DFacility] = SCF3DigitDict[str(line[SCF])]
-			# Set Central ZIP SCF Facility Location
+			
+			# Set Central ZIP SCF Facility location
 			CentralZipLen = len(str(CentralZip))
 			if CentralZipLen < 5:
 				CentralZipSCF3Digit = str(CentralZip[:2])
@@ -769,29 +802,32 @@ def NormalizeFunc():
 				CentralZipSCF3Digit = str(CentralZip[:3])
 			if str(CentralZipSCF3Digit) in SCF3DigitDict:
 				CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
-			# Calculate Radius from Central Zip
+			
+			# Calculate RADIUS from CENTRAL ZIP
 			try:
 				line[Zip] = int(line[Zip])
 			except:
 				line[Zip] = 9999
-			if line[Zip] == '':
-				line[Zip] = 9999
+			
 			# Remove Leading 0 from Zip Code
 			if str(line[Zip])[:1] == 0 and len(str(line[Zip])) == 4:
 				line[Zip] = line[Zip][-4:]
+			
 			# Set Long & Lat Coordinates for Central Zip Code and Zip Code
 			OriginZipCoord = ZipCoordinateDict[str(CentralZip)]
 			if str(line[Zip]) in ZipCoordinateDict:
 				line[Coordinates] = ZipCoordinateDict[str(line[Zip])]
 			else:
 				line[Coordinates] = ''
-			# Set Radius
+			
+			# Set RADIUS
 			if line[Coordinates] == '':
 				line[Radius] = 9999.9999
 			else:
 				line[Radius] = vincenty(OriginZipCoord,line[Coordinates]).miles
 				line[Radius] = round(float(line[Radius]),2)
-			# Convert "Date" Field to DateTime format
+			
+			# Convert DATE Field to DateTime format
 			try:
 				line[Date] = parse(line[Date])
 				PresentDate = parse('')
@@ -799,57 +835,62 @@ def NormalizeFunc():
 					line[Date] = ''
 			except:
 				line[Date] = ''
+			
 			# Apply "Blitz-DNQ" Parameters
 			try:
 				if len(str(line[Phone])) < 8 and len(str(line[VIN])) < 17:
 					line[BlitzDNQ] = 'dnq'
 			except:
 				line[BlitzDNQ] = ''
+			
 			# Apply Universal MAIL-DNQ Parameters
-			if line[FirstName] == '' or line[LastName] == '' or \
-			(line[Address1] == '' and line[Address2] == '') or \
-			(line[City] == '') or \
-			(line[State] == '') or \
-			(line[Zip] == '') or \
+			if line[FirstName] == '' or line[LastName] == '' or\
+			(line[Address1] == '' and line[Address2] == '') or\
+			(line[City] == '') or\
+			(line[State] == '') or\
+			(line[Zip] == '') or\
 			float(line[Radius]) > MaxRadius:
 				line[MailDNQ] = 'dnq'
+			
 			# Test YEAR Validity
 			try:
-				YearValidityTest = int(line[Year]) # Test Year Validity
-			except:
-				line[Year] = 'N/A'
-			if line[Year] != '' and line[Year] != 'N/A':
+				YearValidityTest = int(line[Year])
 				if str(line[Year]) in YearDecodeDict:
 					line[Year] = YearDecodeDict[str(line[Year])]
 				if int(line[Year]) > MaxYear:
 					line[MailDNQ] = 'dnq'
 				if int(line[Year]) < MinYear:
 					line[MailDNQ] = 'dnq'
-			# Test DELDATE Validity
-			try:
-				line[DelDate] = parse(line[DelDate]) # Convert DateTime format
-				CurrentDelDate = parse('') # Assign Current Date 
-				if line[DelDate] == CurrentDelDate:
-					line[DelDate] = ''
 			except:
-				line[DelDate] = ''
-			if line[DelDate] != '':
-				if int(line[DelDate].year) > MaxSaleYear:
-					line[MailDNQ] = 'dnq'
-			# Process againts Suppression files
-			if str.title(line[FirstName]) in DoNotMailFile or \
-			str.title(line[MI]) in DoNotMailFile or \
-			str.title(line[LastName]) in DoNotMailFile or \
-			str.title(line[State]) in STATEList or \
-			str.title(line[SCF]) in SCFList or \
-			str(line[Year]) in YEARList or \
-			str.title(line[City]) in CITYList:
-				line[MailDNQ] = 'dnq'
-			# Set 'N/A' for Make & Model Fields if blank
+				line[Year] = 'N/A'
+						
+			# Set 'N/A' for MAKE & MODEL blank fields
 			if line[Make] == '':
 				line[Make] = 'N/A'
 			if line[Model] == '':
 				line[Model] = 'N/A'
+
+			# Test DELDATE Validity
+			try:
+				line[DelDate] = parse(line[DelDate])
+				CurrentDelDate = parse('')
+				if line[DelDate] == CurrentDelDate:
+					line[DelDate] = ''
+				if int(line[DelDate].year) > MaxSaleYear:
+					line[MailDNQ] = 'dnq'
+			except:
+				line[DelDate] = ''
+			
+			# Dedupe againts suppression files
+			if str.title(line[FirstName]) in DoNotMailFile or\
+			str.title(line[MI]) in DoNotMailFile or\
+			str.title(line[LastName]) in DoNotMailFile or\
+			str.title(line[State]) in STATEList or\
+			str.title(line[SCF]) in SCFList or\
+			str(line[Year]) in YEARList or\
+			str.title(line[City]) in CITYList:
+				line[MailDNQ] = 'dnq'
+						
 			# Generate COUNTERS
 			CityRadius = '{} {} ({} Miles)'.format(
 				line[City],
@@ -868,9 +909,10 @@ def NormalizeFunc():
 			GenCounter(line[State],StateDictCounter)
 			GenCounter(line[SCF3DFacility],SCF3DFacilityCounter)
 			GenCounter(ZipRadius,ZipCounter)
+			
 			# OUTPUT Generate Phone File
-			if line[Phone] != '' and \
-			line[BlitzDNQ] != 'dnq' and \
+			if line[Phone] != '' and\
+			line[BlitzDNQ] != 'dnq' and\
 			line[MailDNQ] != 'dnq':
 				HeaderRowPhones = [
 					'First Name',
@@ -904,6 +946,7 @@ def NormalizeFunc():
 				else:
 					OutputPhones = csv.writer(CleanOutputPhones)
 					OutputPhones.writerow(HeaderRowPhonesOutput)
+			
 			# OUTPUT Dupes and Mail-DNQ Files
 			key = (str.title(line[AddressComb]), str(line[Zip]))
 			if key not in Entries:
@@ -944,6 +987,7 @@ def NormalizeFunc():
 					OutDupes.writerow(line)
 					Entries.add(key)
 					DupesCounter += 1
+			
 			# Generate Suppression File
 			if line[PURL] != '':
 				HeaderRowSuppression = [
@@ -972,6 +1016,7 @@ def NormalizeFunc():
 				else:
 					MonthlySupp = csv.writer(AppendMonthlySupp)
 					MonthlySupp.writerow(HeaderRowSuppressionOutput)
+			
 			# Output Database File
 			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
 				HeaderRowDatabase = [
@@ -1012,6 +1057,7 @@ def NormalizeFunc():
 				else:
 					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
 					OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
+			
 			# Output Purchase File
 			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
 				HeaderRowPurchase = [
@@ -1050,6 +1096,7 @@ def NormalizeFunc():
 				else:
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
 					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
+			
 			# Output Appended files [Penny/Nickel/Other]
 			else:
 				HeaderRowAppend = [
@@ -1108,8 +1155,9 @@ def NormalizeFunc():
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
 # ---------------------------------------------------------------------------- #
+# Function to generate output file 
 def OutputFileFunc():
-	Report = sys.stdout # Output Report
+	Report = sys.stdout
 	with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
 		RadiusKeyList = sorted(RadiusDictCounter)
 		NewRadiusList = []
@@ -1213,7 +1261,7 @@ def OutputFileFunc():
 			ValuePrcnt = percentage(value, SUBTotal)
 			RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
-				if len(str(key)) == 2: # Add leading 0 to 3-Digit
+				if len(str(key)) == 2:
 					print('|>|0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
@@ -1230,7 +1278,7 @@ def OutputFileFunc():
 						round(RTotalPrcnt,2)
 						))
 			else:
-				if len(str(key)) == 2: # Add leading 0 to 3-Digit
+				if len(str(key)) == 2:
 					print('||0{}|{}|{}%|{}|{}%|'.format(
 						key,
 						value,
