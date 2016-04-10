@@ -60,5 +60,3 @@ Lat-Long File:
 Year Decode File:
 * Col[00] = YearAbv
 * Col[01] = Year
-
-New Line
