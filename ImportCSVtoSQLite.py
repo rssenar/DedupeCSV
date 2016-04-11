@@ -4,6 +4,7 @@
 import os, glob, sqlite3, subprocess
 import pandas as pd
 from pandas.io import sql
+from Constants import *
 from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
@@ -11,52 +12,6 @@ CSVFiles = glob.glob('*.csv')
 # ---------------------------------------------------------------------------- #
 table_name = 'Premierworks' # name table
 itersize = 100000 # number of lines to process at each iteration
-# ---------------------------------------------------------------------------- #
-columns = [
-    'CustomerID',
-    'FullName',
-    'FirstName',
-    'MI',
-    'LastName',
-    'Address1',
-    'Address2',
-    'AddressFull',
-    'City',
-    'State',
-    'Zip',
-    '4Zip',
-    'SCF',
-    'Phone',
-    'HPH',
-    'BPH',
-    'CPH',
-    'Email',
-    'VIN',
-    'Year',
-    'Make',
-    'Model',
-    'DelDate',
-    'Date',
-    'Radius',
-    'Coordinates',
-    'VINLen',
-    'DSF_WALK_SEQ',
-    'Crrt',
-    'ZipCrrt',
-    'KBB',
-    'BuybackValue',
-    'WinningNumber',
-    'MailDNQ',
-    'BlitzDNQ',
-    'Drop',
-    'PURL',
-    'YrDec',
-    'SCF3DFacility',
-    'Vendor',
-    'Misc1',
-    'Misc2',
-    'Misc3'
-    ]
 # ---------------------------------------------------------------------------- #
 def CSVtoSQLiteImport():
     for file in tqdm(CSVFiles):
@@ -72,7 +27,7 @@ def CSVtoSQLiteImport():
                 skiprows = row,
                 low_memory = False
                 )
-            DataFrame.columns = columns
+            DataFrame.columns = HeaderRowMain
             sql.to_sql(
                 DataFrame,
                 name = table_name,
