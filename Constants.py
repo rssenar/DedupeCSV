@@ -118,23 +118,30 @@ def MatchHeaderFields(field, index):
 		HeaderDict[State] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bzip\b',field,flags=re.I)):
 		HeaderDict[Zip] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or bool(re.search(r'\bzip4\b',field,flags=re.I)):
+	elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or\
+	bool(re.search(r'\bzip4\b',field,flags=re.I)):
 		HeaderDict[Zip4] = 'line[{}]'.format(str(index))
-	elif bool(re.search('HPho.+',field,flags=re.I)) or bool(re.search(r'\bhph\b',field,flags=re.I)):
+	elif bool(re.search('HPho.+',field,flags=re.I)) or\
+	bool(re.search(r'\bhph\b',field,flags=re.I)):
 		HeaderDict[HPhone] = 'line[{}]'.format(str(index))
-	elif bool(re.search('WPho.+',field,flags=re.I)) or bool(re.search(r'\bbph\b',field,flags=re.I)):
+	elif bool(re.search('WPho.+',field,flags=re.I)) or\
+	bool(re.search(r'\bbph\b',field,flags=re.I)):
 		HeaderDict[WPhone] = 'line[{}]'.format(str(index))
-	elif bool(re.search('MPho.+',field,flags=re.I)) or bool(re.search(r'\bcph\b',field,flags=re.I)):
+	elif bool(re.search('MPho.+',field,flags=re.I)) or\
+	bool(re.search(r'\bcph\b',field,flags=re.I)):
 		HeaderDict[MPhone] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bemail\b',field,flags=re.I)):
 		HeaderDict[Email] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bvin\b',field,flags=re.I)):
 		HeaderDict[VIN] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\byear\b',field,flags=re.I)) or bool(re.search(r'\bvyr\b',field,flags=re.I)):
+	elif bool(re.search(r'\byear\b',field,flags=re.I)) or\
+	bool(re.search(r'\bvyr\b',field,flags=re.I)):
 		HeaderDict[Year] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\bmake\b',field,flags=re.I)) or bool(re.search(r'\bvmk\b',field,flags=re.I)):
+	elif bool(re.search(r'\bmake\b',field,flags=re.I)) or\
+	bool(re.search(r'\bvmk\b',field,flags=re.I)):
 		HeaderDict[Make] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or bool(re.search(r'\bvmd\b',field,flags=re.I)):
+	elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or\
+	bool(re.search(r'\bvmd\b',field,flags=re.I)):
 		HeaderDict[Model] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
 		HeaderDict[DelDate] = 'line[{}]'.format(str(index))
