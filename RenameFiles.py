@@ -1,37 +1,25 @@
 
 #!/usr/bin/env python3.4
 # ---------------------------------------------------------------------------- #
-import os, glob
+import os, glob, time
+from dateutil.parser import *
 from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
-os.makedirs('../../../../Desktop/Renamed')
+print('=======================================')
+print('          R E N A M E  F I L E         ')
+print('=======================================')
+NewName = input('Enter New Name ................ : ').strip()
+FileType = input('Enter File Type (.jpg|.xls) ... : ').strip()
 # ---------------------------------------------------------------------------- #
-'''
-def ConvertXLStoCSV():
-	XLSFiles = glob.glob('*.xls')
-	for file in tqdm(XLSFiles):
-		df = pd.read_excel(file)
-		df.to_csv('{}.csv'.format(file.strip('.xls')),index=False)
-# ---------------------------------------------------------------------------- #
-def ConvertXLSXtoCSV():
-	XLSXFiles = glob.glob('*.xlsx')
-	for file in tqdm(XLSXFiles):
-		df = pd.read_excel(file)
-		df.to_csv('{}.csv'.format(file.strip('.xlsx')),index=False)
-# ---------------------------------------------------------------------------- #
-def Upkeep():
-	Files = glob.glob('*.xls')
+def RenameFiles():
+	SeqNum = 1
+	Files = glob.glob('*{}'.format(FileType))
 	for Record in Files:
-		if bool(re.match('.+.xls',Record,flags=re.I)):
-			os.remove(Record)
-	Files = glob.glob('*.xlsx')
-	for Record in Files:
-		if bool(re.match('.+.xlsx',Record,flags=re.I)):
-			os.remove(Record)
+		FileDate = time.strftime('%Y-%d-%m', time.gmtime(os.path.getmtime(Record)))
+		NewFileName = '{}_{}_{}{}'.format(NewName, FileDate, str(SeqNum).zfill(6), FileType)
+		os.rename(Record, NewFileName)
+		SeqNum += 1
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
-	ConvertXLStoCSV()
-	ConvertXLSXtoCSV()
-	Upkeep()
-'''
+	RenameFiles()
