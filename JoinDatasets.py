@@ -3,6 +3,7 @@
 # ---------------------------------------------------------------------------- #
 import os, csv, glob, re
 import pandas as pd
+from Constants import ConvPercentage
 from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
@@ -34,12 +35,6 @@ OutputHeaderRow = [
 	'ADJ_R-TOTAL'
 	]
 
-def Perc(part, whole):
-	if whole == 0:
-		return 0
-	else:
-		return 100 * float(part)/float(whole)
-
 def Join():
 	ds1 = pd.read_csv(File1)
 	ds2 = pd.read_csv(File2)
@@ -66,13 +61,13 @@ def ReformatOutputReport():
 			for Row in tqdm(Input):
 				if int(Row[Records]) >= 135: 
 					Row[dfo] = round(float(Row[dfo]),1)
-					Row[Percentage] = round(Perc(Row[Records],Row[total]),0)
+					Row[Percentage] = round(ConvPercentage(Row[Records],Row[total]),0)
 					Row[RTotal] = '=SUM($D$2:$D{})'.format(RowCounter)
 					if int(Row[Percentage]) >= 74:
 						Row[AdjRec] = round(float(Row[total]) * 0.73,0)
 					else:
 						Row[AdjRec] = Row[Records]
-					Row[AdjRecPerc] = round(Perc(Row[AdjRec],Row[total]),0)
+					Row[AdjRecPerc] = round(ConvPercentage(Row[AdjRec],Row[total]),0)
 					Row[RecRTotal] = '=SUM($I$2:$I{})'.format(RowCounter)
 					Output.writerow(Row)
 					RowCounter += 1
