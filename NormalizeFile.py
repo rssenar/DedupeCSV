@@ -341,8 +341,6 @@ else:
 def ReMapFunc():
 	if HRSelect == 'Y':
 		print('------------- RE-MAPPING -------------')
-		global InputFile
-		global ReMappedOutputFile
 		global Selection
 		Selection = ReMappedOutput
 		with open(InputFile,'rU') as InputFileReMap,\
