@@ -44,12 +44,11 @@ MailDNQ = 33
 BlitzDNQ = 34
 Drop = 35
 PURL = 36
-YrDec = 37
-SCF3DFacility = 38
-Vendor = 39
-Misc1 = 40
-Misc2 = 41
-Misc3 = 42
+SCF3DFacility = 37
+Vendor = 38
+Misc1 = 39
+Misc2 = 40
+Misc3 = 41
 # ---------------------------------------------------------------------------- #
 # Header Output list
 HeaderRowMain = [
@@ -90,7 +89,6 @@ HeaderRowMain = [
 	'BlitzDNQ',
 	'Drop',
 	'PURL',
-	'YrDec',
 	'SCF3DFacility',
 	'Vendor',
 	'Misc1',
@@ -100,7 +98,7 @@ HeaderRowMain = [
 # ---------------------------------------------------------------------------- #
 HeaderDict = {}
 def MatchHeaderFields(field, index):
-	elif bool(re.search('ful.+me',field,flags=re.I)):
+	if bool(re.search('ful.+me',field,flags=re.I)):
 		HeaderDict[FullName] = 'line[{}]'.format(str(index))
 	elif bool(re.search('fir.+me',field,flags=re.I)):
 		HeaderDict[FirstName] = 'line[{}]'.format(str(index))
@@ -118,30 +116,23 @@ def MatchHeaderFields(field, index):
 		HeaderDict[State] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bzip\b',field,flags=re.I)):
 		HeaderDict[Zip] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or\
-	bool(re.search(r'\bzip4\b',field,flags=re.I)):
+	elif bool(re.search(r'\b4zip\b',field,flags=re.I)) or bool(re.search(r'\bzip4\b',field,flags=re.I)):
 		HeaderDict[Zip4] = 'line[{}]'.format(str(index))
-	elif bool(re.search('HPho.+',field,flags=re.I)) or\
-	bool(re.search(r'\bhph\b',field,flags=re.I)):
+	elif bool(re.search('HPho.+',field,flags=re.I)) or bool(re.search(r'\bhph\b',field,flags=re.I)):
 		HeaderDict[HPhone] = 'line[{}]'.format(str(index))
-	elif bool(re.search('WPho.+',field,flags=re.I)) or\
-	bool(re.search(r'\bbph\b',field,flags=re.I)):
+	elif bool(re.search('WPho.+',field,flags=re.I)) or bool(re.search(r'\bbph\b',field,flags=re.I)):
 		HeaderDict[WPhone] = 'line[{}]'.format(str(index))
-	elif bool(re.search('MPho.+',field,flags=re.I)) or\
-	bool(re.search(r'\bcph\b',field,flags=re.I)):
+	elif bool(re.search('MPho.+',field,flags=re.I)) or bool(re.search(r'\bcph\b',field,flags=re.I)):
 		HeaderDict[MPhone] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bemail\b',field,flags=re.I)):
 		HeaderDict[Email] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bvin\b',field,flags=re.I)):
 		HeaderDict[VIN] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\byear\b',field,flags=re.I)) or\
-	bool(re.search(r'\bvyr\b',field,flags=re.I)):
+	elif bool(re.search(r'\byear\b',field,flags=re.I)) or bool(re.search(r'\bvyr\b',field,flags=re.I)):
 		HeaderDict[Year] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\bmake\b',field,flags=re.I)) or\
-	bool(re.search(r'\bvmk\b',field,flags=re.I)):
+	elif bool(re.search(r'\bmake\b',field,flags=re.I)) or bool(re.search(r'\bvmk\b',field,flags=re.I)):
 		HeaderDict[Make] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or\
-	bool(re.search(r'\bvmd\b',field,flags=re.I)):
+	elif bool(re.search(r'\bmodel\b',field,flags=re.I)) or bool(re.search(r'\bvmd\b',field,flags=re.I)):
 		HeaderDict[Model] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bdeldate\b',field,flags=re.I)):
 		HeaderDict[DelDate] = 'line[{}]'.format(str(index))
@@ -156,7 +147,13 @@ def MatchHeaderFields(field, index):
 	elif bool(re.search(r'\bbuybackvalue\b',field,flags=re.I)):
 		HeaderDict[BuybackValues] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
-		HeaderDict[PURL] = 'line[{}]'.format(str(index)) 
+		HeaderDict[PURL] = 'line[{}]'.format(str(index))
+	elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
+		HeaderDict[Misc1] = 'line[{}]'.format(str(index))
+	elif bool(re.search(r'\bmisc2\b',field,flags=re.I)):
+		HeaderDict[Misc2] = 'line[{}]'.format(str(index))
+	elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
+		HeaderDict[Misc3] = 'line[{}]'.format(str(index))
 # ---------------------------------------------------------------------------- #
 def ConvPercentage(part, whole):
 	if whole == 0:
