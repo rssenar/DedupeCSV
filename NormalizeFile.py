@@ -19,7 +19,7 @@ GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
 SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
 # ---------------------------------------------------------------------------- #
-# Variables
+# Set Initial Variables
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
@@ -33,9 +33,9 @@ DupesCounter = 0
 Entries = set()
 DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
-# Capture Input - File Name
+# Select processing Mode
 SuppSelect = str.upper(input(
-	'Method.... (B)asic | (S)tandard: '
+	'Select Mode... (B)asic | (S)tandard: '
 	))
 while SuppSelect != 'S' and SuppSelect != 'B':
 	SuppSelect = str.upper(input(
