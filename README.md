@@ -1,10 +1,8 @@
-### Premierworks Python ToolKit
+### PremierWorks Python ToolKit
 The Toolkit is a collection of python programs to interact and process with .csv and .xls files.  
 The program runs through every record in the file and performs the following funtions:
 
-* Select process mode Basic or Standard.
-**Basic Mode** - Check file for duplicate recrods based on Address & ZIP match.
-**Standard Mode** - Check file for duplicate recrods based on Address & ZIP match as well as suppression dictionaries.
+- Select process mode Basic or Standard. **Basic Mode** Checks file for duplicate recrods based on Address & ZIP match. **Standard Mode** Checks file for duplicate recrods based on Address & ZIP match as well as suppression dictionaries.
 - Re-Map header row if input file does not match HeaderRowMain format
 - Check file for duplicate recrods based on Address & ZIP match and save to a dupes file
 - Appends Latitude & Longitude Information then calculates straight line distance based on a central ZIP code
