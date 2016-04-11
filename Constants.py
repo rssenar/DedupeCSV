@@ -193,3 +193,11 @@ def MatchHeaderFields(field, index):
 		HeaderDict[Misc2] = 'line[{}]'.format(str(index)) 
 	elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 		HeaderDict[Misc3] = 'line[{}]'.format(str(index))
+# ---------------------------------------------------------------------------- #
+def ConvPercentage(part, whole):
+	if whole == 0:
+		return 0
+	else:
+		return 100 * float(part)/float(whole)
+# ---------------------------------------------------------------------------- #
+
