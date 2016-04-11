@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python3.4.3
 # ---------------------------------------------------------------------------- #
-import csv, os, sys, re, glob, collections, datetime, subprocess
+import csv, os, sys, glob, collections, datetime, subprocess
 from dateutil.parser import *
 from Constants import *
 from geopy.distance import vincenty
@@ -11,7 +11,6 @@ from tqdm import tqdm
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
 recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
-# ---------------------------------------------------------------------------- #
 MDNQFile = os.path.join(recpath,'MailDNQ.csv')
 DropFile = os.path.join(recpath,'_DropFile.csv')
 ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
@@ -19,7 +18,6 @@ YearDecodeFile = os.path.join(recpath,'YearDecode.csv')
 GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
-# ---------------------------------------------------------------------------- #
 Entries = set()
 DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
@@ -977,10 +975,12 @@ def OutputFileFunc():
 		SUBTotal = (DatabaseCounter + PurchaseCounter
 			+ PennyCounter + NickelCounter)
 		sys.stdout = Log
-		print('\n------------------------------------------------------------')
+		print()
+		print('------------------------------------------------------------')
 		print('#### {}'.format(str.upper(IPFName)))
 		print('###### Data Summary Report - as of {}'.format(TodayDateTime))
-		print('------------------------------------------------------------\n')
+		print('------------------------------------------------------------')
+		print()
 		print('||Description|')
 		print('|-:|:-|')
 		print('|Central ZIP Code|{}|'.format(CentralZip))
