@@ -345,9 +345,9 @@ def ReMapFunc():
 		global ReMappedOutputFile
 		global Selection
 		Selection = ReMappedOutput
-		with open(InputFile,'rU') as InputFile,\
+		with open(InputFile,'rU') as InputFileReMap,\
 		open(ReMappedOutput,'at') as ReMappedOutputFile:
-			Input = csv.reader(InputFile)
+			Input = csv.reader(InputFileReMap)
 			Output = csv.writer(ReMappedOutputFile)
 			Output.writerow(HeaderRowMain)
 			FirstLine = True
@@ -370,7 +370,6 @@ def ReMapFunc():
 # Main function to normalize file
 def NormalizeFunc():
 	print('------------- NORMALIZING ------------')
-	global AppendMonthlySupp
 	global CentralZip
 	global CentralZipSCFFacilityReport
 	global CityDictCounter
@@ -384,8 +383,6 @@ def NormalizeFunc():
 	global DatabaseCounter
 	global Dupes
 	global DupesCounter
-	global InputFile
-	global IPFName
 	global MakeDictCounter
 	global MaxSaleYear
 	global MDNQ

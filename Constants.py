@@ -200,4 +200,3 @@ def ConvPercentage(part, whole):
 	else:
 		return 100 * float(part)/float(whole)
 # ---------------------------------------------------------------------------- #
-

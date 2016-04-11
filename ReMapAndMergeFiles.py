@@ -11,8 +11,6 @@ CSVFiles = glob.glob('*.csv')
 # Re-Map Column Fields
 def ReMapHeaderFields():
 	for index in tqdm(range(0,len(CSVFiles))):
-		global IndexA
-		global IndexB
 		with open(CSVFiles[index],'rU') as InputFile,\
 		open('___ReMapped--' + str(CSVFiles[index]),'at') as OutputFile:
 			Input = csv.reader(InputFile)
