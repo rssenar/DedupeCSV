@@ -81,11 +81,11 @@ def PURLConversion():
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	for index in range(0,len(CSVFiles)):
-	FirstTime = True
-	with open(CSVFiles[index],'rU') as InputFile,\
-	open('EBLAST_' + str(CSVFiles[index]),'at') as OutputFile:
-		Input = csv.reader(InputFile)
-		next(InputFile) # skip header row
-		Output = csv.writer(OutputFile)
-		Output.writerow(HeaderRow)
-		PURLConversion()
+		FirstTime = True
+		with open(CSVFiles[index],'rU') as InputFile,\
+		open('EBLAST_' + str(CSVFiles[index]),'at') as OutputFile:
+			Input = csv.reader(InputFile)
+			next(InputFile) # skip header row
+			Output = csv.writer(OutputFile)
+			Output.writerow(HeaderRow)
+			PURLConversion()
