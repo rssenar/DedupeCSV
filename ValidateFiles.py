@@ -1,15 +1,8 @@
 
 #!/usr/bin/env python3.4
 # ---------------------------------------------------------------------------- #
-import csv, os, subprocess
-from tqdm import tqdm
+import csv, os
 # ---------------------------------------------------------------------------- #
-def percentage(part, whole):
-	if whole == 0:
-		return 0
-	else:
-		return 100 * float(part)/float(whole)
-
 def Validate():
 	Message1 = 'Files Validated!'
 	Message2 = '''
@@ -29,9 +22,6 @@ def Validate():
 	DatabaseFile = '{}.csv'.format(File2)
 	PurchaseFile = '{}.csv'.format(File3)
 	# ------------------------------------------------------------------------ #
-	CSVLineCount = subprocess.check_output(['wc','-l',InputFile])
-	CSVLineCount = int(CSVLineCount.split()[0])
-	# ------------------------------------------------------------------------ #
 	if File2 != '':
 		with open(DatabaseFile,'rU') as DatabaseFile:
 			Database = csv.reader(DatabaseFile)
@@ -48,24 +38,23 @@ def Validate():
 				Entries.add((line[1],line[2],line[3],line[4],line[5],line[6]))
 
 	if File1 != '':
-		Counter = 0
+		ErrorCounter = 0
 		with open(InputFile,'rU') as InputFile:
 			Input = csv.reader(InputFile)
 			next(InputFile)
-			for line in tqdm(Input):
+			for line in Input:
 				key = ((line[1],line[2],line[3],line[4],line[5],line[6]))
-				if key in Entries:
-					Counter+=1
-				else:
+				if key not in Entries:
 					with open("error.csv",'at') as ErrorFile:
 						Error = csv.writer(ErrorFile)
 						Error.writerow(line)
-	
-	Percentage = round(percentage(Counter,CSVLineCount),1)
-	if Percentage == 100:
-		print('{}% {}'.format(Percentage,Message1))
+					ErrorCounter += 1
+
+	if ErrorCounter > 0:
+		print('{} Errors Found'.format(ErrorCounter))
+		print(Message2)
 	else:
-		print('{}% {}'.format(Percentage,Message2))
+		print(Message1)
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	Validate()
