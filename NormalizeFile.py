@@ -353,14 +353,14 @@ def ReMapFunc():
 			FirstLine = True
 			for line in tqdm(Input):
 				if FirstLine:
-					for OldColumn in range(0,len(line)):
-						MatchHeaderFields(line[OldColumn], OldColumn)
+					for IndexA in range(0,len(line)):
+						MatchHeaderFields(line[IndexA], IndexA)
 					FirstLine = False
 				else:
 					newline = []
-					for NewColumn in range(0,len(HeaderRowMain)):
-						if NewColumn in HeaderDict:
-							newline.append(eval(HeaderDict[NewColumn]))
+					for IndexB in range(0,len(HeaderRowMain)):
+						if IndexB in HeaderDict:
+							newline.append(eval(HeaderDict[IndexB]))
 						else:
 							newline.append('')
 					Output.writerow(newline)

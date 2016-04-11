@@ -11,8 +11,8 @@ CSVFiles = glob.glob('*.csv')
 # Re-Map Column Fields
 def ReMapHeaderFields():
 	for index in tqdm(range(0,len(CSVFiles))):
-		global OldColumn
-		global NewColumn
+		global IndexA
+		global IndexB
 		with open(CSVFiles[index],'rU') as InputFile,\
 		open('___ReMapped--' + str(CSVFiles[index]),'at') as OutputFile:
 			Input = csv.reader(InputFile)
@@ -21,14 +21,14 @@ def ReMapHeaderFields():
 			FirstLine = True
 			for line in tqdm(Input):
 				if FirstLine:	
-					for OldColumn in range(0,len(line)):
-						MatchHeaderFields(line[OldColumn], OldColumn)
+					for IndexA in range(0,len(line)):
+						MatchHeaderFields(line[IndexA], IndexA)
 					FirstLine = False
 				else:
 					Newline = []
-					for NewColumn in range(0,len(HeaderRowMain)):
-						if NewColumn in HeaderDict:
-							Newline.append(eval(HeaderDict[NewColumn]))
+					for IndexB in range(0,len(HeaderRowMain)):
+						if IndexB in HeaderDict:
+							Newline.append(eval(HeaderDict[IndexB]))
 						else:
 							Newline.append('')
 					Output.writerow(Newline)
