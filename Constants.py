@@ -1,5 +1,11 @@
-# Constant Variables
 
+# Constant Variables
+# ---------------------------------------------------------------------------- #
+SeqNumDatabase = 10000
+SeqNumPurchaseP = 30000
+SeqNumPurchaseN = 40000
+SeqNumPurchase = 50000
+# ---------------------------------------------------------------------------- #
 CustomerID = 0
 FullName = 1
 FirstName = 2
@@ -43,7 +49,7 @@ Vendor = 39
 Misc1 = 40
 Misc2 = 41
 Misc3 = 42
-
+# ---------------------------------------------------------------------------- #
 # Header Output list
 HeaderRowMain = [
 	'CustomerID',

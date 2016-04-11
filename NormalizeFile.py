@@ -10,27 +10,16 @@ from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
-path = '../Dropbox/HUB/Projects/PyToolkit/Resources'
+recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
 # ---------------------------------------------------------------------------- #
-MDNQFile = os.path.join(path,'MailDNQ.csv')
-DropFile = os.path.join(path,'_DropFile.csv')
-ZipCoordFile = os.path.join(path,'USZIPCoordinates.csv')
-YearDecodeFile = os.path.join(path,'YearDecode.csv')
-GenSuppressionFile = os.path.join(path,'_GeneralSuppression.csv')
-MonthlySuppressionFile = os.path.join(path,'_MonthlySuppression.csv')
-SCF3DigitFile = os.path.join(path,'SCFFacilites.csv')
+MDNQFile = os.path.join(recpath,'MailDNQ.csv')
+DropFile = os.path.join(recpath,'_DropFile.csv')
+ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
+YearDecodeFile = os.path.join(recpath,'YearDecode.csv')
+GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
+MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
+SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
 # ---------------------------------------------------------------------------- #
-# Set Initial Variables
-SeqNumDatabase = 10000
-SeqNumPurchaseP = 30000
-SeqNumPurchaseN = 40000
-SeqNumPurchase = 50000
-PennyCounter = 0
-NickelCounter = 0
-DatabaseCounter = 0
-PurchaseCounter = 0
-MDNQCounter = 0
-DupesCounter = 0
 Entries = set()
 DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
@@ -543,6 +532,12 @@ def NormalizeFunc():
 		StateDictCounter = {}
 		SCF3DFacilityCounter = {}
 		ZipCounter = {}
+		PennyCounter = 0
+		NickelCounter = 0
+		DatabaseCounter = 0
+		PurchaseCounter = 0
+		MDNQCounter = 0
+		DupesCounter = 0
 		Input = csv.reader(InputFile)
 		next(InputFile)
 		for line in tqdm(Input):
