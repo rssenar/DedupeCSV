@@ -719,7 +719,7 @@ def NormalizeFunc():
 			if line[Phone] != '' and\
 			line[BlitzDNQ] != 'dnq' and\
 			line[MailDNQ] != 'dnq':
-				HeaderRowPhones = [
+				HeaderRowPhonesStat = [
 					'First Name',
 					'Last Name',
 					'Phone',
@@ -745,7 +745,7 @@ def NormalizeFunc():
 					)
 				if PhonesFirstTime:
 					OutputPhones = csv.writer(CleanOutputPhones)
-					OutputPhones.writerow(HeaderRowPhones)
+					OutputPhones.writerow(HeaderRowPhonesStat)
 					OutputPhones.writerow(HeaderRowPhonesOutput)
 					PhonesFirstTime = False
 				else:
@@ -795,7 +795,7 @@ def NormalizeFunc():
 			
 			# Generate Suppression File
 			if line[PURL] != '':
-				HeaderRowSuppression = [
+				HeaderRowSuppressionStat = [
 					'First Name',
 					'Last Name',
 					'Address',
@@ -815,7 +815,7 @@ def NormalizeFunc():
 					)
 				if MonthlySuppressionFirstTime:
 					MonthlySupp = csv.writer(AppendMonthlySupp)
-					MonthlySupp.writerow(HeaderRowSuppression)
+					MonthlySupp.writerow(HeaderRowSuppressionStat)
 					MonthlySupp.writerow(HeaderRowSuppressionOutput)
 					MonthlySuppressionFirstTime = False
 				else:
@@ -824,7 +824,7 @@ def NormalizeFunc():
 			
 			# Output Database File
 			if line[DSF_WALK_SEQ] == '' and line[PURL] == '':
-				HeaderRowDatabase = [
+				HeaderRowDatabaseStat = [
 					'Customer ID',
 					'First Name',
 					'Last Name',
@@ -856,7 +856,7 @@ def NormalizeFunc():
 					)
 				if DatabaseFirstTime:
 					OutputCleanDatabase = csv.writer(CleanOutputDatabase)
-					OutputCleanDatabase.writerow(HeaderRowDatabase)
+					OutputCleanDatabase.writerow(HeaderRowDatabaseStat)
 					OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
 					DatabaseFirstTime = False
 				else:
@@ -865,7 +865,7 @@ def NormalizeFunc():
 			
 			# Output Purchase File
 			elif line[DSF_WALK_SEQ] != '' and line[PURL] == '':
-				HeaderRowPurchase = [
+				HeaderRowPurchaseStat = [
 					'Customer ID',
 					'First Name',
 					'Last Name',
@@ -895,7 +895,7 @@ def NormalizeFunc():
 					)
 				if PurchaseFirstTimeAll:
 					OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
-					OutputCleanPurchaseAll.writerow(HeaderRowPurchase)
+					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseStat)
 					OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
 					PurchaseFirstTimeAll = False
 				else:
@@ -904,7 +904,7 @@ def NormalizeFunc():
 			
 			# Output Appended files [Penny/Nickel/Other]
 			else:
-				HeaderRowAppend = [
+				HeaderRowAppendStat = [
 					'PURL',
 					'First Name',
 					'Last Name',
@@ -935,7 +935,7 @@ def NormalizeFunc():
 				if line[CustomerID][:1] == 'P' or line[CustomerID][:1] == 'p':
 					if AppendFirstTimeP:
 						OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-						OutputCleanAppendP.writerow(HeaderRowAppend)
+						OutputCleanAppendP.writerow(HeaderRowAppendStat)
 						OutputCleanAppendP.writerow(HeaderRowAppendOutput)
 						AppendFirstTimeP = False
 					else:
@@ -944,7 +944,7 @@ def NormalizeFunc():
 				elif line[CustomerID][:1] == 'N' or line[CustomerID][:1] == 'n':
 					if AppendFirstTimeN:
 						OutputCleanAppendN = csv.writer(CleanOutputAppendN)
-						OutputCleanAppendN.writerow(HeaderRowAppend)
+						OutputCleanAppendN.writerow(HeaderRowAppendStat)
 						OutputCleanAppendN.writerow(HeaderRowAppendOutput)
 						AppendFirstTimeN = False
 					else:
@@ -953,7 +953,7 @@ def NormalizeFunc():
 				else: 
 					if AppendFirstTimeR:
 						OutputCleanAppendR = csv.writer(CleanOutputAppendR)
-						OutputCleanAppendR.writerow(HeaderRowAppend)
+						OutputCleanAppendR.writerow(HeaderRowAppendStat)
 						OutputCleanAppendR.writerow(HeaderRowAppendOutput)
 						AppendFirstTimeR = False
 					else:
