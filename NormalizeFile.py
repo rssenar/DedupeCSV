@@ -1081,7 +1081,7 @@ def OutputFileFunc():
 						))
 			print()
 		print('###### Count Distribution by Radius:')
-		print('||Constants.Radius|Count|%|RTotal|%|')
+		print('||Radius|Count|%|RTotal|%|')
 		print('||-|-:|-:|-:|-:|')
 		RadiusRTotal = 0
 		OdRadiusDictCounter = collections.OrderedDict(sorted(
