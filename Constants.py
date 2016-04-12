@@ -217,7 +217,7 @@ DoNotMailSet = set([
 	'maybach','mazda','mercedes','mercedes-benz','mercury','mini',
 	'mitsubishi','nissan','oldsmobile','plymouth','pontiac','porsche',
 	'ram','saab','saturn','scion','smart','subaru','suzuki','toyota',
-	'volkswagen','volvo','auto','automotive','group' 
+	'volkswagen','volvo','auto','automotive','group'
 	])
 
 YearDecodeDict = dict([
@@ -653,7 +653,6 @@ CommonHispLastNameList = set([
 	'Carrillo',
 	'Carrion',
 	'Carrizales',
-	'Carroll',
 	'Cartagena',
 	'Carvajal',
 	'Casado',
