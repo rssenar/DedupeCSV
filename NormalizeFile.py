@@ -289,8 +289,8 @@ def ReMapFunc():
 				else:
 					newline = []
 					for IndexB in range(0,len(HeaderRowMain)):
-						if IndexB in HeaderDict:
-							newline.append(eval(HeaderDict[IndexB]))
+						if IndexB in HeaderReMapDict:
+							newline.append(eval(HeaderReMapDict[IndexB]))
 						else:
 							newline.append('')
 					Output.writerow(newline)
@@ -428,6 +428,10 @@ def NormalizeFunc():
 			else:
 				line[AddressComb] = str.title(line[AddressComb])
 			
+			# Expand Abreviated State
+			if str.upper(line[State]) in USStatesDict:
+				line[ExpState] = USStatesDict[str.upper(line[State])]
+
 			# Set Drop Index from Drop Dictionary and Set Customer ID	
 			if line[PURL] == '':
 				if str(line[ZipCRRT]) in DropDict:
@@ -618,6 +622,11 @@ def NormalizeFunc():
 			except:
 				line[DelDate] = ''
 			
+			# Check Ethnicity
+			CleanName = StripAndCleanName(line[LastName])
+			if CleanName in CommonHispLastNameList:
+				line[Ethnicity] = 'Hisp'
+
 			# Dedupe againts suppression files
 			if str.lower(line[FirstName]) in DoNotMailSet or\
 			str.lower(line[MI]) in DoNotMailSet or\
