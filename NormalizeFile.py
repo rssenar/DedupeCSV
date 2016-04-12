@@ -11,15 +11,12 @@ from tqdm import tqdm
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
 recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
-MDNQFile = os.path.join(recpath,'MailDNQ.csv')
 DropFile = os.path.join(recpath,'_DropFile.csv')
-ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
-YearDecodeFile = os.path.join(recpath,'YearDecode.csv')
 GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
+ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
 Entries = set()
-DoNotMailFile = set()
 # ---------------------------------------------------------------------------- #
 # Select processing Mode
 SuppSelect = str.upper(input(
@@ -92,26 +89,9 @@ except:
 	print('..... ERROR: Unable to Load Zip Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import Mail DNQ File for the purposes of de-duping
-if SuppSelect == 'S':
-	try:
-		with open(MDNQFile,'rU') as MDNQFile:
-			MDNQ = csv.reader(MDNQFile)
-			for line in MDNQ:
-				DoNotMailFile.add(str.title(line[0]))
-	except:
-		print('..... ERROR: Unable to Load Mail DNQ File')
-else:
+if SuppSelect != 'S':
+	DoNotMailSet = set()
 	print('.............. Mail DNQ File Not Loaded')
-# ---------------------------------------------------------------------------- #
-# Import Year Decode Dictionary from Year_Decode.csv file
-try:
-	YearDecodeDict = {}
-	with open(YearDecodeFile,'rU') as YearDecodeFile:
-		YearDecode = csv.reader(YearDecodeFile)
-		for line in YearDecode:
-			YearDecodeDict[line[0]] = (line[1])
-except:
-	print('..... ERROR: Unable to Load Year Decode Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import SCF Dictionary from SCF Facilities.csv file
 try:
@@ -129,7 +109,7 @@ def ConvertStringToList(input):
 	input = input.split('|')
 	for item in input:
 		item = item.strip()
-		item = str.title(item)
+		item = str.lower(item)
 		AppendedList.append(item)
 	return AppendedList
 # ---------------------------------------------------------------------------- #
@@ -658,8 +638,8 @@ def NormalizeFunc():
 			# Test YEAR Validity
 			try:
 				YearValidityTest = int(line[Year])
-				if str(line[Year]) in YearDecodeDict:
-					line[Year] = YearDecodeDict[str(line[Year])]
+				if int(line[Year]) in YearDecodeDict:
+					line[Year] = YearDecodeDict[int(line[Year])]
 				if int(line[Year]) > MaxYear:
 					line[MailDNQ] = 'dnq'
 				if int(line[Year]) < MinYear:
@@ -685,13 +665,13 @@ def NormalizeFunc():
 				line[DelDate] = ''
 			
 			# Dedupe againts suppression files
-			if str.title(line[FirstName]) in DoNotMailFile or\
-			str.title(line[MI]) in DoNotMailFile or\
-			str.title(line[LastName]) in DoNotMailFile or\
-			str.title(line[State]) in STATEList or\
-			str.title(line[SCF]) in SCFList or\
+			if str.lower(line[FirstName]) in DoNotMailSet or\
+			str.lower(line[MI]) in DoNotMailSet or\
+			str.lower(line[LastName]) in DoNotMailSet or\
+			str.lower(line[State]) in STATEList or\
+			str.lower(line[SCF]) in SCFList or\
 			str(line[Year]) in YEARList or\
-			str.title(line[City]) in CITYList:
+			str.lower(line[City]) in CITYList:
 				line[MailDNQ] = 'dnq'
 						
 			# Generate COUNTERS
