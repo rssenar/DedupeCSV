@@ -49,7 +49,7 @@ try:
 		for line in DropRec:
 			DropDict[line[0]] = line[1]
 except:
-	print('..... ERROR: Unable to Load Constants.Drop Dictionary File')
+	print('..... ERROR: Unable to Load Drop Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import GENERAL Suppression File
 if SuppSelect == 'S':
@@ -85,7 +85,7 @@ try:
 		for line in ZipCoordinate:
 			ZipCoordinateDict[line[0]] = (line[1], line[2])
 except:
-	print('..... ERROR: Unable to Load Constants.Zip Dictionary File')
+	print('..... ERROR: Unable to Load Zip Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Import Mail DNQ File for the purposes of de-duping
 if SuppSelect != 'S':
@@ -100,7 +100,7 @@ try:
 		for line in SCF3Digit:
 			SCF3DigitDict[line[0]] = (line[1])
 except:
-	print('..... ERROR: Unable to Load Constants.SCF 3-Digit Dictionary File')
+	print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
 # ---------------------------------------------------------------------------- #
 # Print captured input file
 print('File Name ........................... : {}'.format(InputFile))
@@ -666,8 +666,8 @@ def NormalizeFunc():
 			line[Constants.BlitzDNQ] != 'dnq' and\
 			line[Constants.MailDNQ] != 'dnq':
 				HeaderRowPhonesStat = [
-					'First Name',
-					'Last Name',
+					'FirstName',
+					'LastName',
 					'Phone',
 					'Address',
 					'City',
@@ -742,8 +742,8 @@ def NormalizeFunc():
 			# Generate Suppression File
 			if line[Constants.PURL] != '':
 				HeaderRowSuppressionStat = [
-					'First Name',
-					'Last Name',
+					'FirstName',
+					'LastName',
 					'Address',
 					'City',
 					'State',
@@ -771,9 +771,9 @@ def NormalizeFunc():
 			# Output Database File
 			if line[Constants.DSF_WALK_SEQ] == '' and line[Constants.PURL] == '':
 				HeaderRowDatabaseStat = [
-					'Customer ID',
-					'First Name',
-					'Last Name',
+					'CustomerID',
+					'FirstName',
+					'LastName',
 					'Address',
 					'City',
 					'State',
@@ -804,9 +804,9 @@ def NormalizeFunc():
 			# Output Purchase File
 			elif line[Constants.DSF_WALK_SEQ] != '' and line[Constants.PURL] == '':
 				HeaderRowPurchaseStat = [
-					'Customer ID',
-					'First Name',
-					'Last Name',
+					'CustomerID',
+					'FirstName',
+					'LastName',
 					'Address',
 					'City',
 					'State',
@@ -844,8 +844,8 @@ def NormalizeFunc():
 			else:
 				HeaderRowAppendStat = [
 					'PURL',
-					'First Name',
-					'Last Name',
+					'FirstName',
+					'LastName',
 					'Address1',
 					'City',
 					'State',
