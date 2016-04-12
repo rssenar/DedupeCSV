@@ -162,11 +162,35 @@ def MatchHeaderFields(field, index):
 	elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
 		HeaderDict[Misc3] = 'line[{}]'.format(str(index))
 # ---------------------------------------------------------------------------- #
+# Function to Generate ConvPercentage Value
 def ConvPercentage(part, whole):
 	if whole == 0:
 		return 0
 	else:
 		return 100 * float(part)/float(whole)
+
+# Function to Convert String To List
+def ConvertStringToList(input):
+	AppendedList = []
+	input = input.split('|')
+	for item in input:
+		item = item.strip()
+		item = str.lower(item)
+		AppendedList.append(item)
+	return AppendedList
+
+# Function to Reformat Phone Number and strip white space and extra char
+def ReformatPhoneNum(Phone):
+	Phone = str(Phone).strip()
+	Phone = str(Phone).replace('-','')
+	Phone = str(Phone).replace('(','')
+	Phone = str(Phone).replace(')','')
+	return Phone
+
+# Convert list item to string
+def ConvListToString(input):
+	for item in input:
+		return item
 # ---------------------------------------------------------------------------- #
 DoNotMailSet = set([
 	'inc', 'inc.', 'incorporated', 'international', 'corporation', 'corp', 
@@ -215,3 +239,4 @@ USStatesDict = {
 	'TX': 'Texas','UT': 'Utah','VA': 'Virginia','VI': 'Virgin Islands','VT': 'Vermont',
 	'WA': 'Washington','WI': 'Wisconsin','WV': 'West Virginia','WY': 'Wyoming'
 	}
+

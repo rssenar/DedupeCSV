@@ -103,52 +103,6 @@ try:
 except:
 	print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
 # ---------------------------------------------------------------------------- #
-# Function to Convert String To List
-def ConvertStringToList(input):
-	AppendedList = []
-	input = input.split('|')
-	for item in input:
-		item = item.strip()
-		item = str.lower(item)
-		AppendedList.append(item)
-	return AppendedList
-# ---------------------------------------------------------------------------- #
-# Function to Reformat Phone Number and strip white space and extra char
-def ReformatPhoneNum(Phone):
-	Phone = str(Phone).strip()
-	Phone = str(Phone).replace('-','')
-	Phone = str(Phone).replace('(','')
-	Phone = str(Phone).replace(')','')
-	return Phone
-# ---------------------------------------------------------------------------- #
-# Counter Function
-def GenCounter(record, DictCntr):
-	if str(record) not in DictCntr:
-		DictCntr[str(record)] = 1
-	else:
-		DictCntr[str(record)] += 1
-# ---------------------------------------------------------------------------- #
-# Function to Generate Percentage
-def percentage(part, whole):
-	if whole == 0:
-		return 0
-	else:
-		return 100 * float(part)/float(whole)
-# ---------------------------------------------------------------------------- #
-# Convert list item to string
-def ConvListToString(input):
-	for item in input:
-		return item
-# ---------------------------------------------------------------------------- #
-# Remove temporary files
-def Upkeep():
-	Files = glob.glob('*.csv')
-	for Record in Files:
-		if os.path.getsize(Record) == 0: # Empty files
-			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-			os.remove(Record)
-# ---------------------------------------------------------------------------- #
 # Print captured input file
 print('File Name ........................... : {}'.format(InputFile))
 CentralZip = input(
@@ -255,7 +209,7 @@ if SuppSelect == 'S':
 else:
 	CITYList =[]
 
-# Set TOP Percentage
+# Set TOPPercentage
 if SuppSelect == 'S':
 	TOPPercentage = input(
 		'Set Top % .......................[3%] : '
@@ -675,6 +629,12 @@ def NormalizeFunc():
 				line[MailDNQ] = 'dnq'
 						
 			# Generate COUNTERS
+			def GenCounter(record, DictCntr):
+				if str(record) not in DictCntr:
+					DictCntr[str(record)] = 1
+				else:
+					DictCntr[str(record)] += 1
+
 			CityRadius = '{} {} ({} Miles)'.format(
 				line[City],
 				line[Zip],
@@ -988,8 +948,8 @@ def OutputFileFunc():
 			))
 		for key, value in OdStateDictCounter.items():
 			StateRTotal = StateRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
-			RTotalPrcnt = percentage(StateRTotal, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
+			RTotalPrcnt = ConvPercentage(StateRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
@@ -1016,8 +976,8 @@ def OutputFileFunc():
 			))
 		for key, value in OdSCF3DFacilityCounter.items():
 			SCFFacilityRTotal = SCFFacilityRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
-			RTotalPrcnt = percentage(SCFFacilityRTotal, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
+			RTotalPrcnt = ConvPercentage(SCFFacilityRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
@@ -1043,8 +1003,8 @@ def OutputFileFunc():
 			))
 		for key, value in OdSCFDictCounter.items():
 			SCFRTotal = SCFRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
-			RTotalPrcnt = percentage(SCFRTotal, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
+			RTotalPrcnt = ConvPercentage(SCFRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				if len(str(key)) == 2:
 					print('|>|0{}|{}|{}%|{}|{}%|'.format(
@@ -1101,8 +1061,8 @@ def OutputFileFunc():
 				))
 			for key, value in OdYearDictCounter.items():
 				YearRTotal = YearRTotal + value
-				ValuePrcnt = percentage(value, SUBTotal)
-				RTotalPrcnt = percentage(YearRTotal, SUBTotal)
+				ValuePrcnt = ConvPercentage(value, SUBTotal)
+				RTotalPrcnt = ConvPercentage(YearRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
@@ -1129,8 +1089,8 @@ def OutputFileFunc():
 			))
 		for key, value in OdRadiusDictCounter.items():
 			RadiusRTotal = RadiusRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
-			RTotalPrcnt = percentage(RadiusRTotal, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
+			RTotalPrcnt = ConvPercentage(RadiusRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
 					key,
@@ -1158,8 +1118,8 @@ def OutputFileFunc():
 				))
 			for key, value in OdMakeDictCounter.items():
 				MakeRTotal = MakeRTotal + value
-				ValuePrcnt = percentage(value, SUBTotal)
-				RTotalPrcnt = percentage(MakeRTotal, SUBTotal)
+				ValuePrcnt = ConvPercentage(value, SUBTotal)
+				RTotalPrcnt = ConvPercentage(MakeRTotal, SUBTotal)
 				if ValuePrcnt > TOPPercentage:
 					print('|>|{}|{}|{}%|{}|{}%|'.format(
 						key,
@@ -1178,7 +1138,7 @@ def OutputFileFunc():
 			))
 		for key, value in OdCityDictCounter.items():
 			CityRTotal = CityRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				print('|>|{}|{}|{}%|{}|'.format(
 					key,
@@ -1195,8 +1155,8 @@ def OutputFileFunc():
 			))
 		for key, value in OdCityDictCounter.items():
 			CityRTotal = CityRTotal + value
-			ValuePrcnt = percentage(value, SUBTotal)
-			RTotalPrcnt = percentage(CityRTotal, SUBTotal)
+			ValuePrcnt = ConvPercentage(value, SUBTotal)
+			RTotalPrcnt = ConvPercentage(CityRTotal, SUBTotal)
 			if ValuePrcnt > TOPPercentage:
 				print('|>|{}|{}|{}%|{}|{}%|'.format(
 					key,
@@ -1218,7 +1178,13 @@ def OutputFileFunc():
 	print('=====  C  O  M  P  L  E  T  E  D  =====')
 	print('=======================================')
 	print()
-	Upkeep()
+	# Remove temporary files
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	ReMapFunc()
