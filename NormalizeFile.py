@@ -38,8 +38,8 @@ else:
 # ---------------------------------------------------------------------------- #
 # Select Input File from Database
 for file in CSVFile:
-	IPFName = file.strip('.csv')
-	InputFile = file
+	IPFName = file.strip('.csv') # Extract filename only w/o ext.
+	InputFile = file # Filename with ext.
 # ---------------------------------------------------------------------------- #
 # Import Drop Dictionary from Drop_File.csv file
 try:
@@ -52,7 +52,7 @@ try:
 except:
 	print('..... ERROR: Unable to Load Drop Dictionary File')
 # ---------------------------------------------------------------------------- #
-# Import General Suppression File
+# Import GENERAL Suppression File
 if SuppSelect == 'S':
 	try:
 		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
@@ -65,7 +65,7 @@ if SuppSelect == 'S':
 else:
 	print('... General Suppression File Not Loaded')
 # ---------------------------------------------------------------------------- #
-# Import Montly Suppression File
+# Import MONTHLY Suppression File
 if SuppSelect == 'S':
 	try:
 		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
@@ -248,9 +248,9 @@ else:
 	VendorSelect = ''
 input('       PRESS [ENTER] TO PROCEED        ')
 # ---------------------------------------------------------------------------- #
-ReMappedOutput = '>>>>>>>>>> Re-Mapped <<<<<<<<<<.csv'
-Dupes = '>>>>>>>>>> Dupes <<<<<<<<<<.csv'
-MDNQ = '>>>>>>>>>> M-DNQ <<<<<<<<<<.csv'
+ReMappedOutput = '>>>>>> Re-Mapped <<<<<<.csv'
+Dupes = '>>>>>> Dupes <<<<<<.csv'
+MDNQ = '>>>>>> M-DNQ <<<<<<.csv'
 CleanOutput = '{}_UpdatedOutputMain.csv'.format(IPFName)
 AppendMonthlySuppFile = '{}_AddMonthlySuppression.csv'.format(IPFName)
 CleanOutputPhones = '{}_PHONES.csv'.format(IPFName)
