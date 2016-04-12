@@ -1,9 +1,8 @@
 
 #!/usr/bin/env python3.4.3
 # ---------------------------------------------------------------------------- #
-import csv, os, sys, glob, re, collections, datetime, subprocess
+import csv, os, sys, glob, re, collections, datetime, subprocess, Constants
 from dateutil.parser import *
-import Constants
 from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
@@ -779,10 +778,6 @@ def NormalizeFunc():
 					'City',
 					'State',
 					'Zip',
-					#'Phone',
-					#'Year',
-					#'Make',
-					#'Model',
 					'Winning Number',
 					'Position'
 					]
@@ -794,10 +789,6 @@ def NormalizeFunc():
 					line[Constants.City],
 					line[Constants.State],
 					line[Constants.Zip],
-					#line[Constants.Phone],
-					#line[Constants.Year],
-					#line[Constants.Make],
-					#line[Constants.Model],
 					line[Constants.WinningNum],
 					line[Constants.Drop]
 					)
