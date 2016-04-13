@@ -251,7 +251,7 @@ else:
 # Set Constants.Vendor Selection
 if SuppSelect == 'S':
 	VendorSelect = str.upper(input(
-		'....... (S)hopper | (P)latinum .......'
+		'....... (S)hopper | (P)latinum ....... '
 		).strip())
 else:
 	VendorSelect = ''
