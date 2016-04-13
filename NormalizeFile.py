@@ -626,6 +626,21 @@ def NormalizeFunc():
 			if CleanName in Constants.CommonHispLastNameList:
 				line[Constants.Ethnicity] = 'Hisp'
 
+			# Set Adjusted KBB Value
+			if line[Constants.KBB] != '':
+				try:
+					line[Constants.KBB] = int(line[Constants.KBB])
+					if (line[Constants.KBB] * 1.2) < 3150:
+						line[Constants.AdjustedKBBValue] = '${:,}'.format(3150)
+					elif (line[Constants.KBB] * 1.2) > (line[Constants.KBB] + 4000):
+						AdjKBB = int(line[Constants.KBB] + 4000)
+						line[Constants.AdjustedKBBValue] = '${:,}'.format(AdjKBB)
+					else:
+						AdjKBB = int(line[Constants.KBB] * 1.2)
+						line[Constants.AdjustedKBBValue] = '${:,}'.format(AdjKBB)
+				except:
+					line[Constants.MailDNQ] = 'dnq'
+
 			# Dedupe againts suppression files
 			if str.lower(line[Constants.FirstName]) in Constants.DoNotMailSet or\
 			str.lower(line[Constants.MI]) in Constants.DoNotMailSet or\
@@ -778,6 +793,12 @@ def NormalizeFunc():
 					'City',
 					'State',
 					'Zip',
+					'4Zip',
+					'VIN',
+					'Year',
+					'Make',
+					'Model',
+					'Buyback_Value',
 					'Winning Number',
 					'Position'
 					]
@@ -789,6 +810,12 @@ def NormalizeFunc():
 					line[Constants.City],
 					line[Constants.State],
 					line[Constants.Zip],
+					line[Constants.Zip4],
+					line[Constants.VIN],
+					line[Constants.Year],
+					line[Constants.Make],
+					line[Constants.Model],
+					line[Constants.AdjustedKBBValue],
 					line[Constants.WinningNum],
 					line[Constants.Drop]
 					)
@@ -812,6 +839,11 @@ def NormalizeFunc():
 					'State',
 					'Zip',
 					'4Zip',
+					'VIN',
+					'Year',
+					'Make',
+					'Model',
+					'Buyback_Value',
 					'DSF_WALK_SEQ',
 					'CRRT',
 					'Winning Number',
@@ -826,6 +858,11 @@ def NormalizeFunc():
 					line[Constants.State],
 					line[Constants.Zip],
 					line[Constants.Zip4],
+					line[Constants.VIN],
+					line[Constants.Year],
+					line[Constants.Make],
+					line[Constants.Model],
+					line[Constants.AdjustedKBBValue],
 					line[Constants.DSF_WALK_SEQ],
 					line[Constants.CRRT],
 					line[Constants.WinningNum],
@@ -849,8 +886,13 @@ def NormalizeFunc():
 					'Address1',
 					'City',
 					'State',
-					'Zip',
+					'Zip',					
 					'4Zip',
+					'VIN',
+					'Year',
+					'Make',
+					'Model',
+					'Buyback_Value',
 					'CRRT',
 					'DSF_WALK_SEQ',
 					'Customer ID',
@@ -865,6 +907,11 @@ def NormalizeFunc():
 					line[Constants.State],
 					line[Constants.Zip],
 					line[Constants.Zip4],
+					line[Constants.VIN],
+					line[Constants.Year],
+					line[Constants.Make],
+					line[Constants.Model],
+					line[Constants.AdjustedKBBValue],
 					line[Constants.CRRT],
 					line[Constants.DSF_WALK_SEQ],
 					line[Constants.CustomerID],

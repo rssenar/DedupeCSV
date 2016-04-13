@@ -39,7 +39,7 @@ DSF_WALK_SEQ = 27
 CRRT = 28
 ZipCRRT = 29
 KBB = 30
-BuybackValues = 31
+AdjustedKBBValue = 31
 WinningNum = 32
 MailDNQ = 33
 BlitzDNQ = 34
@@ -86,7 +86,7 @@ HeaderRowMain = [
 	'Crrt',
 	'ZipCrrt',
 	'KBB',
-	'BuybackValue',
+	'Buyback_Value',
 	'WinningNumber',
 	'MailDNQ',
 	'BlitzDNQ',
@@ -156,8 +156,6 @@ def MatchHeaderFields(field, index):
 		HeaderReMapDict[CRRT] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
 		HeaderReMapDict[KBB] = 'line[{}]'.format(str(index))
-	elif bool(re.search(r'\bbuybackvalue\b',field,flags=re.I)):
-		HeaderReMapDict[BuybackValues] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
 		HeaderReMapDict[PURL] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):
@@ -211,14 +209,17 @@ DoNotMailSet = set([
 	'incorporated',
 	'international',
 	'corporation',
+	'corporations',
 	'corp',
 	'corp.',
 	'construction',
+	'constructions',
 	'const',
 	'const.',
 	'prof',
 	'prof.',
 	'professional',
+	'professionals',
 	'service',
 	'services',
 	'consultancy',
@@ -226,27 +227,35 @@ DoNotMailSet = set([
 	'consultants',
 	'living',
 	'trust',
+	'trusts',
 	'llc',
 	'enterprise',
 	'enterprises',
 	'infrastructure',
+	'infrastructures',
 	'the',
 	'resource',
 	'resources',
 	'cooperative',
 	'cooperatives',
 	'comp',
+	'comp.',
 	'company',
 	'companies',
 	'store',
+	'stores',
 	'dealer',
 	'dealers',
 	'dealership',
 	'dealerships',
 	'fleet',
 	'office',
+	'offices',
 	'station',
+	'stations',
 	'health',
+	'partner',
+	'partners',
 	'acura',
 	'am general',
 	'audi',
@@ -295,8 +304,11 @@ DoNotMailSet = set([
 	'volkswagen',
 	'volvo',
 	'auto',
+	'autos',
 	'automotive',
+	'automotives',
 	'group'
+	'groups'
 	])
 
 YearDecodeDict = dict([
