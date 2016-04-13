@@ -201,7 +201,6 @@ def StripAndCleanName(Name):
 def ConvListToString(input):
 	for item in input:
 		return item
-
 # ---------------------------------------------------------------------------- #
 DoNotMailSet = set([
 	'inc',

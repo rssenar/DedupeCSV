@@ -19,12 +19,22 @@ Entries = set()
 # ---------------------------------------------------------------------------- #
 # Select processing Mode
 SuppSelect = str.upper(input(
-	'Select Mode... (B)asic | (S)tandard: '
+	'Select Mode.,,.. (B)asic    | (S)tandard: '
 	))
 while SuppSelect != 'S' and SuppSelect != 'B':
 	SuppSelect = str.upper(input(
 		'ERROR! Enter Valid Selection... : '
 		))
+
+# Select Source Mode
+SourceSelect = str.upper(input(
+	'Select Source... (D)atabase | (P)urchase: '
+	))
+while SourceSelect != 'D' and SourceSelect != 'P':
+	SourceSelect = str.upper(input(
+		'ERROR! Enter Valid Selection... : '
+		))
+
 if SuppSelect == 'B':
 	print('=======================================')
 	print('             B  A  S  I  C             ')
@@ -112,7 +122,7 @@ while str(CentralZip) not in ZipCoordinateDict:
 		'ERROR: Enter Zip Codes............... : '
 		).strip()
 
-# Capture Input - Max Constants.Radius
+# Capture Input - Max Radius
 if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
@@ -123,7 +133,7 @@ if SuppSelect == 'S':
 else:
 	MaxRadius = 9999
 
-# Capture Input - Max Constants.Year
+# Capture Input - Max Year
 if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
@@ -134,7 +144,7 @@ if SuppSelect == 'S':
 else:
 	MaxYear = 9999
 
-# Capture Input - Min Constants.Year
+# Capture Input - Min Year
 if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
@@ -145,7 +155,7 @@ if SuppSelect == 'S':
 else:
 	MinYear = 1
 
-# Capture Input - Max SALE Constants.Year
+# Capture Input - Max SALE Year
 if SuppSelect == 'S':
 	try:
 		MaxSaleYear = int(input(
@@ -156,7 +166,7 @@ if SuppSelect == 'S':
 else:
 	MaxSaleYear = 9999
 
-# Generate Suppress Constants.State List
+# Generate Suppress State List
 if SuppSelect == 'S':
 	STATEList = input(
 		'Enter Suppression List .......[State] : '
@@ -169,7 +179,7 @@ if SuppSelect == 'S':
 else:
 	STATEList = []
 
-# Generate Suppress Constants.SCF List
+# Generate Suppress SCF List
 if SuppSelect == 'S':
 	SCFList = input(
 		'Enter Suppression List .........[SCF] : '
@@ -182,7 +192,7 @@ if SuppSelect == 'S':
 else:
 	SCFList = []
 
-# Generate Suppress Constants.Year List
+# Generate Suppress Year List
 if SuppSelect == 'S':
 	YEARList = input(
 		'Enter Suppression List ........[Year] : '
@@ -195,7 +205,7 @@ if SuppSelect == 'S':
 else:
 	YEARList = []
 
-# Generate Suppress Constants.City List
+# Generate Suppress City List
 if SuppSelect == 'S':
 	CITYList = input(
 		'Enter Suppression List ........[City] : '
@@ -384,7 +394,7 @@ def NormalizeFunc():
 			line[Constants.WinningNum] = WinningNumber
 			VendorSelected = line[Constants.Vendor] 
 			
-			# Parse Constants.FullName if First & Last Name fields are missing
+			# Parse FullName if First & Last Name fields are missing
 			if line[Constants.FullName] != '' and \
 			line[Constants.FirstName] == '' and line[Constants.LastName] == '':
 				try:
@@ -395,13 +405,13 @@ def NormalizeFunc():
 				except:
 					line[Constants.FullName] = ''
 			
-			# Parse Constants.Zip to Constants.Zip & Constants.Zip4 components (when possible)
+			# Parse Zip to Zip & Zip4 components (when possible)
 			if len(str(line[Constants.Zip])) > 5 and (str(line[Constants.Zip]).find('-') == 5):
 				FullZip = line[Constants.Zip].split('-')
 				line[Constants.Zip] = FullZip[0]
 				line[Constants.Zip4] = FullZip[1]
 			
-			# Combine Constants.Zip + Constants.CRRT fields
+			# Combine Zip + CRRT fields
 			if line[Constants.Zip] != '' and line[Constants.CRRT] != '':
 				if len(str(line[Constants.Zip])) < 5:
 					line[Constants.ZipCRRT] = '0{}{}'.format(
@@ -414,7 +424,7 @@ def NormalizeFunc():
 						line[Constants.CRRT]
 						)
 			
-			# Combine Constants.Address1 + Constants.Address2
+			# Combine Address1 + Address2
 			if line[Constants.AddressComb] == '' and\
 			line[Constants.Address1] != '' and\
 			line[Constants.Address2] != '':
@@ -427,11 +437,11 @@ def NormalizeFunc():
 			else:
 				line[Constants.AddressComb] = str.title(line[Constants.AddressComb])
 			
-			# Expand Abreviated Constants.State
+			# Expand Abreviated State
 			if str.upper(line[Constants.State]) in Constants.USStatesDict:
 				line[Constants.ExpState] = Constants.USStatesDict[str.upper(line[Constants.State])]
 
-			# Set Constants.Drop Index from Constants.Drop Dictionary and Set Customer ID	
+			# Set Drop Index from Drop Dictionary and Set CustomerID	
 			if line[Constants.PURL] == '':
 				if str(line[Constants.ZipCRRT]) in DropDict:
 					line[Constants.Drop] = DropDict[str(line[Constants.ZipCRRT])]
@@ -449,14 +459,14 @@ def NormalizeFunc():
 							)
 						Constants.SeqNumPurchaseN += 1
 						NickelCounter += 1
-				elif line[Constants.DSF_WALK_SEQ] == '':
+				elif SourceSelect == 'D':
 					line[Constants.Drop] = 'D'
 					line[Constants.CustomerID] = 'D{}'.format(
 						str(Constants.SeqNumDatabase)
 						)
 					Constants.SeqNumDatabase += 1
 					DatabaseCounter += 1
-				elif line[Constants.DSF_WALK_SEQ] != '':
+				elif SourceSelect == 'P':
 					line[Constants.Drop] = 'A'
 					line[Constants.CustomerID] = 'A{}'.format(
 						str(Constants.SeqNumPurchase)
@@ -784,7 +794,7 @@ def NormalizeFunc():
 					MonthlySupp.writerow(HeaderRowSuppressionOutput)
 			
 			# Output Database File
-			if line[Constants.DSF_WALK_SEQ] == '' and line[Constants.PURL] == '':
+			if SourceSelect == 'D' and line[Constants.PURL] == '':
 				HeaderRowDatabaseStat = [
 					'CustomerID',
 					'FirstName',
@@ -829,7 +839,7 @@ def NormalizeFunc():
 					OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
 			
 			# Output Purchase File
-			elif line[Constants.DSF_WALK_SEQ] != '' and line[Constants.PURL] == '':
+			elif SourceSelect == 'P' and line[Constants.PURL] == '':
 				HeaderRowPurchaseStat = [
 					'CustomerID',
 					'FirstName',
