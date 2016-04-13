@@ -676,7 +676,7 @@ def NormalizeFunc():
 			GenCounter(line[Constants.SCF3DFacility],SCF3DFacilityCounter)
 			GenCounter(ZipRadius,ZipCounter)
 			
-			# OUTPUT Generate Constants.Phone File
+			# OUTPUT Generate Phone File
 			if line[Constants.Phone] != '' and\
 			line[Constants.BlitzDNQ] != 'dnq' and\
 			line[Constants.MailDNQ] != 'dnq':
