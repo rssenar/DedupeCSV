@@ -62,13 +62,13 @@ def ReformatOutputReport():
 				if int(Row[Records]) >= 135: 
 					Row[dfo] = round(float(Row[dfo]),1)
 					Row[Percentage] = round(ConvPercentage(Row[Records],Row[total]),0)
-					Row[RTotal] = '=SUM($D$2:$D{})'.format(RowCounter)
+					Row[RTotal] = '=SUM($C$2:$C{})'.format(RowCounter)
 					if int(Row[Percentage]) >= 74:
 						Row[AdjRec] = round(float(Row[total]) * 0.73,0)
 					else:
 						Row[AdjRec] = Row[Records]
 					Row[AdjRecPerc] = round(ConvPercentage(Row[AdjRec],Row[total]),0)
-					Row[RecRTotal] = '=SUM($I$2:$I{})'.format(RowCounter)
+					Row[RecRTotal] = '=SUM($H$2:$H{})'.format(RowCounter)
 					Output.writerow(Row)
 					RowCounter += 1
 # ---------------------------------------------------------------------------- #
