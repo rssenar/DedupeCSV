@@ -126,10 +126,10 @@ while str(CentralZip) not in ZipCoordinateDict:
 if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
-			'Enter MAX Radius ................[50] : '
+			'Enter MAX Radius ...............[100] : '
 			).strip())
 	except:
-		MaxRadius = 50
+		MaxRadius = 100
 else:
 	MaxRadius = 9999
 
@@ -137,10 +137,10 @@ else:
 if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
-			'Enter MAX Year ................[2014] : '
+			'Enter MAX Year ................[2015] : '
 			).strip())
 	except:
-		MaxYear = 2014
+		MaxYear = 2015
 else:
 	MaxYear = 9999
 
@@ -148,10 +148,10 @@ else:
 if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
-			'Enter MIN Year ................[1990] : '
+			'Enter MIN Year ................[1900] : '
 			).strip())
 	except:
-		MinYear = 1990
+		MinYear = 1900
 else:
 	MinYear = 1
 
