@@ -45,12 +45,17 @@ else:
 	print('         S  T  A  N  D  A  R  D        ')
 	print('=======================================')
 # ---------------------------------------------------------------------------- #
-# Select Input File from Database
+# Select Input File from Desktop
 for file in CSVFile:
 	IPFName = file.strip('.csv') # Extract filename only w/o ext.
 	InputFile = file # Filename with ext.
 # ---------------------------------------------------------------------------- #
-# Import Constants.Drop Dictionary from Drop_File.csv file
+# Import DoNotMailSet for Constants.py for the purposes of de-duping
+if SuppSelect != 'S':
+	Constants.DoNotMailSet = set()
+	print('.............. Mail DNQ File Not Loaded')
+# ---------------------------------------------------------------------------- #
+# Import DropFile.csv file
 try:
 	DropDict = {}
 	with open(DropFile,'rU') as DropFile:
@@ -61,7 +66,7 @@ try:
 except:
 	print('..... ERROR: Unable to Load Drop Dictionary File')
 # ---------------------------------------------------------------------------- #
-# Import GENERAL Suppression File
+# Import GeneralSuppression.csv file
 if SuppSelect == 'S':
 	try:
 		with open(GenSuppressionFile,'rU') as GenSuppressionFile:
@@ -74,7 +79,7 @@ if SuppSelect == 'S':
 else:
 	print('... General Suppression File Not Loaded')
 # ---------------------------------------------------------------------------- #
-# Import MONTHLY Suppression File
+# Import MonthlySuppression.csv file
 if SuppSelect == 'S':
 	try:
 		with open(MonthlySuppressionFile,'rU') as MonthlySuppressionFile:
@@ -87,7 +92,7 @@ if SuppSelect == 'S':
 else:
 	print('... Monthly Suppression File Not Loaded')
 # ---------------------------------------------------------------------------- #
-# Import Zip Dictionary from US_ZIP_Coordinates.csv file
+# Import USZIPCoordinates.csv file
 try:
 	ZipCoordinateDict = {}
 	with open(ZipCoordFile,'rU') as ZipCoord:
@@ -97,12 +102,7 @@ try:
 except:
 	print('..... ERROR: Unable to Load Zip Dictionary File')
 # ---------------------------------------------------------------------------- #
-# Import Mail DNQ File for the purposes of de-duping
-if SuppSelect != 'S':
-	Constants.DoNotMailSet = set()
-	print('.............. Mail DNQ File Not Loaded')
-# ---------------------------------------------------------------------------- #
-# Import SCF Dictionary from Constants.SCF Facilities.csv file
+# Import SCFFacilites.csv file
 try:
 	SCF3DigitDict = {}
 	with open(SCF3DigitFile,'rU') as SCF3DigitFile:
@@ -122,7 +122,7 @@ while str(CentralZip) not in ZipCoordinateDict:
 		'ERROR: Enter Zip Codes............... : '
 		).strip()
 
-# Capture Input - Max Radius
+# Capture Input (Max Radius)
 if SuppSelect == 'S':
 	try:
 		MaxRadius = int(input(
@@ -133,7 +133,7 @@ if SuppSelect == 'S':
 else:
 	MaxRadius = 9999
 
-# Capture Input - Max Year
+# Capture Input (Max Year)
 if SuppSelect == 'S':
 	try:
 		MaxYear = int(input(
@@ -144,7 +144,7 @@ if SuppSelect == 'S':
 else:
 	MaxYear = 9999
 
-# Capture Input - Min Year
+# Capture Input (Min Year)
 if SuppSelect == 'S':
 	try:
 		MinYear = int(input(
@@ -155,7 +155,7 @@ if SuppSelect == 'S':
 else:
 	MinYear = 1
 
-# Capture Input - Max SALE Year
+# Capture Input (Max SALE Year)
 if SuppSelect == 'S':
 	try:
 		MaxSaleYear = int(input(
@@ -166,7 +166,7 @@ if SuppSelect == 'S':
 else:
 	MaxSaleYear = 9999
 
-# Generate Suppress State List
+# Capture Suppress State List
 if SuppSelect == 'S':
 	STATEList = input(
 		'Enter Suppression List .......[State] : '
@@ -179,7 +179,7 @@ if SuppSelect == 'S':
 else:
 	STATEList = []
 
-# Generate Suppress SCF List
+# Capture Suppress SCF List
 if SuppSelect == 'S':
 	SCFList = input(
 		'Enter Suppression List .........[SCF] : '
@@ -192,7 +192,7 @@ if SuppSelect == 'S':
 else:
 	SCFList = []
 
-# Generate Suppress Year List
+# Capture Suppress Year List
 if SuppSelect == 'S':
 	YEARList = input(
 		'Enter Suppression List ........[Year] : '
@@ -205,7 +205,7 @@ if SuppSelect == 'S':
 else:
 	YEARList = []
 
-# Generate Suppress City List
+# Capture Suppress City List
 if SuppSelect == 'S':
 	CITYList = input(
 		'Enter Suppression List ........[City] : '
@@ -221,12 +221,12 @@ else:
 # Set TOPPercentage
 if SuppSelect == 'S':
 	TOPPercentage = input(
-		'Set Top % .......................[3%] : '
+		'Set Top % .......................[2%] : '
 		).strip()
 	try:
 		TOPPercentage = int(TOPPercentage)
 	except:
-		TOPPercentage = 3
+		TOPPercentage = 2
 else:
 	TOPPercentage = 0
 
