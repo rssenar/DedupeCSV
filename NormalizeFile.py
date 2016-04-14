@@ -112,7 +112,7 @@ try:
 except:
 	print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
 # ---------------------------------------------------------------------------- #
-# Print captured input file
+# Print captured Input file
 print('File Name ........................... : {}'.format(InputFile))
 CentralZip = input(
 	'Enter Central Zip Code .............. : '
@@ -230,7 +230,7 @@ if SuppSelect == 'S':
 else:
 	TOPPercentage = 0
 
-# Import LOCAL Suppression File for the purposes of de-duping
+# Import Local Suppression File for the purposes of de-duping
 SuppressionFileName = input(
 	'Enter Suppression File Name ......... : '
 	).strip()
@@ -255,7 +255,9 @@ if SuppSelect == 'S':
 		).strip())
 else:
 	VendorSelect = ''
+print()
 input('       PRESS [ENTER] TO PROCEED        ')
+print()
 # ---------------------------------------------------------------------------- #
 ReMappedOutput = '>>>>>> Re-Mapped <<<<<<.csv'
 Dupes = '>>>>>> Dupes <<<<<<.csv'
