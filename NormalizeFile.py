@@ -1237,13 +1237,7 @@ def OutputFileFunc():
 	print('       C  O  M  P  L  E  T  E  D       ')
 	print('=======================================')
 	print()
-	# Remove temporary files
-	Files = glob.glob('*.csv')
-	for Record in Files:
-		if os.path.getsize(Record) == 0: # Empty files
-			os.remove(Record)
-		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
-			os.remove(Record)
+	Constants.Upkeep()
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
 	ReMapFunc()

@@ -1,6 +1,6 @@
 
 #!/usr/bin/env python3.4.3
-import re
+import os, re, glob
 # ---------------------------------------------------------------------------- #
 # Set Constant Variables
 SeqNumDatabase = 10000
@@ -201,6 +201,15 @@ def StripAndCleanName(Name):
 def ConvListToString(input):
 	for item in input:
 		return item
+
+# Remove temporary files
+def Upkeep():
+	Files = glob.glob('*.csv')
+	for Record in Files:
+		if os.path.getsize(Record) == 0: # Empty files
+			os.remove(Record)
+		if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
+			os.remove(Record)
 # ---------------------------------------------------------------------------- #
 DoNotMailSet = set([
 	'inc',
