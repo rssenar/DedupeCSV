@@ -1234,7 +1234,7 @@ def OutputFileFunc():
 					))
 		sys.stdout = Report
 	print('================ TOTAL ================ : {}'.format(GrandTotal))
-	print('=====  C  O  M  P  L  E  T  E  D  =====')
+	print('       C  O  M  P  L  E  T  E  D       ')
 	print('=======================================')
 	print()
 	# Remove temporary files
