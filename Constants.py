@@ -103,6 +103,8 @@ HeaderRowMain = [
 # ---------------------------------------------------------------------------- #
 HeaderReMapDict = {}
 def MatchHeaderFields(field, index):
+	if bool(re.search('cust.+id',field,flags=re.I)):
+		HeaderReMapDict[CustomerID] = 'line[{}]'.format(str(index))
 	if bool(re.search('ful.+me',field,flags=re.I)):
 		HeaderReMapDict[FullName] = 'line[{}]'.format(str(index))
 	elif bool(re.search('fir.+me',field,flags=re.I)):
@@ -156,6 +158,9 @@ def MatchHeaderFields(field, index):
 		HeaderReMapDict[CRRT] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bkbb\b',field,flags=re.I)):
 		HeaderReMapDict[KBB] = 'line[{}]'.format(str(index))
+	elif bool(re.search(r'\bdrop\b',field,flags=re.I)) or\
+	bool(re.search(r'\bposition\b',field,flags=re.I)):
+		HeaderReMapDict[Drop] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bpurl\b',field,flags=re.I)):
 		HeaderReMapDict[PURL] = 'line[{}]'.format(str(index))
 	elif bool(re.search(r'\bmisc1\b',field,flags=re.I)):

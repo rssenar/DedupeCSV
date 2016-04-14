@@ -798,7 +798,7 @@ def NormalizeFunc():
 			# Output Database File
 			if SourceSelect == 'D' and line[Constants.PURL] == '':
 				HeaderRowDatabaseStat = [
-					'CustomerID',
+					'Customer ID',
 					'FirstName',
 					'LastName',
 					'Address',
@@ -843,7 +843,7 @@ def NormalizeFunc():
 			# Output Purchase File
 			elif SourceSelect == 'P' and line[Constants.PURL] == '':
 				HeaderRowPurchaseStat = [
-					'CustomerID',
+					'Customer ID',
 					'FirstName',
 					'LastName',
 					'Address',
@@ -857,7 +857,7 @@ def NormalizeFunc():
 					'Model',
 					'Buyback_Value',
 					'DSF_WALK_SEQ',
-					'CRRT',
+					'Crrt',
 					'Winning Number',
 					'Position'
 					]
@@ -905,7 +905,7 @@ def NormalizeFunc():
 					'Make',
 					'Model',
 					'Buyback_Value',
-					'CRRT',
+					'Crrt',
 					'DSF_WALK_SEQ',
 					'Customer ID',
 					'Position'
