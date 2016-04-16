@@ -4,7 +4,6 @@
 import os, glob, sqlite3, subprocess, Constants
 import pandas as pd
 from pandas.io import sql
-from Constants import HeaderRowMain
 from tqdm import tqdm
 # ---------------------------------------------------------------------------- #
 os.chdir('../../../../Desktop/')
