@@ -1,5 +1,6 @@
 # Git Ignore File
 
+test.py
 .DS_Store
 *.txt
 *.zip
