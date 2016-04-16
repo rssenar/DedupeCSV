@@ -13,13 +13,13 @@ NewName = input('Enter New Name ................ : ').strip()
 FileType = input('Enter File Type (.jpg|.xls) ... : ').strip()
 # ---------------------------------------------------------------------------- #
 def RenameFiles():
-	SeqNum = 1
-	Files = glob.glob('*{}'.format(FileType))
-	for Record in Files:
-		FileDate = time.strftime('%Y-%d-%m', time.gmtime(os.path.getmtime(Record)))
-		NewFileName = '{}_{}_{}{}'.format(NewName, FileDate, str(SeqNum).zfill(6), FileType)
-		os.rename(Record, NewFileName)
-		SeqNum += 1
+  SeqNum = 1
+  Files = glob.glob('*{}'.format(FileType))
+  for Record in Files:
+    FileDate = time.strftime('%Y-%d-%m', time.gmtime(os.path.getmtime(Record)))
+    NewFileName = '{}_{}_{}{}'.format(NewName, FileDate, str(SeqNum).zfill(6), FileType)
+    os.rename(Record, NewFileName)
+    SeqNum += 1
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
-	RenameFiles()
+  RenameFiles()
