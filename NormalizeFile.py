@@ -249,14 +249,14 @@ def ReMapFunc():
       FirstLine = True
       for line in tqdm(Input):
         if FirstLine:
-          for IndexA in range(0,len(line)):
-            Constants.MatchHeaderFields(line[IndexA], IndexA)
+          for OrigHRIndex in range(0,len(line)):
+            Constants.MatchHeaderFields(line[OrigHRIndex], OrigHRIndex)
           FirstLine = False
         else:
           newline = []
-          for IndexB in range(0,len(Constants.HeaderRowMain)):
-            if IndexB in Constants.HeaderReMapDict:
-              newline.append(eval(Constants.HeaderReMapDict[IndexB]))
+          for NewHRIndex in range(0,len(Constants.HeaderRowMain)):
+            if NewHRIndex in Constants.HeaderReMapDict:
+              newline.append(eval(Constants.HeaderReMapDict[NewHRIndex]))
             else:
               newline.append('')
           Output.writerow(newline)
@@ -352,7 +352,8 @@ def NormalizeFunc():
       VendorSelected = line[Constants.Vendor]
       # Parse FullName if First & Last Name fields are missing
       if line[Constants.FullName] != '' and \
-      line[Constants.FirstName] == '' and line[Constants.LastName] == '':
+      line[Constants.FirstName] == '' and\
+      line[Constants.LastName] == '':
         try:
           ParsedFName = HumanName(str.title(line[Constants.FullName]))
           line[Constants.FirstName] = ParsedFName.first
@@ -361,12 +362,14 @@ def NormalizeFunc():
         except:
           line[Constants.FullName] = ''
       # Parse Zip to Zip & Zip4 components (when possible)
-      if len(str(line[Constants.Zip])) > 5 and (str(line[Constants.Zip]).find('-') == 5):
+      if len(str(line[Constants.Zip])) > 5 and\
+      (str(line[Constants.Zip]).find('-') == 5):
         FullZip = line[Constants.Zip].split('-')
         line[Constants.Zip] = FullZip[0]
         line[Constants.Zip4] = FullZip[1]
       # Combine Zip + CRRT fields
-      if line[Constants.Zip] != '' and line[Constants.CRRT] != '':
+      if line[Constants.Zip] != '' and\
+      line[Constants.CRRT] != '':
         if len(str(line[Constants.Zip])) < 5:
           line[Constants.ZipCRRT] = '0{}{}'.format(
             line[Constants.Zip],
@@ -385,7 +388,8 @@ def NormalizeFunc():
           str.title(line[Constants.Address1]),
           str.title(line[Constants.Address2])
           )
-      elif line[Constants.Address1] != '' and line[Constants.Address2] == '':
+      elif line[Constants.Address1] != '' and\
+      line[Constants.Address2] == '':
         line[Constants.AddressComb] = str.title(line[Constants.Address1])
       else:
         line[Constants.AddressComb] = str.title(line[Constants.AddressComb])
@@ -396,15 +400,19 @@ def NormalizeFunc():
       if line[Constants.PURL] == '':
         if str(line[Constants.ZipCRRT]) in DropDict:
           line[Constants.Drop] = DropDict[str(line[Constants.ZipCRRT])]
-          if line[Constants.Drop] == 'P' or line[Constants.Drop] == 'Penny' or\
-          line[Constants.Drop] == 'p' or line[Constants.Drop] == 'penny':
+          if line[Constants.Drop] == 'P' or\
+          line[Constants.Drop] == 'Penny' or\
+          line[Constants.Drop] == 'p' or\
+          line[Constants.Drop] == 'penny':
             line[Constants.CustomerID] = 'P{}'.format(
               str(Constants.SeqNumPurchaseP)
               )
             Constants.SeqNumPurchaseP += 1
             PennyCounter += 1
-          elif line[Constants.Drop] == 'N' or line[Constants.Drop] == 'Nickel' or\
-          line[Constants.Drop] == 'n' or line[Constants.Drop] == 'nickel':
+          elif line[Constants.Drop] == 'N' or\
+          line[Constants.Drop] == 'Nickel' or\
+          line[Constants.Drop] == 'n' or\
+          line[Constants.Drop] == 'nickel':
             line[Constants.CustomerID] = 'N{}'.format(
               str(Constants.SeqNumPurchaseN)
               )
@@ -425,22 +433,29 @@ def NormalizeFunc():
           Constants.SeqNumPurchase += 1
           PurchaseCounter += 1
       else:
-        if line[Constants.Drop] == 'P' or line[Constants.Drop] == 'Penny' or\
-        line[Constants.Drop] == 'p' or line[Constants.Drop] == 'penny':
+        if line[Constants.Drop] == 'P' or\
+        line[Constants.Drop] == 'Penny' or\
+        line[Constants.Drop] == 'p' or\
+        line[Constants.Drop] == 'penny':
           PennyCounter += 1
-        elif line[Constants.Drop] == 'N' or line[Constants.Drop] == 'Nickel' or\
-        line[Constants.Drop] == 'n' or line[Constants.Drop] == 'nickel':
+        elif line[Constants.Drop] == 'N' or\
+        line[Constants.Drop] == 'Nickel' or\
+        line[Constants.Drop] == 'n' or\
+        line[Constants.Drop] == 'nickel':
           NickelCounter += 1
         elif line[Constants.Drop] == 'D':
           DatabaseCounter += 1
         elif line[Constants.Drop] == 'A':
           PurchaseCounter += 1
       # Parse & Clean up Constants.Phone #
-      if line[Constants.MPhone] != '' and len(str(line[Constants.MPhone])) > 6:
+      if line[Constants.MPhone] != '' and\
+      len(str(line[Constants.MPhone])) > 6:
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.MPhone])
-      elif line[Constants.HPhone] != '' and len(str(line[Constants.HPhone])) > 6:
+      elif line[Constants.HPhone] != '' and\
+      len(str(line[Constants.HPhone])) > 6:
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.HPhone])
-      elif line[Constants.WPhone] != '' and len(str(line[Constants.WPhone])) > 6:
+      elif line[Constants.WPhone] != '' and\
+      len(str(line[Constants.WPhone])) > 6:
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.WPhone])
       else:
         line[Constants.Phone] = ''
@@ -503,9 +518,10 @@ def NormalizeFunc():
       except:
         line[Constants.Zip] = 9999
       # Remove Leading 0 from Constants.Zip Code
-      if str(line[Constants.Zip])[:1] == 0 and len(str(line[Constants.Zip])) == 4:
+      if str(line[Constants.Zip])[:1] == 0 and\
+      len(str(line[Constants.Zip])) == 4:
         line[Constants.Zip] = line[Constants.Zip][-4:]
-      # Set Long & Lat Constants.Coordinates for Central Constants.Zip Code and Constants.Zip Code
+      # Set Long & Lat Coordinates for Central Zip Code and Zip Code
       OriginZipCoord = ZipCoordinateDict[str(CentralZip)]
       if str(line[Constants.Zip]) in ZipCoordinateDict:
         line[Constants.Coordinates] = ZipCoordinateDict[str(line[Constants.Zip])]
@@ -527,12 +543,14 @@ def NormalizeFunc():
         line[Constants.Date] = ''
       # Apply "Blitz-DNQ" Parameters
       try:
-        if len(str(line[Constants.Phone])) < 8 and len(str(line[Constants.VIN])) < 17:
+        if len(str(line[Constants.Phone])) < 8 and\
+        len(str(line[Constants.VIN])) < 17:
           line[Constants.BlitzDNQ] = 'dnq'
       except:
         line[Constants.BlitzDNQ] = ''
       # Apply Universal MAIL-DNQ Parameters
-      if line[Constants.FirstName] == '' or line[Constants.LastName] == '' or\
+      if line[Constants.FirstName] == '' or\
+      line[Constants.LastName] == '' or\
       (line[Constants.Address1] == '' and line[Constants.Address2] == '') or\
       (line[Constants.City] == '') or\
       (line[Constants.State] == '') or\
@@ -720,7 +738,8 @@ def NormalizeFunc():
           MonthlySupp = csv.writer(AppendMonthlySupp)
           MonthlySupp.writerow(HeaderRowSuppressionOutput)
       # Output Database File
-      if SourceSelect == 'D' and line[Constants.PURL] == '':
+      if SourceSelect == 'D' and\
+      line[Constants.PURL] == '':
         HeaderRowDatabaseStat = [
           'Customer ID',
           'FirstName',
@@ -764,7 +783,8 @@ def NormalizeFunc():
           OutputCleanDatabase = csv.writer(CleanOutputDatabase)
           OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
       # Output Purchase File
-      elif SourceSelect == 'P' and line[Constants.PURL] == '':
+      elif SourceSelect == 'P' and\
+      line[Constants.PURL] == '':
         HeaderRowPurchaseStat = [
           'Customer ID',
           'FirstName',

@@ -1,14 +1,14 @@
 
 #!/usr/bin/env python3.4.3
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 import os, re, glob
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 # Set Constant Variables
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
 SeqNumPurchase = 50000
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 CustomerID = 0
 FullName = 1
 FirstName = 2
@@ -53,7 +53,7 @@ Ethnicity = 40
 Misc1 = 41
 Misc2 = 42
 Misc3 = 43
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 # Header Output list
 HeaderRowMain = [
   'CustomerID',
@@ -101,8 +101,9 @@ HeaderRowMain = [
   'Misc2',
   'Misc3'
   ]
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 HeaderReMapDict = {}
+# ---------------------- #
 def MatchHeaderFields(field, index):
   if bool(re.search('cust.+id',field,flags=re.I)):
     HeaderReMapDict[CustomerID] = 'line[{}]'.format(str(index))
@@ -170,15 +171,14 @@ def MatchHeaderFields(field, index):
     HeaderReMapDict[Misc2] = 'line[{}]'.format(str(index))
   elif bool(re.search(r'\bmisc3\b',field,flags=re.I)):
     HeaderReMapDict[Misc3] = 'line[{}]'.format(str(index))
-# ---------------------------------------------------------------------------- #
-# Function to Generate ConvPercentage Value
+# ---------------------- #
+# Function to generate ConvPercentage Value
 def ConvPercentage(part, whole):
   if whole == 0:
     return 0
   else:
     return 100 * float(part)/float(whole)
-
-# Function to Convert String To List
+# Function to convert string To List
 def ConvertStringToList(input):
   AppendedList = []
   input = input.split('|')
@@ -187,36 +187,35 @@ def ConvertStringToList(input):
     item = str.lower(item)
     AppendedList.append(item)
   return AppendedList
-
-# Function to Reformat Phone Number and strip white space and extra char
+# Function to reformat Phone Number, remove the following
+# characters : '-',',' white space
 def ReformatPhoneNum(Phone):
   Phone = str(Phone).strip()
   Phone = str(Phone).replace('-','')
   Phone = str(Phone).replace('(','')
   Phone = str(Phone).replace(')','')
   return Phone
-
+# Function to strip name field of the following
+# characters : '-', ' '
 def StripAndCleanName(Name):
   Name = str(Name).strip()
   Name = str(Name).replace('-','')
   Name = str(Name).replace(' ','')
   Name = str.title(Name)
   return Name
-
-# Convert list item to string
+# Function to convert list item to string
 def ConvListToString(input):
   for item in input:
     return item
-
-# Remove temporary files
+# Function to remove temporary files
 def Upkeep():
   Files = glob.glob('*.csv')
   for Record in Files:
-    if os.path.getsize(Record) == 0: # Empty files
+    if os.path.getsize(Record) == 0:
       os.remove(Record)
     if bool(re.match('.+Re-Mapped.+', Record, flags = re.I)):
       os.remove(Record)
-# ---------------------------------------------------------------------------- #
+# ---------------------- #
 DoNotMailSet = set([
   'inc',
   'inc.',
@@ -324,7 +323,7 @@ DoNotMailSet = set([
   'group'
   'groups'
   ])
-
+# ---------------------- #
 YearDecodeDict = dict([
   (0,2000),
   (1,2001),
@@ -408,7 +407,7 @@ YearDecodeDict = dict([
   (98,1998),
   (99,1999)
   ])
-
+# ---------------------- #
 USStatesDict = {
   'AK':'Alaska',
   'AL':'Alabama',
@@ -468,7 +467,7 @@ USStatesDict = {
   'WV':'West Virginia',
   'WY':'Wyoming'
   }
-
+# ---------------------- #
 CommonHispLastNameList = set([
   'Abad',
   'Abarca',
