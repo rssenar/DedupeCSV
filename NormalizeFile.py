@@ -237,31 +237,28 @@ else:
 # ---------------------- #
 # Function to Re-Map header rows
 def ReMapFunc():
-  if HRSelect == 'Y':
-    print('------------- RE-MAPPING -------------')
-    global Selection
-    Selection = ReMappedOutput
-    with open(InputFile,'rU') as InputFileReMap,\
-    open(ReMappedOutput,'at') as ReMappedOutputFile:
-      Input = csv.reader(InputFileReMap)
-      Output = csv.writer(ReMappedOutputFile)
-      Output.writerow(Constants.HeaderRowMain)
-      FirstLine = True
-      for line in tqdm(Input):
-        if FirstLine:
-          for OrigHRIndex in range(0,len(line)):
-            Constants.MatchHeaderFields(line[OrigHRIndex], OrigHRIndex)
-          FirstLine = False
-        else:
-          newline = []
-          for NewHRIndex in range(0,len(Constants.HeaderRowMain)):
-            if NewHRIndex in Constants.HeaderReMapDict:
-              newline.append(eval(Constants.HeaderReMapDict[NewHRIndex]))
-            else:
-              newline.append('')
-          Output.writerow(newline)
-  else:
-    Selection = InputFile
+  print('------------- RE-MAPPING -------------')
+  global Selection
+  Selection = ReMappedOutput
+  with open(InputFile,'rU') as InputFileReMap,\
+  open(ReMappedOutput,'at') as ReMappedOutputFile:
+    Input = csv.reader(InputFileReMap)
+    Output = csv.writer(ReMappedOutputFile)
+    Output.writerow(Constants.HeaderRowMain)
+    FirstLine = True
+    for line in tqdm(Input):
+      if FirstLine:
+        for OrigHRIndex in range(0,len(line)):
+          Constants.MatchHeaderFields(line[OrigHRIndex], OrigHRIndex)
+        FirstLine = False
+      else:
+        newline = []
+        for NewHRIndex in range(0,len(Constants.HeaderRowMain)):
+          if NewHRIndex in Constants.HeaderReMapDict:
+            newline.append(eval(Constants.HeaderReMapDict[NewHRIndex]))
+          else:
+            newline.append('')
+        Output.writerow(newline)
 # ---------------------- #
 # Function to normalize file
 def NormalizeFunc():
@@ -1184,6 +1181,9 @@ def OutputFileFunc():
   Constants.Upkeep()
 # ---------------------- #
 if __name__ == '__main__':
-  ReMapFunc()
+  if HRSelect == 'Y':
+    ReMapFunc()
+  else:
+    Selection = InputFile
   NormalizeFunc()
   OutputFileFunc()
