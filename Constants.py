@@ -3,7 +3,6 @@
 # ---------------------- #
 import os, re, glob
 # ---------------------- #
-# Set Constant Variables
 SeqNumDatabase = 10000
 SeqNumPurchaseP = 30000
 SeqNumPurchaseN = 40000
@@ -105,19 +104,19 @@ HeaderRowMain = [
 HeaderReMapDict = {}
 # ---------------------- #
 def MatchHeaderFields(field, index):
-  if bool(re.search('cust.+id',field,flags=re.I)):
+  if bool(re.search(r'cust.+id',field,flags=re.I)):
     HeaderReMapDict[CustomerID] = 'line[{}]'.format(str(index))
-  if bool(re.search('ful.+me',field,flags=re.I)):
+  if bool(re.search(r'ful.+me',field,flags=re.I)):
     HeaderReMapDict[FullName] = 'line[{}]'.format(str(index))
-  elif bool(re.search('fir.+me',field,flags=re.I)):
+  elif bool(re.search(r'fir.+me',field,flags=re.I)):
     HeaderReMapDict[FirstName] = 'line[{}]'.format(str(index))
   elif bool(re.search(r'\bmi\b',field,flags=re.I)):
     HeaderReMapDict[MI] = 'line[{}]'.format(str(index))
-  elif bool(re.search('las.+me',field,flags=re.I)):
+  elif bool(re.search(r'las.+me',field,flags=re.I)):
     HeaderReMapDict[LastName] = 'line[{}]'.format(str(index))
-  elif bool(re.search('addr.+1',field,flags=re.I)):
+  elif bool(re.search(r'addr.+1',field,flags=re.I)):
     HeaderReMapDict[Address1] = 'line[{}]'.format(str(index))
-  elif bool(re.search('addr.+2',field,flags=re.I)):
+  elif bool(re.search(r'addr.+2',field,flags=re.I)):
     HeaderReMapDict[Address2] = 'line[{}]'.format(str(index))
   elif bool(re.search(r'\bcity\b',field,flags=re.I)):
     HeaderReMapDict[City] = 'line[{}]'.format(str(index))
@@ -178,6 +177,7 @@ def ConvPercentage(part, whole):
     return 0
   else:
     return 100 * float(part)/float(whole)
+
 # Function to convert string To List
 def ConvertStringToList(input):
   AppendedList = []
@@ -187,6 +187,7 @@ def ConvertStringToList(input):
     item = str.lower(item)
     AppendedList.append(item)
   return AppendedList
+
 # Function to reformat Phone Number, remove the following
 # characters : '-',',' white space
 def ReformatPhoneNum(Phone):
@@ -195,6 +196,7 @@ def ReformatPhoneNum(Phone):
   Phone = str(Phone).replace('(','')
   Phone = str(Phone).replace(')','')
   return Phone
+
 # Function to strip name field of the following
 # characters : '-', ' '
 def StripAndCleanName(Name):
@@ -203,10 +205,12 @@ def StripAndCleanName(Name):
   Name = str(Name).replace(' ','')
   Name = str.title(Name)
   return Name
+
 # Function to convert list item to string
 def ConvListToString(input):
   for item in input:
     return item
+
 # Function to remove temporary files
 def Upkeep():
   Files = glob.glob('*.csv')
