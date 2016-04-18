@@ -49,5 +49,11 @@ def MultiFileMarge():
           OutputClean.writerow(line)
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
+  print('=======================================')
+  print('             RE-MAP & MERGE            ')
+  print('=======================================')
   ReMapHeaderFields()
   MultiFileMarge()
+  print('=======================================')
+  print('               COMPLETED               ')
+  print()

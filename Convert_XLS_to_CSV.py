@@ -30,6 +30,12 @@ def Upkeep():
       os.remove(Record)
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
+  print('=======================================')
+  print('           CONVERT XLS to CSV          ')
+  print('=======================================')
   ConvertXLStoCSV()
   ConvertXLSXtoCSV()
   Upkeep()
+  print('=======================================')
+  print('               COMPLETED               ')
+  print()

@@ -17,6 +17,10 @@ ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
 Entries = set()
 # ---------------------- #
+print('=======================================')
+print('            NORMALIZING FILE           ')
+print('=======================================')
+print()
 # Select processing Mode
 SuppSelect = str.upper(input('Select Mode..... (B)asic    | (S)tandard: '))
 while SuppSelect != 'S' and SuppSelect != 'B':

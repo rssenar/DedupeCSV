@@ -80,12 +80,16 @@ def PURLConversion():
         ))
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
+  print('=======================================')
+  print('           EBLAST CONVERSION           ')
+  print('=======================================')
   for index in range(0,len(CSVFiles)):
     FirstTime = True
     with open(CSVFiles[index],'rU') as InputFile,\
     open('EBLAST_' + str(CSVFiles[index]),'at') as OutputFile:
       Input = csv.reader(InputFile)
-      next(InputFile) # skip header row
+      next(InputFile)
       Output = csv.writer(OutputFile)
       Output.writerow(HeaderRow)
       PURLConversion()
+      print('EBLAST CONVERSION COMPLETED!!! - {}'.format(CSVFiles[index]))

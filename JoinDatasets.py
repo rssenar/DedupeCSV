@@ -73,10 +73,15 @@ def ReformatOutputReport():
           RowCounter += 1
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
+  print('=======================================')
+  print('             JOIN DATASETS             ')
+  print('=======================================')
   Join()
   ReformatOutputReport()
   Files = glob.glob('*.csv')
   for Record in Files:
     if bool(re.match(r'\btemp\b', Record, flags = re.I)):
       os.remove(Record)
-
+  print('=======================================')
+  print('               COMPLETED               ')
+  print()
