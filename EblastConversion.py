@@ -92,4 +92,4 @@ if __name__ == '__main__':
       Output = csv.writer(OutputFile)
       Output.writerow(HeaderRow)
       PURLConversion()
-      print('EBLAST CONVERSION COMPLETED!!! - {}'.format(CSVFiles[index]))
+      print('EBLAST CONVERSION ... {} ... DONE!!'.format(CSVFiles[index]))
