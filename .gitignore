@@ -12,6 +12,7 @@ log/*.log.[0-9]
 # Byte-compiled / optimized / DLL files
 __pycache__/
 Resources/
+Testing/
 Temp/
 *.py[cod]
 *$py.class
