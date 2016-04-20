@@ -32,9 +32,9 @@ def PURLConversion():
         'http://',
         line[Website]
         )
-      F_PURL = requests.get(PURL)
+      O_PURL = requests.get(PURL)
       F_PURL = '{}{}'.format(
-        str(F_PURL.url),
+        str(O_PURL.url),
         '8'
         )
       FirstLastName = '{}{}'.format(
@@ -78,6 +78,27 @@ def PURLConversion():
         line[State],
         line[Zip]
         ))
+  if O_PURL.status_code != requests.codes.ok:
+    print('{}\nPage Not Found for {}'.format(ErrorMessage, CSVFiles[index]))
+  else:
+    print('{}\nEblast Conversion Completed for {}'.format(OKMessage, CSVFiles[index]))
+
+ErrorMessage = '''
+ /$$   /$$ /$$$$$$ /$$   /$$     /$$$$$$$$
+| $$  | $| $$$$\ $| $$  | $$    | $$       /$$$$$$  /$$$$$$  /$$$$$$  /$$$$$$
+| $$$$$$$| $$ $$ $| $$$$$$$$    | $$$$$   /$$__  $$/$$__  $$/$$__  $$/$$__  $$
+|_____  $| $$\ $$$|_____  $$    | $$__/  | $$  \__| $$  \__| $$  \ $| $$  \__/
+      | $|  $$$$$$/     | $$    | $$$$$$$| $$     | $$     |  $$$$$$| $$
+      |__/\______/      |__/    |________|__/     |__/      \______/|__/
+'''
+OKMessage = '''
+  /$$$$$$  /$$$$$$  /$$$$$$       /$$$$$$ /$$   /$$
+ /$$__  $$/$$$_  $$/$$$_  $$     /$$__  $| $$  /$$/
+  /$$$$$$| $$ $$ $| $$ $$ $$    | $$  | $| $$$$$/
+| $$     | $$ \ $$| $$ \ $$$    | $$  | $| $$\  $$
+| $$$$$$$|  $$$$$$|  $$$$$$/    |  $$$$$$| $$ \  $$
+|________/\______/ \______/      \______/|__/  \__/
+'''
 # ---------------------------------------------------------------------------- #
 if __name__ == '__main__':
   print('=======================================')
@@ -92,4 +113,3 @@ if __name__ == '__main__':
       Output = csv.writer(OutputFile)
       Output.writerow(HeaderRow)
       PURLConversion()
-      print('EBLAST CONVERSION ... {} ... DONE!!'.format(CSVFiles[index]))
