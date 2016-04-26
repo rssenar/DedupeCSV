@@ -10,6 +10,7 @@ from tqdm import tqdm
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
 recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
+# ---------------------- #
 DropFile = os.path.join(recpath,'_DropFile.csv')
 GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
@@ -223,6 +224,7 @@ Dupes = '>>>>>> Dupes <<<<<<.csv'
 MDNQ = '>>>>>> M-DNQ <<<<<<.csv'
 CleanOutput = '{}_UpdatedOutputMain.csv'.format(IPFName)
 AppendMonthlySuppFile = '{}_AddMonthlySuppression.csv'.format(IPFName)
+CleanEmailFile = '{}_EMAILS.csv'.format(IPFName)
 CleanOutputPhones = '{}_PHONES.csv'.format(IPFName)
 CleanOutputDatabase = '{}_UPLOAD DATA.csv'.format(IPFName)
 CleanOutputPurchaseAll = '{}_UPLOAD.csv'.format(IPFName)
@@ -308,6 +310,7 @@ def NormalizeFunc():
   open(CleanOutputAppendP,'at') as CleanOutputAppendP,\
   open(CleanOutputAppendN,'at') as CleanOutputAppendN,\
   open(CleanOutputAppendR,'at') as CleanOutputAppendR,\
+  open(CleanEmailFile,'at') as CleanEmail,\
   open(AppendMonthlySuppFile,'at') as AppendMonthlySupp:
     CleanOutputFirstTime = True
     DatabaseFirstTime = True
@@ -322,6 +325,7 @@ def NormalizeFunc():
     AppendFirstTimeR = True
     MDNQFirstTime = True
     MonthlySuppressionFirstTime = True
+    EmailFirstTime = True
     YearDictCounter = {}
     MakeDictCounter = {}
     ModelDictCounter = {}
@@ -448,7 +452,7 @@ def NormalizeFunc():
           DatabaseCounter += 1
         elif line[Constants.Drop] == 'A':
           PurchaseCounter += 1
-      # Parse & Clean up Constants.Phone #
+      # Parse & Clean up Phone#
       if line[Constants.MPhone] != '' and\
       len(str(line[Constants.MPhone])) > 6:
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.MPhone])
@@ -460,7 +464,7 @@ def NormalizeFunc():
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.WPhone])
       else:
         line[Constants.Phone] = ''
-      # Re-Format Constants.Phone#
+      # Re-Format Phone#
       if len(str(line[Constants.Phone])) == 10:
         line[Constants.Phone] = '({}) {}-{}'.format(
           str(line[Constants.Phone][0:3]),
@@ -491,13 +495,13 @@ def NormalizeFunc():
       line[Constants.Model] = str.title(line[Constants.Model])
       line[Constants.Email] = str.lower(line[Constants.Email])
       line[Constants.State] = str.upper(line[Constants.State])
-      # Set Constants.VIN Length
+      # Set VIN Length
       line[Constants.VINLen] = len(str(line[Constants.VIN]))
       if line[Constants.VINLen] < 17:
         line[Constants.VIN] = ''
       else:
         line[Constants.VIN] = str.upper(line[Constants.VIN])
-      # Set Constants.SCF Facility Location
+      # Set SCF Facility Location
       ZipLen = len(str(line[Constants.Zip]))
       if ZipLen < 5:
         line[Constants.SCF] = (line[Constants.Zip])[:2]
@@ -505,7 +509,7 @@ def NormalizeFunc():
         line[Constants.SCF] = (line[Constants.Zip])[:3]
       if str(line[Constants.SCF]) in SCF3DigitDict:
         line[Constants.SCF3DFacility] = SCF3DigitDict[str(line[Constants.SCF])]
-      # Set Central Constants.Zip Constants.SCF Facility location
+      # Set Central Zip SCF Facility location
       CentralZipLen = len(str(CentralZip))
       if CentralZipLen < 5:
         CentralZipSCF3Digit = str(CentralZip[:2])
@@ -513,7 +517,7 @@ def NormalizeFunc():
         CentralZipSCF3Digit = str(CentralZip[:3])
       if str(CentralZipSCF3Digit) in SCF3DigitDict:
         CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
-      # Calculate Constants.Radius from CENTRAL Constants.Zip
+      # Calculate Radius from CENTRAL Constants.Zip
       try:
         line[Constants.Zip] = int(line[Constants.Zip])
       except:
@@ -534,7 +538,7 @@ def NormalizeFunc():
       else:
         line[Constants.Radius] = vincenty(OriginZipCoord,line[Constants.Coordinates]).miles
         line[Constants.Radius] = round(float(line[Constants.Radius]),2)
-      # Convert Constants.Date Field to DateTime format
+      # Convert Date Field to DateTime format
       try:
         line[Constants.Date] = parse(line[Constants.Date])
         PresentDate = parse('')
@@ -602,6 +606,10 @@ def NormalizeFunc():
             line[Constants.AdjustedKBBValue] = '${:,}'.format(AdjKBB)
         except:
           line[Constants.MailDNQ] = 'dnq'
+      # Validate Email Address
+      if line[Constants.Email] != '':
+        if not bool(re.search(r'.+@.+',line[Constants.Email],flags=re.I)):
+          line[Constants.Email] = ''
       # Dedupe againts suppression files
       if str.lower(line[Constants.FirstName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.MI]) in Constants.DoNotMailSet or\
@@ -738,6 +746,48 @@ def NormalizeFunc():
         else:
           MonthlySupp = csv.writer(AppendMonthlySupp)
           MonthlySupp.writerow(HeaderRowSuppressionOutput)
+      # Generate Email File
+      if line[Constants.PURL] == '':
+        HeaderRowEmail = [
+          'Customer ID',
+          'FirstName',
+          'LastName',
+          'Address',
+          'City',
+          'State',
+          'Zip',
+          'Email',
+          'VIN',
+          'Winning Number',
+          'Position',
+          'Year',
+          'Make',
+          'Model',
+          ]
+        HeaderRowEmailOutput = (
+          line[Constants.CustomerID],
+          line[Constants.FirstName],
+          line[Constants.LastName],
+          line[Constants.AddressComb],
+          line[Constants.City],
+          line[Constants.State],
+          line[Constants.Zip],
+          line[Constants.Email],
+          line[Constants.VIN],
+          line[Constants.WinningNum],
+          line[Constants.Drop],
+          line[Constants.Year],
+          line[Constants.Make],
+          line[Constants.Model]
+          )
+        if EmailFirstTime:
+          CleanEmailOutput = csv.writer(CleanEmail)
+          CleanEmailOutput.writerow(HeaderRowEmail)
+          CleanEmailOutput.writerow(HeaderRowEmailOutput)
+          EmailFirstTime = False
+        else:
+          CleanEmailOutput = csv.writer(CleanEmail)
+          CleanEmailOutput.writerow(HeaderRowEmailOutput)
       # Output Database File
       if SourceSelect == 'D' and\
       line[Constants.PURL] == '':
