@@ -45,13 +45,14 @@ MailDNQ = 33
 BlitzDNQ = 34
 Drop = 35
 PURL = 36
-SCF3DFacility = 37
-Vendor = 38
-ExpState = 39
-Ethnicity = 40
-Misc1 = 41
-Misc2 = 42
-Misc3 = 43
+DDUFacility = 37
+SCF3DFacility = 38
+Vendor = 39
+ExpState = 40
+Ethnicity = 41
+Misc1 = 42
+Misc2 = 43
+Misc3 = 44
 # ---------------------- #
 # Header Output list
 HeaderRowMain = [
@@ -92,6 +93,7 @@ HeaderRowMain = [
   'BlitzDNQ',
   'Drop',
   'PURL',
+  'DDUFacility',
   'SCF3DFacility',
   'Vendor',
   'ExpandedState',

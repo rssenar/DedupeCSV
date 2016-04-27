@@ -16,6 +16,7 @@ GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
 MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
 ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
+DDUFile = os.path.join(recpath,'DDUFacilites.csv')
 Entries = set()
 # ---------------------- #
 print('=======================================')
@@ -106,6 +107,16 @@ try:
       SCF3DigitDict[line[0]] = (line[1])
 except:
   print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
+# ---------------------- #
+# Import DDUFacilites.csv file
+try:
+  DDUDict = {}
+  with open(DDUFile,'rU') as DDUFile:
+    DDU = csv.reader(DDUFile)
+    for line in DDU:
+      DDUDict[line[0]] = (line[1])
+except:
+  print('..... ERROR: Unable to Load DDU Dictionary File')
 # ---------------------- #
 # Print captured Input file
 print('File Name ........................... : {}'.format(InputFile))
@@ -291,6 +302,7 @@ def NormalizeFunc():
   global PurchaseCounter
   global RadiusDictCounter
   global SCF3DFacilityCounter
+  global DDUFacilityCounter
   global SCFDictCounter
   global SeqNumDatabase
   global SeqNumPurchase
@@ -334,6 +346,7 @@ def NormalizeFunc():
     CityDictCounter = {}
     StateDictCounter = {}
     SCF3DFacilityCounter = {}
+    DDUFacilityCounter = {}
     ZipCounter = {}
     PennyCounter = 0
     NickelCounter = 0
@@ -517,6 +530,9 @@ def NormalizeFunc():
         CentralZipSCF3Digit = str(CentralZip[:3])
       if str(CentralZipSCF3Digit) in SCF3DigitDict:
         CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
+      # Set DDU Facility Location
+      if str(line[Constants.Zip]) in DDUDict:
+        line[Constants.DDUFacility] = DDUDict[str(line[Constants.Zip])]
       # Calculate Radius from CENTRAL Constants.Zip
       try:
         line[Constants.Zip] = int(line[Constants.Zip])
@@ -640,6 +656,7 @@ def NormalizeFunc():
       GenCounter(line[Constants.Radius],RadiusDictCounter)
       GenCounter(CityRadius,CityDictCounter)
       GenCounter(line[Constants.State],StateDictCounter)
+      GenCounter(line[Constants.DDUFacility],DDUFacilityCounter)
       GenCounter(line[Constants.SCF3DFacility],SCF3DFacilityCounter)
       GenCounter(ZipRadius,ZipCounter)
       # OUTPUT Generate Phone File
@@ -1018,6 +1035,34 @@ def OutputFileFunc():
           value,
           round(ValuePrcnt,2),
           StateRTotal,
+          round(RTotalPrcnt,2)
+          ))
+    print()
+    print('###### Count Distribution by DDU FACILITY:')
+    print('||DDU Facilities|Count|%|RTotal|%|')
+    print('||-|-:|-:|-:|-:|')
+    DDUFacilityRTotal = 0
+    OdDDUFacilityCounter = collections.OrderedDict(sorted(
+      DDUFacilityCounter.items(), key=lambda t: t[1], reverse = True
+      ))
+    for key, value in OdDDUFacilityCounter.items():
+      DDUFacilityRTotal = DDUFacilityRTotal + value
+      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
+      RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, SUBTotal)
+      if ValuePrcnt > TOPPercentage:
+        print('|>|{}|{}|{}%|{}|{}%|'.format(
+          key,
+          value,
+          round(ValuePrcnt,2),
+          DDUFacilityRTotal,
+          round(RTotalPrcnt,2)
+          ))
+      else:
+        print('||{}|{}|{}%|{}|{}%|'.format(
+          key,
+          value,
+          round(ValuePrcnt,2),
+          DDUFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
     print()
