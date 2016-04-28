@@ -130,7 +130,7 @@ if SuppSelect == 'S':
   except:
     MaxRadius = 100
 else:
-  MaxRadius = 9999
+  MaxRadius = 1000
 # Capture Input (Max Year)
 if SuppSelect == 'S':
   try:
@@ -138,7 +138,7 @@ if SuppSelect == 'S':
   except:
     MaxYear = 2015
 else:
-  MaxYear = 9999
+  MaxYear = 2020
 # Capture Input (Min Year)
 if SuppSelect == 'S':
   try:
@@ -154,7 +154,7 @@ if SuppSelect == 'S':
   except:
     MaxSaleYear = 2014
 else:
-  MaxSaleYear = 9999
+  MaxSaleYear = 2020
 # Capture Suppress State List
 if SuppSelect == 'S':
   STATEList = input('Enter Suppression List .......[State] : ')
@@ -972,7 +972,7 @@ def NormalizeFunc():
 # Function to generate output file
 def OutputFileFunc():
   Report = sys.stdout
-  with open('SUMMARY-REPORT_{}.md'.format(IPFName),'w') as Log:
+  with open('SUMMARY-REPORT_{}.html'.format(IPFName),'w') as Log:
     RadiusKeyList = sorted(RadiusDictCounter)
     NewRadiusList = []
     for item in RadiusKeyList:
@@ -986,33 +986,48 @@ def OutputFileFunc():
     SUBTotal = (DatabaseCounter + PurchaseCounter
       + PennyCounter + NickelCounter)
     sys.stdout = Log
-    print()
-    print('------------------------------------------------------------')
-    print('#### {}'.format(str.upper(IPFName)))
-    print('###### Data Summary Report - as of {}'.format(TodayDateTime))
-    print('------------------------------------------------------------')
-    print()
-    print('||Description|')
-    print('|-:|:-|')
-    print('|Central Zip Code|{}|'.format(CentralZip))
-    print('|SCF Facility|{}|'.format(CentralZipSCFFacilityReport))
-    print('|Max Radius|{} Miles|'.format(HighestRadius))
-    print('|Max Year|{}|'.format(HigherstYear))
-    print('|Min Year|{}|'.format(LowestYear))
-    print('|Sold Years up to|{}|'.format(MaxSaleYear))
-    print('|Vendor|{}|'.format(VendorSelected))
-    print('|Database Total|{}|'.format(DatabaseCounter))
-    print('|Purchase Total|{}|'.format(PurchaseCounter))
-    print('|Penny Total|{}|'.format(PennyCounter))
-    print('|Nickel Total|{}|'.format(NickelCounter))
-    print('|Less MDNQ Total|({})|'.format(MDNQCounter))
-    print('|Less Dupes Total|({})|'.format(DupesCounter))
-    print('|**GRAND TOTAL**|**{}**|'.format(GrandTotal))
-    print()
-    print('------------------------------------------------------------')
-    print('###### Count Distribution by State:')
-    print('||State|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+    print('''
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    table {width:35%;}
+    table {font-family:verdana;}
+    table {font-size:85%;}
+    table, th, td {border: 1px solid Gainsboro; border-collapse: collapse;}
+    th {padding: 10px; text-align: center;}
+    td {padding: 10px; text-align: left;}
+    table#t01 tr:nth-child(even) {background-color:#eee;}
+    table#t01 tr:nth-child(odd) {background-color:#fff;}
+    table#t01 th {background-color: #034f84; color: White;}
+    </style>
+    </head>
+    <body>
+      ''')
+    print('<table id="t01">')
+    print('<tr><th><h3>{}</h3></th></tr>'.format(str.upper(IPFName)))
+    print('<table id="t01">')
+    print('<tr><td>Summary Report Date</td><td>{}</td></tr>'.format(TodayDateTime))
+    print('<tr><td>Central Zip Code</td><td>{}</td></tr>'.format(CentralZip))
+    print('<tr><td>SCF Facility</td><td>{}</td></tr>'.format(CentralZipSCFFacilityReport))
+    print('<tr><td>Max Radius</td><td>{}</td></tr>'.format(HighestRadius))
+    print('<tr><td>Max Year</td><td>{}</td></tr>'.format(HigherstYear))
+    print('<tr><td>Min Year</td><td>{}</td></tr>'.format(LowestYear))
+    print('<tr><td>Sold Years up to</td><td>{}</td></tr>'.format(MaxSaleYear))
+    #print('<tr><td>Vendor</td><td>{}</td></tr>'.format(VendorSelected))
+    print('<tr><td>Database Total</td><td>{}</td></tr>'.format(DatabaseCounter))
+    print('<tr><td>Purchase Total</td><td>{}</td></tr>'.format(PurchaseCounter))
+    print('<tr><td>Penny Total</td><td>{}</td></tr>'.format(PennyCounter))
+    print('<tr><td>Nickel Total</td><td>{}</td></tr>'.format(NickelCounter))
+    print('<tr><td>Less MDNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
+    print('<tr><td>Less Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
+    print('<tr><td><b>GRAND TOTAL</b></b><td><b>{}</b></b></tr>'.format(GrandTotal))
+    print('</table>')
+    print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by STATE</b></caption>')
+    print('<tr><th></th><th>State</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     StateRTotal = 0
     OdStateDictCounter = collections.OrderedDict(sorted(
       StateDictCounter.items(), key=lambda t: t[0], reverse = True
@@ -1022,7 +1037,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(StateRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1030,17 +1045,19 @@ def OutputFileFunc():
           round(RTotalPrcnt,2)
           ))
       else:
-        print('||{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           StateRTotal,
           round(RTotalPrcnt,2)
           ))
-    print()
-    print('###### Count Distribution by DDU FACILITY:')
-    print('||DDU Facilities|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+    print('</table>')
+    print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by DDU</b></caption>')
+    print('<tr><th></th><th>DDU Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     DDUFacilityRTotal = 0
     OdDDUFacilityCounter = collections.OrderedDict(sorted(
       DDUFacilityCounter.items(), key=lambda t: t[1], reverse = True
@@ -1050,7 +1067,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1058,17 +1075,19 @@ def OutputFileFunc():
           round(RTotalPrcnt,2)
           ))
       else:
-        print('||{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           DDUFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
-    print()
-    print('###### Count Distribution by SCF FACILITY and 3-Digit:')
-    print('||SCF Facilities|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+    print('</table>')
+    print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by SCF</b></caption>')
+    print('<tr><th></th><th>SCF Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     SCFFacilityRTotal = 0
     OdSCF3DFacilityCounter = collections.OrderedDict(sorted(
       SCF3DFacilityCounter.items(), key=lambda t: t[1], reverse = True
@@ -1078,7 +1097,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(SCFFacilityRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1086,16 +1105,19 @@ def OutputFileFunc():
           round(RTotalPrcnt,2)
           ))
       else:
-        print('||{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           SCFFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
-    print()
-    print('||3-Digit|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+    print('</table>')
+    print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by 3-DIGIT</b></caption>')
+    print('<tr><th></th><th>3Digit</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     SCFRTotal = 0
     OdSCFDictCounter = collections.OrderedDict(sorted(
       SCFDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1106,7 +1128,7 @@ def OutputFileFunc():
       RTotalPrcnt = Constants.ConvPercentage(SCFRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
         if len(str(key)) == 2:
-          print('|>|0{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1114,7 +1136,7 @@ def OutputFileFunc():
             round(RTotalPrcnt,2)
             ))
         else:
-          print('|>|{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1123,7 +1145,7 @@ def OutputFileFunc():
             ))
       else:
         if len(str(key)) == 2:
-          print('||0{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td></td><td>0{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1131,14 +1153,14 @@ def OutputFileFunc():
             round(RTotalPrcnt,2)
             ))
         else:
-          print('||{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
             SCFRTotal,
             round(RTotalPrcnt,2)
             ))
-    print()
+    print('</table>')
     SortedSCFText = ''
     OdSCFDictCounter = collections.OrderedDict(sorted(
       SCFDictCounter.items(), key=lambda t: t[0]
@@ -1149,11 +1171,12 @@ def OutputFileFunc():
         key
         )
     print('<!--',SortedSCFText,'-->')
-    print()
+    print('<p></p>')
+
     if len(YearDictCounter) !=  1:
-      print('###### Count Distribution by Year:')
-      print('||Years|Count|%|RTotal|%|')
-      print('||-|-:|-:|-:|-:|')
+      print('<table id="t01">')
+      print('<caption><b>Count by YEAR</b></caption>')
+      print('<tr><th></th><th>Year</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
       YearRTotal = 0
       OdYearDictCounter = collections.OrderedDict(sorted(
         YearDictCounter.items(), key=lambda t: t[0], reverse = True
@@ -1163,7 +1186,7 @@ def OutputFileFunc():
         ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
         RTotalPrcnt = Constants.ConvPercentage(YearRTotal, SUBTotal)
         if ValuePrcnt > TOPPercentage:
-          print('|>|{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1171,17 +1194,19 @@ def OutputFileFunc():
             round(RTotalPrcnt,2)
             ))
         else:
-          print('||{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
             YearRTotal,
             round(RTotalPrcnt,2)
             ))
-      print()
-    print('###### Count Distribution by Radius:')
-    print('||Radius|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+      print('</table>')
+      print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by RADIUS</b></caption>')
+    print('<tr><th></th><th>Radius</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     RadiusRTotal = 0
     OdRadiusDictCounter = collections.OrderedDict(sorted(
       RadiusDictCounter.items(), key=lambda t: float(t[0])
@@ -1191,7 +1216,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(RadiusRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{} Miles|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{} Miles</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1199,18 +1224,21 @@ def OutputFileFunc():
           round(RTotalPrcnt,2)
           ))
       else:
-        print('||{} Miles|{}|{}%|{}|{}%|'.format(
+        print('<tr><td></td><td>{} Miles</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           RadiusRTotal,
           round(RTotalPrcnt,2)
           ))
-    print()
+    print('</table>')
+    print('<p></p>')
+
+
     if len(MakeDictCounter) !=  1:
-      print('###### Top Counts by Make ( > {}% ):'.format(TOPPercentage))
-      print('||Makes|Count|%|RTotal|%|')
-      print('||-|-:|-:|-:|-:|')
+      print('<table id="t01">')
+      print('<caption><b>Top Counts by MAKE ( > {}% )</b></caption>'.format(TOPPercentage))
+      print('<tr><th></th><th>Make</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
       MakeRTotal = 0
       OdMakeDictCounter = collections.OrderedDict(sorted(
         MakeDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1220,17 +1248,20 @@ def OutputFileFunc():
         ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
         RTotalPrcnt = Constants.ConvPercentage(MakeRTotal, SUBTotal)
         if ValuePrcnt > TOPPercentage:
-          print('|>|{}|{}|{}%|{}|{}%|'.format(
+          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
             MakeRTotal,
             round(RTotalPrcnt,2)
             ))
-      print()
-    print('###### Top Counts & Distributions by City ( > {}% ):'.format(TOPPercentage))
-    print('||Top Cities|Count|%|RTotal|')
-    print('||-|-:|-:|-:|')
+      print('</table>')
+      print('<p></p>')
+
+
+    print('<table id="t01">')
+    print('<caption><b>Top Counts by CITY ( > {}% )</b></caption>'.format(TOPPercentage))
+    print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th></tr>')
     CityRTotal = 0
     OdCityDictCounter = collections.OrderedDict(sorted(
       CityDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1239,15 +1270,18 @@ def OutputFileFunc():
       CityRTotal = CityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{}|{}|{}%|{}|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           CityRTotal
           ))
-    print()
-    print('||Cities|Count|%|RTotal|%|')
-    print('||-|-:|-:|-:|-:|')
+    print('</table>')
+    print('<p></p>')
+
+    print('<table id="t01">')
+    print('<caption><b>Count by CITY</b></caption>')
+    print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
     CityRTotal = 0
     OdCityDictCounter = collections.OrderedDict(sorted(
       CityDictCounter.items(), key=lambda t: t[0]
@@ -1257,7 +1291,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(CityRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('|>|{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1265,13 +1299,17 @@ def OutputFileFunc():
           round(RTotalPrcnt,2)
           ))
       else:
-        print('||{}|{}|{}%|{}|{}%|'.format(
+        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
           CityRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</table>')
+    print('<p></p>')
+    print('</body>')
+    print('</html>')
     sys.stdout = Report
   print('================ TOTAL ================ : {}'.format(GrandTotal))
   print('       C  O  M  P  L  E  T  E  D       ')
