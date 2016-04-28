@@ -998,9 +998,9 @@ def OutputFileFunc():
     </head>
     <body>
     <div class="container">
-      ''')
+    ''')
     print('<p></p>')
-    print('<div class="alert alert-info">')
+    print('<div class="alert alert-success">')
     print('<h4 class="text-center">{}</h4>'.format(str.upper(IPFName)))
     print('</div>')
     print('<table class="table table-striped">')
@@ -1019,7 +1019,7 @@ def OutputFileFunc():
     print('<tr><td>Nickel Total</td><td>{}</td></tr>'.format(NickelCounter))
     print('<tr><td>Less MDNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
     print('<tr><td>Less Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
-    print('<tr><td><h4>GRAND TOTAL</h4></b><td><h4>{}</h4></b></tr>'.format(GrandTotal))
+    print('<tr><td><b>GRAND TOTAL</b></b><td><b>{}</b></b></tr>'.format(GrandTotal))
     print('</tbody>')
     print('</table>')
     print('<p></p>')
@@ -1058,7 +1058,6 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1094,7 +1093,6 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1130,7 +1128,6 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1184,7 +1181,6 @@ def OutputFileFunc():
             ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     SortedSCFText = ''
     OdSCFDictCounter = collections.OrderedDict(sorted(
@@ -1232,7 +1228,6 @@ def OutputFileFunc():
             ))
       print('</tbody>')
       print('</table>')
-      print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1268,7 +1263,6 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     if len(MakeDictCounter) !=  1:
       print('<table class="table table-striped">')
@@ -1297,7 +1291,6 @@ def OutputFileFunc():
             ))
       print('</tbody>')
       print('</table>')
-      print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1323,7 +1316,6 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     print('<table class="table table-striped">')
     print('<div class="alert alert-info">')
@@ -1359,12 +1351,13 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
+
     print('''
       </div>
       </div>
       </body>
       </html>
-      ''')
+    ''')
     sys.stdout = Report
   print('================ TOTAL ================ : {}'.format(GrandTotal))
   print('       C  O  M  P  L  E  T  E  D       ')
