@@ -197,11 +197,11 @@ else:
   CITYList =[]
 # Set TOPPercentage
 if SuppSelect == 'S':
-  TOPPercentage = input('Set Top % .......................[2%] : ').strip()
+  TOPPercentage = input('Set Top % .......................[5%] : ').strip()
   try:
     TOPPercentage = int(TOPPercentage)
   except:
-    TOPPercentage = 2
+    TOPPercentage = 5
 else:
   TOPPercentage = 0
 # Import Local Suppression File for the purposes of de-duping
@@ -990,23 +990,21 @@ def OutputFileFunc():
     <!DOCTYPE html>
     <html>
     <head>
-    <style>
-    table {width:35%;}
-    table {font-family:verdana;}
-    table {font-size:85%;}
-    table, th, td {border: 1px solid Gainsboro; border-collapse: collapse;}
-    th {padding: 10px; text-align: center;}
-    td {padding: 10px; text-align: left;}
-    table#t01 tr:nth-child(even) {background-color:#eee;}
-    table#t01 tr:nth-child(odd) {background-color:#fff;}
-    table#t01 th {background-color: #034f84; color: White;}
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     </head>
     <body>
+    <div class="container">
       ''')
-    print('<table id="t01">')
-    print('<tr><th><h3>{}</h3></th></tr>'.format(str.upper(IPFName)))
-    print('<table id="t01">')
+    print('<p></p>')
+    print('<div class="alert alert-info">')
+    print('<h4 class="text-center">{}</h4>'.format(str.upper(IPFName)))
+    print('</div>')
+    print('<table class="table table-striped">')
+    print('<tbody>')
     print('<tr><td>Summary Report Date</td><td>{}</td></tr>'.format(TodayDateTime))
     print('<tr><td>Central Zip Code</td><td>{}</td></tr>'.format(CentralZip))
     print('<tr><td>SCF Facility</td><td>{}</td></tr>'.format(CentralZipSCFFacilityReport))
@@ -1021,13 +1019,19 @@ def OutputFileFunc():
     print('<tr><td>Nickel Total</td><td>{}</td></tr>'.format(NickelCounter))
     print('<tr><td>Less MDNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
     print('<tr><td>Less Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
-    print('<tr><td><b>GRAND TOTAL</b></b><td><b>{}</b></b></tr>'.format(GrandTotal))
+    print('<tr><td><h4>GRAND TOTAL</h4></b><td><h4>{}</h4></b></tr>'.format(GrandTotal))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by STATE</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by STATE</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>State</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     StateRTotal = 0
     OdStateDictCounter = collections.OrderedDict(sorted(
       StateDictCounter.items(), key=lambda t: t[0], reverse = True
@@ -1052,12 +1056,18 @@ def OutputFileFunc():
           StateRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by DDU</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by DDU</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>DDU Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     DDUFacilityRTotal = 0
     OdDDUFacilityCounter = collections.OrderedDict(sorted(
       DDUFacilityCounter.items(), key=lambda t: t[1], reverse = True
@@ -1082,12 +1092,18 @@ def OutputFileFunc():
           DDUFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by SCF</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by SCF</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>SCF Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     SCFFacilityRTotal = 0
     OdSCF3DFacilityCounter = collections.OrderedDict(sorted(
       SCF3DFacilityCounter.items(), key=lambda t: t[1], reverse = True
@@ -1112,12 +1128,18 @@ def OutputFileFunc():
           SCFFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by 3-DIGIT</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by 3-DIGIT</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>3Digit</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     SCFRTotal = 0
     OdSCFDictCounter = collections.OrderedDict(sorted(
       SCFDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1160,7 +1182,10 @@ def OutputFileFunc():
             SCFRTotal,
             round(RTotalPrcnt,2)
             ))
+    print('</tbody>')
     print('</table>')
+    print('<p></p>')
+
     SortedSCFText = ''
     OdSCFDictCounter = collections.OrderedDict(sorted(
       SCFDictCounter.items(), key=lambda t: t[0]
@@ -1171,12 +1196,16 @@ def OutputFileFunc():
         key
         )
     print('<!--',SortedSCFText,'-->')
-    print('<p></p>')
 
     if len(YearDictCounter) !=  1:
-      print('<table id="t01">')
-      print('<caption><b>Count by YEAR</b></caption>')
+      print('<table class="table table-striped">')
+      print('<div class="alert alert-info">')
+      print('<p class="text-center"><b>Count by YEAR</b></p>')
+      print('</div>')
+      print('<thead>')
       print('<tr><th></th><th>Year</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+      print('</thead>')
+      print('<tbody>')
       YearRTotal = 0
       OdYearDictCounter = collections.OrderedDict(sorted(
         YearDictCounter.items(), key=lambda t: t[0], reverse = True
@@ -1201,12 +1230,18 @@ def OutputFileFunc():
             YearRTotal,
             round(RTotalPrcnt,2)
             ))
+      print('</tbody>')
       print('</table>')
       print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by RADIUS</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by RADIUS</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>Radius</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     RadiusRTotal = 0
     OdRadiusDictCounter = collections.OrderedDict(sorted(
       RadiusDictCounter.items(), key=lambda t: float(t[0])
@@ -1231,14 +1266,19 @@ def OutputFileFunc():
           RadiusRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-
     if len(MakeDictCounter) !=  1:
-      print('<table id="t01">')
-      print('<caption><b>Top Counts by MAKE ( > {}% )</b></caption>'.format(TOPPercentage))
+      print('<table class="table table-striped">')
+      print('<div class="alert alert-info">')
+      print('<p class="text-center"><b>Top Counts by MAKE ( > {}% )</b></p>'.format(TOPPercentage))
+      print('</div>')
+      print('<thead>')
       print('<tr><th></th><th>Make</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+      print('</thead>')
+      print('<tbody>')
       MakeRTotal = 0
       OdMakeDictCounter = collections.OrderedDict(sorted(
         MakeDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1255,13 +1295,18 @@ def OutputFileFunc():
             MakeRTotal,
             round(RTotalPrcnt,2)
             ))
+      print('</tbody>')
       print('</table>')
       print('<p></p>')
 
-
-    print('<table id="t01">')
-    print('<caption><b>Top Counts by CITY ( > {}% )</b></caption>'.format(TOPPercentage))
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Top Counts by CITY ( > {}% )</b></p>'.format(TOPPercentage))
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     CityRTotal = 0
     OdCityDictCounter = collections.OrderedDict(sorted(
       CityDictCounter.items(), key=lambda t: t[1], reverse = True
@@ -1276,12 +1321,18 @@ def OutputFileFunc():
           round(ValuePrcnt,2),
           CityRTotal
           ))
+    print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table id="t01">')
-    print('<caption><b>Count by CITY</b></caption>')
+    print('<table class="table table-striped">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Count by CITY</b></p>')
+    print('</div>')
+    print('<thead>')
     print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
     CityRTotal = 0
     OdCityDictCounter = collections.OrderedDict(sorted(
       CityDictCounter.items(), key=lambda t: t[0]
@@ -1306,10 +1357,14 @@ def OutputFileFunc():
           CityRTotal,
           round(RTotalPrcnt,2)
           ))
+    print('</tbody>')
     print('</table>')
-    print('<p></p>')
-    print('</body>')
-    print('</html>')
+    print('''
+      </div>
+      </div>
+      </body>
+      </html>
+      ''')
     sys.stdout = Report
   print('================ TOTAL ================ : {}'.format(GrandTotal))
   print('       C  O  M  P  L  E  T  E  D       ')
