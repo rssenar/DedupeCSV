@@ -197,11 +197,11 @@ else:
   CITYList =[]
 # Set TOPPercentage
 if SuppSelect == 'S':
-  TOPPercentage = input('Set Top % .......................[5%] : ').strip()
+  TOPPercentage = input('Set Top % .......................[3%] : ').strip()
   try:
     TOPPercentage = int(TOPPercentage)
   except:
-    TOPPercentage = 5
+    TOPPercentage = 3
 else:
   TOPPercentage = 0
 # Import Local Suppression File for the purposes of de-duping
@@ -310,7 +310,6 @@ def NormalizeFunc():
   global SeqNumPurchaseP
   global StateDictCounter
   global TOPPercentage
-  global VendorSelected
   global YearDictCounter
   with open(Selection,'rU') as InputFile,\
   open(CleanOutput,'at') as CleanOutput,\
@@ -364,7 +363,7 @@ def NormalizeFunc():
         WinningNumber = 40754 # Shopper
         line[Constants.Vendor] = 'Shopper'
       else:
-        WinningNumber = 40754 # Default
+        WinningNumber = 42619 # Default
         line[Constants.Vendor] = 'Premierworks'
       line[Constants.WinningNum] = WinningNumber
       VendorSelected = line[Constants.Vendor]
@@ -632,7 +631,7 @@ def NormalizeFunc():
       str.lower(line[Constants.LastName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.State]) in STATEList or\
       str.lower(line[Constants.SCF]) in SCFList or\
-      str(line[Constants.Year]) in YEARList or\
+      str.lower(line[Constants.Year]) in YEARList or\
       str.lower(line[Constants.City]) in CITYList:
         line[Constants.MailDNQ] = 'dnq'
       # Generate COUNTERS
@@ -987,23 +986,22 @@ def OutputFileFunc():
       + PennyCounter + NickelCounter)
     sys.stdout = Log
     print('''
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    </head>
-    <body>
-    <div class="container">
-      ''')
-    print('<p></p>')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+    ''')
+    print('<div class="container">')
     print('<div class="alert alert-info">')
     print('<h4 class="text-center">{}</h4>'.format(str.upper(IPFName)))
     print('</div>')
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<tbody>')
     print('<tr><td>Summary Report Date</td><td>{}</td></tr>'.format(TodayDateTime))
     print('<tr><td>Central Zip Code</td><td>{}</td></tr>'.format(CentralZip))
@@ -1012,24 +1010,23 @@ def OutputFileFunc():
     print('<tr><td>Max Year</td><td>{}</td></tr>'.format(HigherstYear))
     print('<tr><td>Min Year</td><td>{}</td></tr>'.format(LowestYear))
     print('<tr><td>Sold Years up to</td><td>{}</td></tr>'.format(MaxSaleYear))
-    #print('<tr><td>Vendor</td><td>{}</td></tr>'.format(VendorSelected))
     print('<tr><td>Database Total</td><td>{}</td></tr>'.format(DatabaseCounter))
     print('<tr><td>Purchase Total</td><td>{}</td></tr>'.format(PurchaseCounter))
     print('<tr><td>Penny Total</td><td>{}</td></tr>'.format(PennyCounter))
     print('<tr><td>Nickel Total</td><td>{}</td></tr>'.format(NickelCounter))
     print('<tr><td>Less MDNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
     print('<tr><td>Less Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
-    print('<tr><td><h4>GRAND TOTAL</h4></b><td><h4>{}</h4></b></tr>'.format(GrandTotal))
+    print('<tr><td><b>Grand Total</b></b><td><b>{}</b></b></tr>'.format(GrandTotal))
     print('</tbody>')
     print('</table>')
     print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by STATE</b></p>')
+    print('<p class="text-center"><b>Quantity per State</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>State</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>State</th><th>Count</th><th>State%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     StateRTotal = 0
@@ -1040,32 +1037,22 @@ def OutputFileFunc():
       StateRTotal = StateRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(StateRTotal, SUBTotal)
-      if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
-          value,
-          round(ValuePrcnt,2),
-          StateRTotal,
-          round(RTotalPrcnt,2)
-          ))
-      else:
-        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
-          value,
-          round(ValuePrcnt,2),
-          StateRTotal,
-          round(RTotalPrcnt,2)
-          ))
+      print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        key,
+        value,
+        round(ValuePrcnt,2),
+        StateRTotal,
+        round(RTotalPrcnt,2)
+        ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by DDU</b></p>')
+    print('<p class="text-center"><b>Quantity per Destination Delivery Unit (DDU) ( > 500 )</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>DDU Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>DDU Facility</th><th>Count</th><th>DDU%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     DDUFacilityRTotal = 0
@@ -1076,15 +1063,7 @@ def OutputFileFunc():
       DDUFacilityRTotal = DDUFacilityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, SUBTotal)
-      if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
-          value,
-          round(ValuePrcnt,2),
-          DDUFacilityRTotal,
-          round(RTotalPrcnt,2)
-          ))
-      else:
+      if value >= 500:
         print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
@@ -1094,14 +1073,13 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by SCF</b></p>')
+    print('<p class="text-center"><b>Quantity per Sectional Center Facility (SCF)</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>SCF Facility</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>SCF</th><th>Count</th><th>SCF%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     SCFFacilityRTotal = 0
@@ -1112,32 +1090,22 @@ def OutputFileFunc():
       SCFFacilityRTotal = SCFFacilityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(SCFFacilityRTotal, SUBTotal)
-      if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
-          value,
-          round(ValuePrcnt,2),
-          SCFFacilityRTotal,
-          round(RTotalPrcnt,2)
-          ))
-      else:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
-          value,
-          round(ValuePrcnt,2),
-          SCFFacilityRTotal,
-          round(RTotalPrcnt,2)
-          ))
+      print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        key,
+        value,
+        round(ValuePrcnt,2),
+        SCFFacilityRTotal,
+        round(RTotalPrcnt,2)
+        ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by 3-DIGIT</b></p>')
+    print('<p class="text-center"><b>Quantity per 3-Digit Zip Code Prefix Groups — SCF Sortation</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>3Digit</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>3Digit</th><th>Count</th><th>3Digit%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     SCFRTotal = 0
@@ -1148,9 +1116,9 @@ def OutputFileFunc():
       SCFRTotal = SCFRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(SCFRTotal, SUBTotal)
-      if ValuePrcnt > TOPPercentage:
+      if value > 1000:
         if len(str(key)) == 2:
-          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+          print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1158,7 +1126,7 @@ def OutputFileFunc():
             round(RTotalPrcnt,2)
             ))
         else:
-          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+          print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1184,7 +1152,6 @@ def OutputFileFunc():
             ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     SortedSCFText = ''
     OdSCFDictCounter = collections.OrderedDict(sorted(
@@ -1198,12 +1165,12 @@ def OutputFileFunc():
     print('<!--',SortedSCFText,'-->')
 
     if len(YearDictCounter) !=  1:
-      print('<table class="table table-striped">')
+      print('<table class="table table-hover">')
       print('<div class="alert alert-info">')
-      print('<p class="text-center"><b>Count by YEAR</b></p>')
+      print('<p class="text-center"><b>Quantity per Year</b></p>')
       print('</div>')
       print('<thead>')
-      print('<tr><th></th><th>Year</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+      print('<tr><th></th><th>Year</th><th>Count</th><th>Year%</th><th>RTotal</th><th>RTotal%</th></tr>')
       print('</thead>')
       print('<tbody>')
       YearRTotal = 0
@@ -1214,32 +1181,22 @@ def OutputFileFunc():
         YearRTotal = YearRTotal + value
         ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
         RTotalPrcnt = Constants.ConvPercentage(YearRTotal, SUBTotal)
-        if ValuePrcnt > TOPPercentage:
-          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-            key,
-            value,
-            round(ValuePrcnt,2),
-            YearRTotal,
-            round(RTotalPrcnt,2)
-            ))
-        else:
-          print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-            key,
-            value,
-            round(ValuePrcnt,2),
-            YearRTotal,
-            round(RTotalPrcnt,2)
-            ))
+        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+          key,
+          value,
+          round(ValuePrcnt,2),
+          YearRTotal,
+          round(RTotalPrcnt,2)
+          ))
       print('</tbody>')
       print('</table>')
-      print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by RADIUS</b></p>')
+    print('<p class="text-center"><b>Quantity per Central Zip Radius</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>Radius</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>Radius</th><th>Count</th><th>Radius%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     RadiusRTotal = 0
@@ -1251,7 +1208,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(RadiusRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{} Miles</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        print('<tr class="warning"><td></td><td>{} Miles</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1268,15 +1225,14 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
     if len(MakeDictCounter) !=  1:
-      print('<table class="table table-striped">')
+      print('<table class="table table-hover">')
       print('<div class="alert alert-info">')
-      print('<p class="text-center"><b>Top Counts by MAKE ( > {}% )</b></p>'.format(TOPPercentage))
+      print('<p class="text-center"><b>Quantity per Vehicle Make ( > {}% )</b></p>'.format(TOPPercentage))
       print('</div>')
       print('<thead>')
-      print('<tr><th></th><th>Make</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+      print('<tr><th></th><th>Make</th><th>Count</th><th>Make%</th><th>RTotal</th><th>RTotal%</th></tr>')
       print('</thead>')
       print('<tbody>')
       MakeRTotal = 0
@@ -1288,7 +1244,15 @@ def OutputFileFunc():
         ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
         RTotalPrcnt = Constants.ConvPercentage(MakeRTotal, SUBTotal)
         if ValuePrcnt > TOPPercentage:
-          print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+          print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+            key,
+            value,
+            round(ValuePrcnt,2),
+            MakeRTotal,
+            round(RTotalPrcnt,2)
+            ))
+        else:
+          print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
             value,
             round(ValuePrcnt,2),
@@ -1297,14 +1261,13 @@ def OutputFileFunc():
             ))
       print('</tbody>')
       print('</table>')
-      print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Top Counts by CITY ( > {}% )</b></p>'.format(TOPPercentage))
+    print('<p class="text-center"><b>Quantity per City ( > {}% )</b></p>'.format(TOPPercentage))
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th></tr>')
+    print('<tr><th></th><th>City</th><th>Count</th><th>City%</th><th>RTotal</th></tr>')
     print('</thead>')
     print('<tbody>')
     CityRTotal = 0
@@ -1315,7 +1278,7 @@ def OutputFileFunc():
       CityRTotal = CityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td></tr>'.format(
+        print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1323,14 +1286,13 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-    print('<p></p>')
 
-    print('<table class="table table-striped">')
+    print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
-    print('<p class="text-center"><b>Count by CITY</b></p>')
+    print('<p class="text-center"><b>Quantity per City</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>City</th><th>Count</th><th>%</th><th>RTotal</th><th>%</th></tr>')
+    print('<tr><th></th><th>City</th><th>Count</th><th>City%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     CityRTotal = 0
@@ -1342,7 +1304,7 @@ def OutputFileFunc():
       ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
       RTotalPrcnt = Constants.ConvPercentage(CityRTotal, SUBTotal)
       if ValuePrcnt > TOPPercentage:
-        print('<tr><td>*</td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
           round(ValuePrcnt,2),
@@ -1359,12 +1321,13 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
+
     print('''
-      </div>
-      </div>
-      </body>
-      </html>
-      ''')
+</div>
+</div>
+</body>
+</html>
+    ''')
     sys.stdout = Report
   print('================ TOTAL ================ : {}'.format(GrandTotal))
   print('       C  O  M  P  L  E  T  E  D       ')
