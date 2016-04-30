@@ -363,7 +363,7 @@ def NormalizeFunc():
         WinningNumber = 40754 # Shopper
         line[Constants.Vendor] = 'Shopper'
       else:
-        WinningNumber = 40754 # Default
+        WinningNumber = 42619 # Default
         line[Constants.Vendor] = 'Premierworks'
       line[Constants.WinningNum] = WinningNumber
       VendorSelected = line[Constants.Vendor]
@@ -631,7 +631,7 @@ def NormalizeFunc():
       str.lower(line[Constants.LastName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.State]) in STATEList or\
       str.lower(line[Constants.SCF]) in SCFList or\
-      str(line[Constants.Year]) in YEARList or\
+      str.lower(line[Constants.Year]) in YEARList or\
       str.lower(line[Constants.City]) in CITYList:
         line[Constants.MailDNQ] = 'dnq'
       # Generate COUNTERS
@@ -987,7 +987,7 @@ def OutputFileFunc():
     sys.stdout = Log
     print('''
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -996,9 +996,8 @@ def OutputFileFunc():
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class="container">
     ''')
-    print('<p></p>')
+    print('<div class="container">')
     print('<div class="alert alert-info">')
     print('<h4 class="text-center">{}</h4>'.format(str.upper(IPFName)))
     print('</div>')
@@ -1072,14 +1071,6 @@ def OutputFileFunc():
           DDUFacilityRTotal,
           round(RTotalPrcnt,2)
           ))
-#      else:
-#        print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-#          key,
-#          value,
-#          round(ValuePrcnt,2),
-#          DDUFacilityRTotal,
-#          round(RTotalPrcnt,2)
-#          ))
     print('</tbody>')
     print('</table>')
 
