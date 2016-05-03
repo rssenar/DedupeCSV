@@ -631,7 +631,7 @@ def NormalizeFunc():
       str.lower(line[Constants.LastName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.State]) in STATEList or\
       str.lower(line[Constants.SCF]) in SCFList or\
-      str.lower(line[Constants.Year]) in YEARList or\
+      str(line[Constants.Year]) in YEARList or\
       str.lower(line[Constants.City]) in CITYList:
         line[Constants.MailDNQ] = 'dnq'
       # Generate COUNTERS
