@@ -587,12 +587,12 @@ def NormalizeFunc():
         if int(line[Constants.Year]) < MinYear:
           line[Constants.MailDNQ] = 'dnq'
       except:
-        line[Constants.Year] = 'N/A'
-      # Set 'N/A' for Constants.Make & Constants.Model blank fields
+        line[Constants.Year] = 'n/a'
+      # Set 'n/a' for Constants.Make & Constants.Model blank fields
       if line[Constants.Make] == '':
-        line[Constants.Make] = 'N/A'
+        line[Constants.Make] = 'n/a'
       if line[Constants.Model] == '':
-        line[Constants.Model] = 'N/A'
+        line[Constants.Model] = 'n/a'
       # Test Constants.DelDate Validity
       try:
         line[Constants.DelDate] = parse(line[Constants.DelDate])
