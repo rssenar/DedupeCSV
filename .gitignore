@@ -16,6 +16,8 @@ Testing/
 Temp/
 *.py[cod]
 *$py.class
+PyToolkit.sublime-project
+PyToolkit.sublime-workspace
 
 # C extensions
 *.so
