@@ -219,7 +219,7 @@ if SuppressionFileName != '':
     print('ERROR: Cannot load local suppression file\n')
 else:
   print('     No Suppression File Selected     ')
-# Set Constants.Vendor Selection
+# Set Constants.Vendor
 if SuppSelect == 'S':
   VendorSelect = str.upper(input(
     '....... (S)hopper | (P)latinum ....... '
@@ -243,7 +243,7 @@ else:
 def ReMapFunc():
   print('------------- RE-MAPPING -------------')
   global Selection
-  Selection = ReMappedOutput
+  Selection = '>>> Re-Mapped <<<.csv'
   with open(InputFile,'rU') as InputFileReMap,\
   open('>>> Re-Mapped <<<.csv','at') as ReMappedOutputFile:
     Input = csv.reader(InputFileReMap)
@@ -509,12 +509,9 @@ def NormalizeFunc():
       else:
         line[Constants.Radius] = vincenty(OriginZipCoord,line[Constants.Coordinates]).miles
         line[Constants.Radius] = round(float(line[Constants.Radius]),2)
-      # Convert Date Field to DateTime format
+      # Parse Date Field to DateTime format
       try:
-        line[Constants.Date] = parse(line[Constants.Date])
-        PresentDate = parse('')
-        if line[Constants.Date] == PresentDate:
-          line[Constants.Date] = ''
+        line[Constants.Date] = parse(line[Constants.Date]).date()
       except:
         line[Constants.Date] = ''
       # Apply "Blitz-DNQ" Parameters
@@ -549,16 +546,17 @@ def NormalizeFunc():
         line[Constants.Make] = 'n/a'
       if line[Constants.Model] == '':
         line[Constants.Model] = 'n/a'
-      # Test Constants.DelDate Validity
+      # Prse & Test DelDate Validity
       try:
-        line[Constants.DelDate] = parse(line[Constants.DelDate])
-        CurrentDelDate = parse('')
-        if line[Constants.DelDate] == CurrentDelDate:
-          line[Constants.DelDate] = ''
-        if int(line[Constants.DelDate].Constants.Year) > MaxSaleYear:
+        line[Constants.DelDate] = parse(line[Constants.DelDate]).date()
+        if int(line[Constants.DelDate].year) > MaxSaleYear:
           line[Constants.MailDNQ] = 'dnq'
       except:
         line[Constants.DelDate] = ''
+      if line[Constants.DelDate] != '':
+        line[Constants.Dld_Year] = line[Constants.DelDate].year
+        line[Constants.Dld_Month] = line[Constants.DelDate].month
+        line[Constants.Dld_Day] = line[Constants.DelDate].day
       # Check Constants.Ethnicity
       CleanName = Constants.StripAndCleanName(line[Constants.LastName])
       if CleanName in Constants.CommonHispLastNameList:
@@ -622,10 +620,6 @@ def NormalizeFunc():
           'FirstName',
           'LastName',
           'Phone',
-          'Address',
-          'City',
-          'State',
-          'Zip',
           'Last Veh Year',
           'Last Veh Make',
           'Last Veh Model'
@@ -634,10 +628,6 @@ def NormalizeFunc():
           line[Constants.FirstName],
           line[Constants.LastName],
           line[Constants.Phone],
-          line[Constants.AddressComb],
-          line[Constants.City],
-          line[Constants.State],
-          line[Constants.Zip],
           line[Constants.Year],
           line[Constants.Make],
           line[Constants.Model]
@@ -729,7 +719,6 @@ def NormalizeFunc():
           'State',
           'Zip',
           'Email',
-          'VIN',
           'Winning Number',
           'Position',
           'Year',
@@ -745,7 +734,6 @@ def NormalizeFunc():
           line[Constants.State],
           line[Constants.Zip],
           line[Constants.Email],
-          line[Constants.VIN],
           line[Constants.WinningNum],
           line[Constants.Drop],
           line[Constants.Year],

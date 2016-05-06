@@ -50,9 +50,12 @@ SCF3DFacility = 38
 Vendor = 39
 ExpState = 40
 Ethnicity = 41
-Misc1 = 42
-Misc2 = 43
-Misc3 = 44
+Dld_Year = 42
+Dld_Month = 43
+Dld_Day = 44
+Misc1 = 45
+Misc2 = 45
+Misc3 = 46
 # ---------------------- #
 # Header Output list
 HeaderRowMain = [
@@ -98,6 +101,9 @@ HeaderRowMain = [
   'Vendor',
   'ExpandedState',
   'Ethnicity',
+  'Dld_Year',
+  'Dld_Month',
+  'Dld_Day',
   'Misc1',
   'Misc2',
   'Misc3'
