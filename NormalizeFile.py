@@ -41,7 +41,7 @@ else:
   print('         S  T  A  N  D  A  R  D        ')
   print('=======================================')
 # ---------------------- #
-# Select Input File from Desktop
+# Select Input File from Desktopbr
 for file in CSVFile:
   IPFName = file.strip('.csv') # Extract filename only w/o ext.
   InputFile = file # Filename with ext.
@@ -230,19 +230,6 @@ print()
 input('       PRESS [ENTER] TO PROCEED        ')
 print()
 # ---------------------- #
-ReMappedOutput = '>>>>>> Re-Mapped <<<<<<.csv'
-Dupes = '>>>>>> Dupes <<<<<<.csv'
-MDNQ = '>>>>>> M-DNQ <<<<<<.csv'
-CleanOutput = '{}_UpdatedOutputMain.csv'.format(IPFName)
-AppendMonthlySuppFile = '{}_AddMonthlySuppression.csv'.format(IPFName)
-CleanEmailFile = '{}_EMAILS.csv'.format(IPFName)
-CleanOutputPhones = '{}_PHONES.csv'.format(IPFName)
-CleanOutputDatabase = '{}_UPLOAD DATA.csv'.format(IPFName)
-CleanOutputPurchaseAll = '{}_UPLOAD.csv'.format(IPFName)
-CleanOutputAppendP = '{}_PENNY.csv'.format(IPFName)
-CleanOutputAppendN = '{}_NICKEL.csv'.format(IPFName)
-CleanOutputAppendR = '{}_OTHER.csv'.format(IPFName)
-# ---------------------- #
 # Compare File Header row to HeaderRowMain to determin if re-mapping is required
 ExtractCSVHeader = subprocess.check_output(['head','-n','1',InputFile])
 ExtractCSVHeader = ExtractCSVHeader.decode("utf-8").split(',')
@@ -258,7 +245,7 @@ def ReMapFunc():
   global Selection
   Selection = ReMappedOutput
   with open(InputFile,'rU') as InputFileReMap,\
-  open(ReMappedOutput,'at') as ReMappedOutputFile:
+  open('>>> Re-Mapped <<<.csv','at') as ReMappedOutputFile:
     Input = csv.reader(InputFileReMap)
     Output = csv.writer(ReMappedOutputFile)
     Output.writerow(Constants.HeaderRowMain)
@@ -284,12 +271,9 @@ def NormalizeFunc():
   global CentralZipSCFFacilityReport
   global CityDictCounter
   global CleanOutput
-  global CleanOutputAppendN
-  global CleanOutputAppendP
-  global CleanOutputAppendR
   global CleanOutputDatabase
   global CleanOutputPhones
-  global CleanOutputPurchaseAll
+  global CleanOutputPurchase
   global DatabaseCounter
   global Dupes
   global DupesCounter
@@ -297,8 +281,6 @@ def NormalizeFunc():
   global MaxSaleYear
   global MDNQ
   global MDNQCounter
-  global NickelCounter
-  global PennyCounter
   global PurchaseCounter
   global RadiusDictCounter
   global SCF3DFacilityCounter
@@ -306,23 +288,22 @@ def NormalizeFunc():
   global SCFDictCounter
   global SeqNumDatabase
   global SeqNumPurchase
-  global SeqNumPurchaseN
-  global SeqNumPurchaseP
   global StateDictCounter
+  global DropDictCounter
   global TOPPercentage
   global YearDictCounter
-  with open(Selection,'rU') as InputFile,\
-  open(CleanOutput,'at') as CleanOutput,\
-  open(Dupes,'at') as Dupes,\
-  open(MDNQ,'at') as MDNQ,\
-  open(CleanOutputPhones,'at') as CleanOutputPhones,\
-  open(CleanOutputDatabase,'at') as CleanOutputDatabase,\
-  open(CleanOutputPurchaseAll,'at') as CleanOutputPurchaseAll,\
-  open(CleanOutputAppendP,'at') as CleanOutputAppendP,\
-  open(CleanOutputAppendN,'at') as CleanOutputAppendN,\
-  open(CleanOutputAppendR,'at') as CleanOutputAppendR,\
-  open(CleanEmailFile,'at') as CleanEmail,\
-  open(AppendMonthlySuppFile,'at') as AppendMonthlySupp:
+  global OutputDroplist
+  global OutputDictOpenFiles
+  global TOTALMailCounter
+  with open(Selection, 'rU') as InputFile,\
+  open('{}_CleanOutputMain.csv'.format(IPFName), 'at') as CleanOutput,\
+  open('>>> Dupes <<<.csv', 'at') as Dupes,\
+  open('>>> M-DNQ <<<.csv', 'at') as MDNQ,\
+  open('{}_PHONES.csv'.format(IPFName), 'at') as CleanOutputPhones,\
+  open('{}_UPLOAD DATA.csv'.format(IPFName), 'at') as CleanOutputDatabase,\
+  open('{}_UPLOAD.csv'.format(IPFName), 'at') as CleanOutputPurchase,\
+  open('{}_EMAILS.csv'.format(IPFName), 'at') as CleanEmail,\
+  open('{}_AddToMonthlySuppression.csv'.format(IPFName), 'at') as AppendMonthlySupp:
     CleanOutputFirstTime = True
     DatabaseFirstTime = True
     PurchaseFirstTimeP = True
@@ -346,16 +327,16 @@ def NormalizeFunc():
     StateDictCounter = {}
     SCF3DFacilityCounter = {}
     DDUFacilityCounter = {}
-    ZipCounter = {}
-    PennyCounter = 0
-    NickelCounter = 0
-    DatabaseCounter = 0
-    PurchaseCounter = 0
+    DropDictCounter = {}
     MDNQCounter = 0
     DupesCounter = 0
+    TOTALMailCounter = 0
+    OutputDroplist = []
+    OutputDictOpenFiles = {}
     Input = csv.reader(InputFile)
     next(InputFile)
     for line in tqdm(Input):
+      TOTALMailCounter += 1
       if VendorSelect == 'P':
         WinningNumber = 42619 # Platinum
         line[Constants.Vendor] = 'Platinum'
@@ -364,7 +345,7 @@ def NormalizeFunc():
         line[Constants.Vendor] = 'Shopper'
       else:
         WinningNumber = 42619 # Default
-        line[Constants.Vendor] = 'Premierworks'
+        line[Constants.Vendor] = 'Zolton'
       line[Constants.WinningNum] = WinningNumber
       VendorSelected = line[Constants.Vendor]
       # Parse FullName if First & Last Name fields are missing
@@ -417,53 +398,28 @@ def NormalizeFunc():
       if line[Constants.PURL] == '':
         if str(line[Constants.ZipCRRT]) in DropDict:
           line[Constants.Drop] = DropDict[str(line[Constants.ZipCRRT])]
-          if line[Constants.Drop] == 'P' or\
-          line[Constants.Drop] == 'Penny' or\
-          line[Constants.Drop] == 'p' or\
-          line[Constants.Drop] == 'penny':
+          if SourceSelect == 'D':
+            line[Constants.CustomerID] = 'D{}'.format(
+              str(Constants.SeqNumDatabase)
+              )
+            Constants.SeqNumDatabase += 1
+          elif SourceSelect == 'P':
             line[Constants.CustomerID] = 'P{}'.format(
-              str(Constants.SeqNumPurchaseP)
+              str(Constants.SeqNumPurchase)
               )
-            Constants.SeqNumPurchaseP += 1
-            PennyCounter += 1
-          elif line[Constants.Drop] == 'N' or\
-          line[Constants.Drop] == 'Nickel' or\
-          line[Constants.Drop] == 'n' or\
-          line[Constants.Drop] == 'nickel':
-            line[Constants.CustomerID] = 'N{}'.format(
-              str(Constants.SeqNumPurchaseN)
-              )
-            Constants.SeqNumPurchaseN += 1
-            NickelCounter += 1
+            Constants.SeqNumPurchase += 1
         elif SourceSelect == 'D':
-          line[Constants.Drop] = 'D'
+          line[Constants.Drop] = 'Database'
           line[Constants.CustomerID] = 'D{}'.format(
             str(Constants.SeqNumDatabase)
             )
           Constants.SeqNumDatabase += 1
-          DatabaseCounter += 1
         elif SourceSelect == 'P':
-          line[Constants.Drop] = 'A'
-          line[Constants.CustomerID] = 'A{}'.format(
+          line[Constants.Drop] = 'Purchase'
+          line[Constants.CustomerID] = 'P{}'.format(
             str(Constants.SeqNumPurchase)
             )
           Constants.SeqNumPurchase += 1
-          PurchaseCounter += 1
-      else:
-        if line[Constants.Drop] == 'P' or\
-        line[Constants.Drop] == 'Penny' or\
-        line[Constants.Drop] == 'p' or\
-        line[Constants.Drop] == 'penny':
-          PennyCounter += 1
-        elif line[Constants.Drop] == 'N' or\
-        line[Constants.Drop] == 'Nickel' or\
-        line[Constants.Drop] == 'n' or\
-        line[Constants.Drop] == 'nickel':
-          NickelCounter += 1
-        elif line[Constants.Drop] == 'D':
-          DatabaseCounter += 1
-        elif line[Constants.Drop] == 'A':
-          PurchaseCounter += 1
       # Parse & Clean up Phone#
       if line[Constants.MPhone] != '' and\
       len(str(line[Constants.MPhone])) > 6:
@@ -649,15 +605,15 @@ def NormalizeFunc():
         line[Constants.Zip],
         line[Constants.Radius]
         )
-      GenCounter(line[Constants.Year],YearDictCounter)
-      GenCounter(line[Constants.Make],MakeDictCounter)
-      GenCounter(line[Constants.SCF],SCFDictCounter)
-      GenCounter(line[Constants.Radius],RadiusDictCounter)
-      GenCounter(CityRadius,CityDictCounter)
-      GenCounter(line[Constants.State],StateDictCounter)
-      GenCounter(line[Constants.DDUFacility],DDUFacilityCounter)
-      GenCounter(line[Constants.SCF3DFacility],SCF3DFacilityCounter)
-      GenCounter(ZipRadius,ZipCounter)
+      GenCounter(line[Constants.Year], YearDictCounter)
+      GenCounter(line[Constants.Make], MakeDictCounter)
+      GenCounter(line[Constants.SCF], SCFDictCounter)
+      GenCounter(line[Constants.Radius], RadiusDictCounter)
+      GenCounter(CityRadius, CityDictCounter)
+      GenCounter(line[Constants.State], StateDictCounter)
+      GenCounter(line[Constants.DDUFacility], DDUFacilityCounter)
+      GenCounter(line[Constants.SCF3DFacility], SCF3DFacilityCounter)
+      GenCounter(line[Constants.Drop], DropDictCounter)
       # OUTPUT Generate Phone File
       if line[Constants.Phone] != '' and\
       line[Constants.BlitzDNQ] != 'dnq' and\
@@ -891,14 +847,14 @@ def NormalizeFunc():
           line[Constants.Drop]
           )
         if PurchaseFirstTimeAll:
-          OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
-          OutputCleanPurchaseAll.writerow(HeaderRowPurchaseStat)
-          OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
+          OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+          OutputCleanPurchase.writerow(HeaderRowPurchaseStat)
+          OutputCleanPurchase.writerow(HeaderRowPurchaseOutput)
           PurchaseFirstTimeAll = False
         else:
-          OutputCleanPurchaseAll = csv.writer(CleanOutputPurchaseAll)
-          OutputCleanPurchaseAll.writerow(HeaderRowPurchaseOutput)
-      # Output Appended files [Penny/Nickel/Other]
+          OutputCleanPurchase = csv.writer(CleanOutputPurchase)
+          OutputCleanPurchase.writerow(HeaderRowPurchaseOutput)
+      # Output files based on line[Constants.Drop] value
       else:
         HeaderRowAppendStat = [
           'PURL',
@@ -938,35 +894,15 @@ def NormalizeFunc():
           line[Constants.CustomerID],
           line[Constants.Drop]
           )
-        if line[Constants.CustomerID][:1] == 'P' or\
-        line[Constants.CustomerID][:1] == 'p':
-          if AppendFirstTimeP:
-            OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-            OutputCleanAppendP.writerow(HeaderRowAppendStat)
-            OutputCleanAppendP.writerow(HeaderRowAppendOutput)
-            AppendFirstTimeP = False
-          else:
-            OutputCleanAppendP = csv.writer(CleanOutputAppendP)
-            OutputCleanAppendP.writerow(HeaderRowAppendOutput)
-        elif line[Constants.CustomerID][:1] == 'N' or\
-        line[Constants.CustomerID][:1] == 'n':
-          if AppendFirstTimeN:
-            OutputCleanAppendN = csv.writer(CleanOutputAppendN)
-            OutputCleanAppendN.writerow(HeaderRowAppendStat)
-            OutputCleanAppendN.writerow(HeaderRowAppendOutput)
-            AppendFirstTimeN = False
-          else:
-            OutputCleanAppendN = csv.writer(CleanOutputAppendN)
-            OutputCleanAppendN.writerow(HeaderRowAppendOutput)
+        if line[Constants.Drop] not in OutputDroplist:
+          OutputDroplist.append(line[Constants.Drop])
+          OutputDictOpenFiles[line[Constants.Drop]] = open('{}_{}.csv'.format(IPFName, line[Constants.Drop]), 'at')
+          DropOutput = csv.writer(OutputDictOpenFiles[line[Constants.Drop]])
+          DropOutput.writerow(HeaderRowAppendStat)
+          DropOutput.writerow(HeaderRowAppendOutput)
         else:
-          if AppendFirstTimeR:
-            OutputCleanAppendR = csv.writer(CleanOutputAppendR)
-            OutputCleanAppendR.writerow(HeaderRowAppendStat)
-            OutputCleanAppendR.writerow(HeaderRowAppendOutput)
-            AppendFirstTimeR = False
-          else:
-            OutputCleanAppendR = csv.writer(CleanOutputAppendR)
-            OutputCleanAppendR.writerow(HeaderRowAppendOutput)
+          DropOutput = csv.writer(OutputDictOpenFiles[line[Constants.Drop]])
+          DropOutput.writerow(HeaderRowAppendOutput)
 # ---------------------- #
 # Function to generate output file
 def OutputFileFunc():
@@ -980,22 +916,18 @@ def OutputFileFunc():
     HigherstYear = Constants.ConvListToString(sorted(YearDictCounter)[-1:])
     LowestYear = Constants.ConvListToString(sorted(YearDictCounter)[:1])
     TodayDateTime = datetime.datetime.now()
-    GrandTotal = (DatabaseCounter + PurchaseCounter + PennyCounter
-      + NickelCounter - MDNQCounter - DupesCounter)
-    SUBTotal = (DatabaseCounter + PurchaseCounter
-      + PennyCounter + NickelCounter)
     sys.stdout = Log
     print('''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-</head>
-<body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    </head>
+    <body>
     ''')
     print('<div class="container">')
     print('<div class="alert alert-info">')
@@ -1010,16 +942,37 @@ def OutputFileFunc():
     print('<tr><td>Max Year</td><td>{}</td></tr>'.format(HigherstYear))
     print('<tr><td>Min Year</td><td>{}</td></tr>'.format(LowestYear))
     print('<tr><td>Sold Years up to</td><td>{}</td></tr>'.format(MaxSaleYear))
-    print('<tr><td>Database Total</td><td>{}</td></tr>'.format(DatabaseCounter))
-    print('<tr><td>Purchase Total</td><td>{}</td></tr>'.format(PurchaseCounter))
-    print('<tr><td>Penny Total</td><td>{}</td></tr>'.format(PennyCounter))
-    print('<tr><td>Nickel Total</td><td>{}</td></tr>'.format(NickelCounter))
-    print('<tr><td>Less MDNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
-    print('<tr><td>Less Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
-    print('<tr><td><b>Grand Total</b></b><td><b>{}</b></b></tr>'.format(GrandTotal))
+    print('<tr><td>Mail DNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
+    print('<tr><td>Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
     print('</tbody>')
     print('</table>')
     print('<p></p>')
+
+    print('<table class="table table-hover">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>TOTAL Mail Quantity</b></p>')
+    print('</div>')
+    print('<thead>')
+    print('<tr><th></th><th>Drop</th><th>Count</th><th>Drop%</th><th>RTotal</th><th>RTotal%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
+    DropRTotal = 0
+    OdDropDictCounter = collections.OrderedDict(sorted(
+      DropDictCounter.items(), key=lambda t: t[0]
+      ))
+    for key, value in OdDropDictCounter.items():
+      DropRTotal = DropRTotal + value
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(DropRTotal, TOTALMailCounter)
+      print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        key,
+        value,
+        round(ValuePrcnt,2),
+        DropRTotal,
+        round(RTotalPrcnt,2)
+        ))
+    print('</tbody>')
+    print('</table>')
 
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
@@ -1035,8 +988,8 @@ def OutputFileFunc():
       ))
     for key, value in OdStateDictCounter.items():
       StateRTotal = StateRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(StateRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(StateRTotal, TOTALMailCounter)
       print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
         key,
         value,
@@ -1061,8 +1014,8 @@ def OutputFileFunc():
       ))
     for key, value in OdDDUFacilityCounter.items():
       DDUFacilityRTotal = DDUFacilityRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, TOTALMailCounter)
       if value >= 500:
         print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
@@ -1088,8 +1041,8 @@ def OutputFileFunc():
       ))
     for key, value in OdSCF3DFacilityCounter.items():
       SCFFacilityRTotal = SCFFacilityRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(SCFFacilityRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(SCFFacilityRTotal, TOTALMailCounter)
       print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
         key,
         value,
@@ -1114,8 +1067,8 @@ def OutputFileFunc():
       ))
     for key, value in OdSCFDictCounter.items():
       SCFRTotal = SCFRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(SCFRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(SCFRTotal, TOTALMailCounter)
       if value > 1000:
         if len(str(key)) == 2:
           print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
@@ -1179,8 +1132,8 @@ def OutputFileFunc():
         ))
       for key, value in OdYearDictCounter.items():
         YearRTotal = YearRTotal + value
-        ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-        RTotalPrcnt = Constants.ConvPercentage(YearRTotal, SUBTotal)
+        ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+        RTotalPrcnt = Constants.ConvPercentage(YearRTotal, TOTALMailCounter)
         print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
           value,
@@ -1205,8 +1158,8 @@ def OutputFileFunc():
       ))
     for key, value in OdRadiusDictCounter.items():
       RadiusRTotal = RadiusRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(RadiusRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(RadiusRTotal, TOTALMailCounter)
       if ValuePrcnt > TOPPercentage:
         print('<tr class="warning"><td></td><td>{} Miles</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
@@ -1241,8 +1194,8 @@ def OutputFileFunc():
         ))
       for key, value in OdMakeDictCounter.items():
         MakeRTotal = MakeRTotal + value
-        ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-        RTotalPrcnt = Constants.ConvPercentage(MakeRTotal, SUBTotal)
+        ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+        RTotalPrcnt = Constants.ConvPercentage(MakeRTotal, TOTALMailCounter)
         if ValuePrcnt > TOPPercentage:
           print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
             key,
@@ -1276,7 +1229,7 @@ def OutputFileFunc():
       ))
     for key, value in OdCityDictCounter.items():
       CityRTotal = CityRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
       if ValuePrcnt > TOPPercentage:
         print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td></tr>'.format(
           key,
@@ -1301,8 +1254,8 @@ def OutputFileFunc():
       ))
     for key, value in OdCityDictCounter.items():
       CityRTotal = CityRTotal + value
-      ValuePrcnt = Constants.ConvPercentage(value, SUBTotal)
-      RTotalPrcnt = Constants.ConvPercentage(CityRTotal, SUBTotal)
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(CityRTotal, TOTALMailCounter)
       if ValuePrcnt > TOPPercentage:
         print('<tr class="warning"><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
           key,
@@ -1323,13 +1276,13 @@ def OutputFileFunc():
     print('</table>')
 
     print('''
-</div>
-</div>
-</body>
-</html>
+    </div>
+    </div>
+    </body>
+    </html>
     ''')
     sys.stdout = Report
-  print('================ TOTAL ================ : {}'.format(GrandTotal))
+  print('================ TOTAL ================ : {}'.format(TOTALMailCounter))
   print('       C  O  M  P  L  E  T  E  D       ')
   print('=======================================')
   print()
@@ -1342,3 +1295,6 @@ if __name__ == '__main__':
     Selection = InputFile
   NormalizeFunc()
   OutputFileFunc()
+  for i in OutputDictOpenFiles:
+    OutputDictOpenFiles[i].close
+
