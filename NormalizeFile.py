@@ -6,10 +6,12 @@ from dateutil.parser import *
 from geopy.distance import vincenty
 from nameparser import HumanName
 from tqdm import tqdm
+
 # ---------------------- #
 os.chdir('../../../../Desktop/')
 CSVFile = glob.glob('*.csv')
 recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
+
 # ---------------------- #
 DropFile = os.path.join(recpath,'_DropFile.csv')
 GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
@@ -18,6 +20,7 @@ ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
 DDUFile = os.path.join(recpath,'DDUFacilites.csv')
 Entries = set()
+
 # ---------------------- #
 print('=======================================')
 print('            NORMALIZING FILE           ')
@@ -40,16 +43,19 @@ else:
   print('=======================================')
   print('         S  T  A  N  D  A  R  D        ')
   print('=======================================')
+
 # ---------------------- #
 # Select Input File from Desktopbr
 for file in CSVFile:
   IPFName = file.strip('.csv') # Extract filename only w/o ext.
   InputFile = file # Filename with ext.
+
 # ---------------------- #
 # Import DoNotMailSet for Constants.py for the purposes of de-duping
 if SuppSelect != 'S':
   Constants.DoNotMailSet = set()
   print('.............. Mail DNQ File Not Loaded')
+
 # ---------------------- #
 # Import DropFile.csv file
 try:
@@ -61,6 +67,7 @@ try:
       DropDict[line[0]] = line[1]
 except:
   print('..... ERROR: Unable to Load Drop Dictionary File')
+
 # ---------------------- #
 # Import GeneralSuppression.csv file
 if SuppSelect == 'S':
@@ -74,6 +81,7 @@ if SuppSelect == 'S':
     print('..... ERROR: Unable to Load GENERAL Suppression File')
 else:
   print('... General Suppression File Not Loaded')
+
 # ---------------------- #
 # Import MonthlySuppression.csv file
 if SuppSelect == 'S':
@@ -87,6 +95,7 @@ if SuppSelect == 'S':
     print('..... ERROR: Unable to Load Montly Suppression File')
 else:
   print('... Monthly Suppression File Not Loaded')
+
 # ---------------------- #
 # Import USZIPCoordinates.csv file
 try:
@@ -97,6 +106,7 @@ try:
       ZipCoordinateDict[line[0]] = (line[1], line[2])
 except:
   print('..... ERROR: Unable to Load Zip Dictionary File')
+
 # ---------------------- #
 # Import SCFFacilites.csv file
 try:
@@ -107,6 +117,7 @@ try:
       SCF3DigitDict[line[0]] = (line[1])
 except:
   print('..... ERROR: Unable to Load SCF 3-Digit Dictionary File')
+
 # ---------------------- #
 # Import DDUFacilites.csv file
 try:
@@ -117,12 +128,14 @@ try:
       DDUDict[line[0]] = (line[1])
 except:
   print('..... ERROR: Unable to Load DDU Dictionary File')
+
 # ---------------------- #
 # Print captured Input file
 print('File Name ........................... : {}'.format(InputFile))
 CentralZip = input('Enter Central Zip Code .............. : ').strip()
 while str(CentralZip) not in ZipCoordinateDict:
   CentralZip = input('ERROR: Enter Zip Codes............... : ').strip()
+
 # Capture Input (Max Radius)
 if SuppSelect == 'S':
   try:
@@ -131,6 +144,7 @@ if SuppSelect == 'S':
     MaxRadius = 100
 else:
   MaxRadius = 1000
+
 # Capture Input (Max Year)
 if SuppSelect == 'S':
   try:
@@ -139,6 +153,7 @@ if SuppSelect == 'S':
     MaxYear = 2015
 else:
   MaxYear = 2020
+
 # Capture Input (Min Year)
 if SuppSelect == 'S':
   try:
@@ -147,6 +162,7 @@ if SuppSelect == 'S':
     MinYear = 1900
 else:
   MinYear = 1
+
 # Capture Input (Max SALE Year)
 if SuppSelect == 'S':
   try:
@@ -155,6 +171,7 @@ if SuppSelect == 'S':
     MaxSaleYear = 2014
 else:
   MaxSaleYear = 2020
+
 # Capture Suppress State List
 if SuppSelect == 'S':
   STATEList = input('Enter Suppression List .......[State] : ')
@@ -165,6 +182,7 @@ if SuppSelect == 'S':
     STATEList = []
 else:
   STATEList = []
+
 # Capture Suppress SCF List
 if SuppSelect == 'S':
   SCFList = input('Enter Suppression List .........[SCF] : ')
@@ -175,6 +193,7 @@ if SuppSelect == 'S':
     SCFList = []
 else:
   SCFList = []
+
 # Capture Suppress Year List
 if SuppSelect == 'S':
   YEARList = input('Enter Suppression List ........[Year] : ')
@@ -185,6 +204,7 @@ if SuppSelect == 'S':
     YEARList = []
 else:
   YEARList = []
+
 # Capture Suppress City List
 if SuppSelect == 'S':
   CITYList = input('Enter Suppression List ........[City] : ')
@@ -195,6 +215,7 @@ if SuppSelect == 'S':
     CITYList =[]
 else:
   CITYList =[]
+
 # Set TOPPercentage
 if SuppSelect == 'S':
   TOPPercentage = input('Set Top % .......................[3%] : ').strip()
@@ -204,6 +225,7 @@ if SuppSelect == 'S':
     TOPPercentage = 3
 else:
   TOPPercentage = 0
+
 # Import Local Suppression File for the purposes of de-duping
 SuppressionFileName = input('Enter Suppression File Name ......... : ').strip()
 SuppressionFile = '{}.csv'.format(SuppressionFileName)
@@ -219,6 +241,7 @@ if SuppressionFileName != '':
     print('ERROR: Cannot load local suppression file\n')
 else:
   print('     No Suppression File Selected     ')
+
 # Set Constants.Vendor
 if SuppSelect == 'S':
   VendorSelect = str.upper(input(
@@ -229,6 +252,7 @@ else:
 print()
 input('       PRESS [ENTER] TO PROCEED        ')
 print()
+
 # ---------------------- #
 # Compare File Header row to HeaderRowMain to determin if re-mapping is required
 ExtractCSVHeader = subprocess.check_output(['head','-n','1',InputFile])
@@ -238,6 +262,7 @@ if ExtractCSVHeader == Constants.HeaderRowMain:
   HRSelect = 'N'
 else:
   HRSelect = 'Y'
+
 # ---------------------- #
 # Function to Re-Map header rows
 def ReMapFunc():
@@ -263,6 +288,7 @@ def ReMapFunc():
           else:
             newline.append('')
         Output.writerow(newline)
+
 # ---------------------- #
 # Function to normalize file
 def NormalizeFunc():
@@ -348,6 +374,7 @@ def NormalizeFunc():
         line[Constants.Vendor] = 'Zolton'
       line[Constants.WinningNum] = WinningNumber
       VendorSelected = line[Constants.Vendor]
+
       # Parse FullName if First & Last Name fields are missing
       if line[Constants.FullName] != '' and \
       line[Constants.FirstName] == '' and\
@@ -359,12 +386,14 @@ def NormalizeFunc():
           line[Constants.LastName] = ParsedFName.last
         except:
           line[Constants.FullName] = ''
+
       # Parse Zip to Zip & Zip4 components (when possible)
       if len(str(line[Constants.Zip])) > 5 and\
       (str(line[Constants.Zip]).find('-') == 5):
         FullZip = line[Constants.Zip].split('-')
         line[Constants.Zip] = FullZip[0]
         line[Constants.Zip4] = FullZip[1]
+
       # Combine Zip + CRRT fields
       if line[Constants.Zip] != '' and\
       line[Constants.CRRT] != '':
@@ -378,6 +407,7 @@ def NormalizeFunc():
             line[Constants.Zip],
             line[Constants.CRRT]
             )
+
       # Combine Address1 + Address2
       if line[Constants.AddressComb] == '' and\
       line[Constants.Address1] != '' and\
@@ -391,9 +421,11 @@ def NormalizeFunc():
         line[Constants.AddressComb] = str.title(line[Constants.Address1])
       else:
         line[Constants.AddressComb] = str.title(line[Constants.AddressComb])
+
       # Expand Abreviated State
       if str.upper(line[Constants.State]) in Constants.USStatesDict:
         line[Constants.ExpState] = Constants.USStatesDict[str.upper(line[Constants.State])]
+
       # Set Drop Index from Drop Dictionary and Set CustomerID
       if line[Constants.PURL] == '':
         if str(line[Constants.ZipCRRT]) in DropDict:
@@ -420,6 +452,7 @@ def NormalizeFunc():
             str(Constants.SeqNumPurchase)
             )
           Constants.SeqNumPurchase += 1
+
       # Parse & Clean up Phone#
       if line[Constants.MPhone] != '' and\
       len(str(line[Constants.MPhone])) > 6:
@@ -432,6 +465,7 @@ def NormalizeFunc():
         line[Constants.Phone] = Constants.ReformatPhoneNum(line[Constants.WPhone])
       else:
         line[Constants.Phone] = ''
+
       # Re-Format Phone#
       if len(str(line[Constants.Phone])) == 10:
         line[Constants.Phone] = '({}) {}-{}'.format(
@@ -446,6 +480,7 @@ def NormalizeFunc():
           )
       else:
         line[Constants.Phone] = ''
+
       # Set Case for data fields
       line[Constants.FullName] = str.title(line[Constants.FullName])
       line[Constants.FirstName] = str.title(line[Constants.FirstName])
@@ -463,12 +498,14 @@ def NormalizeFunc():
       line[Constants.Model] = str.title(line[Constants.Model])
       line[Constants.Email] = str.lower(line[Constants.Email])
       line[Constants.State] = str.upper(line[Constants.State])
+
       # Set VIN Length
       line[Constants.VINLen] = len(str(line[Constants.VIN]))
       if line[Constants.VINLen] < 17:
         line[Constants.VIN] = ''
       else:
         line[Constants.VIN] = str.upper(line[Constants.VIN])
+
       # Set SCF Facility Location
       ZipLen = len(str(line[Constants.Zip]))
       if ZipLen < 5:
@@ -477,6 +514,7 @@ def NormalizeFunc():
         line[Constants.SCF] = (line[Constants.Zip])[:3]
       if str(line[Constants.SCF]) in SCF3DigitDict:
         line[Constants.SCF3DFacility] = SCF3DigitDict[str(line[Constants.SCF])]
+
       # Set Central Zip SCF Facility location
       CentralZipLen = len(str(CentralZip))
       if CentralZipLen < 5:
@@ -485,35 +523,42 @@ def NormalizeFunc():
         CentralZipSCF3Digit = str(CentralZip[:3])
       if str(CentralZipSCF3Digit) in SCF3DigitDict:
         CentralZipSCFFacilityReport = SCF3DigitDict[str(CentralZipSCF3Digit)]
+
       # Set DDU Facility Location
       if str(line[Constants.Zip]) in DDUDict:
         line[Constants.DDUFacility] = DDUDict[str(line[Constants.Zip])]
+
       # Calculate Radius from CENTRAL Constants.Zip
       try:
         line[Constants.Zip] = int(line[Constants.Zip])
       except:
         line[Constants.Zip] = 9999
+
       # Remove Leading 0 from Constants.Zip Code
       if str(line[Constants.Zip])[:1] == 0 and\
       len(str(line[Constants.Zip])) == 4:
         line[Constants.Zip] = line[Constants.Zip][-4:]
+
       # Set Long & Lat Coordinates for Central Zip Code and Zip Code
       OriginZipCoord = ZipCoordinateDict[str(CentralZip)]
       if str(line[Constants.Zip]) in ZipCoordinateDict:
         line[Constants.Coordinates] = ZipCoordinateDict[str(line[Constants.Zip])]
       else:
         line[Constants.Coordinates] = ''
+
       # Set Constants.Radius
       if line[Constants.Coordinates] == '':
         line[Constants.Radius] = 9999.9999
       else:
         line[Constants.Radius] = vincenty(OriginZipCoord,line[Constants.Coordinates]).miles
         line[Constants.Radius] = round(float(line[Constants.Radius]),2)
+
       # Parse Date Field to DateTime format
       try:
         line[Constants.Date] = parse(line[Constants.Date]).date()
       except:
         line[Constants.Date] = ''
+
       # Apply "Blitz-DNQ" Parameters
       try:
         if len(str(line[Constants.Phone])) < 8 and\
@@ -521,6 +566,7 @@ def NormalizeFunc():
           line[Constants.BlitzDNQ] = 'dnq'
       except:
         line[Constants.BlitzDNQ] = ''
+
       # Apply Universal MAIL-DNQ Parameters
       if line[Constants.FirstName] == '' or\
       line[Constants.LastName] == '' or\
@@ -530,6 +576,7 @@ def NormalizeFunc():
       (line[Constants.Zip] == '') or\
       float(line[Constants.Radius]) > MaxRadius:
         line[Constants.MailDNQ] = 'dnq'
+
       # Test Constants.Year Validity
       try:
         YearValidityTest = int(line[Constants.Year])
@@ -541,11 +588,13 @@ def NormalizeFunc():
           line[Constants.MailDNQ] = 'dnq'
       except:
         line[Constants.Year] = 'n/a'
+
       # Set 'n/a' for Constants.Make & Constants.Model blank fields
       if line[Constants.Make] == '':
         line[Constants.Make] = 'n/a'
       if line[Constants.Model] == '':
         line[Constants.Model] = 'n/a'
+
       # Prse & Test DelDate Validity
       try:
         line[Constants.DelDate] = parse(line[Constants.DelDate]).date()
@@ -557,10 +606,12 @@ def NormalizeFunc():
         line[Constants.Dld_Year] = line[Constants.DelDate].year
         line[Constants.Dld_Month] = line[Constants.DelDate].month
         line[Constants.Dld_Day] = line[Constants.DelDate].day
+
       # Check Constants.Ethnicity
       CleanName = Constants.StripAndCleanName(line[Constants.LastName])
       if CleanName in Constants.CommonHispLastNameList:
         line[Constants.Ethnicity] = 'Hisp'
+
       # Set Adjusted KBB Value
       if line[Constants.KBB] != '':
         try:
@@ -575,10 +626,12 @@ def NormalizeFunc():
             line[Constants.AdjustedKBBValue] = '${:,}'.format(AdjKBB)
         except:
           line[Constants.MailDNQ] = 'dnq'
+
       # Validate Email Address
       if line[Constants.Email] != '':
         if not bool(re.search(r'.+@.+',line[Constants.Email],flags=re.I)):
           line[Constants.Email] = ''
+
       # Dedupe againts suppression files
       if str.lower(line[Constants.FirstName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.MI]) in Constants.DoNotMailSet or\
@@ -588,6 +641,7 @@ def NormalizeFunc():
       str(line[Constants.Year]) in YEARList or\
       str.lower(line[Constants.City]) in CITYList:
         line[Constants.MailDNQ] = 'dnq'
+
       # Generate COUNTERS
       def GenCounter(record, DictCntr):
         if str(record) not in DictCntr:
@@ -612,6 +666,7 @@ def NormalizeFunc():
       GenCounter(line[Constants.DDUFacility], DDUFacilityCounter)
       GenCounter(line[Constants.SCF3DFacility], SCF3DFacilityCounter)
       GenCounter(line[Constants.Drop], DropDictCounter)
+
       # OUTPUT Generate Phone File
       if line[Constants.Phone] != '' and\
       line[Constants.BlitzDNQ] != 'dnq' and\
@@ -640,6 +695,7 @@ def NormalizeFunc():
         else:
           OutputPhones = csv.writer(CleanOutputPhones)
           OutputPhones.writerow(HeaderRowPhonesOutput)
+
       # OUTPUT Dupes and Mail-DNQ Files
       key = (str.title(line[Constants.AddressComb]), str(line[Constants.Zip]))
       if key not in Entries:
@@ -680,6 +736,7 @@ def NormalizeFunc():
           OutDupes.writerow(line)
           Entries.add(key)
           DupesCounter += 1
+
       # Generate Suppression File
       if line[Constants.PURL] != '':
         HeaderRowSuppressionStat = [
@@ -708,6 +765,7 @@ def NormalizeFunc():
         else:
           MonthlySupp = csv.writer(AppendMonthlySupp)
           MonthlySupp.writerow(HeaderRowSuppressionOutput)
+
       # Generate Email File
       if line[Constants.PURL] == '':
         HeaderRowEmail = [
@@ -748,6 +806,7 @@ def NormalizeFunc():
         else:
           CleanEmailOutput = csv.writer(CleanEmail)
           CleanEmailOutput.writerow(HeaderRowEmailOutput)
+
       # Output Database File
       if SourceSelect == 'D' and\
       line[Constants.PURL] == '':
@@ -793,6 +852,7 @@ def NormalizeFunc():
         else:
           OutputCleanDatabase = csv.writer(CleanOutputDatabase)
           OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
+
       # Output Purchase File
       elif SourceSelect == 'P' and\
       line[Constants.PURL] == '':
@@ -842,6 +902,7 @@ def NormalizeFunc():
         else:
           OutputCleanPurchase = csv.writer(CleanOutputPurchase)
           OutputCleanPurchase.writerow(HeaderRowPurchaseOutput)
+
       # Output files based on line[Constants.Drop] value
       else:
         HeaderRowAppendStat = [
@@ -891,6 +952,7 @@ def NormalizeFunc():
         else:
           DropOutput = csv.writer(OutputDictOpenFiles[line[Constants.Drop]])
           DropOutput.writerow(HeaderRowAppendOutput)
+
 # ---------------------- #
 # Function to generate output file
 def OutputFileFunc():
@@ -935,7 +997,7 @@ def OutputFileFunc():
     print('</tbody>')
     print('</table>')
     print('<p></p>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>TOTAL Mail Quantity</b></p>')
@@ -961,7 +1023,7 @@ def OutputFileFunc():
         ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per State</b></p>')
@@ -987,7 +1049,7 @@ def OutputFileFunc():
         ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per Destination Delivery Unit (DDU) ( > 500 )</b></p>')
@@ -1014,7 +1076,7 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per Sectional Center Facility (SCF)</b></p>')
@@ -1040,7 +1102,7 @@ def OutputFileFunc():
         ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per 3-Digit Zip Code Prefix Groups — SCF Sortation</b></p>')
@@ -1093,7 +1155,7 @@ def OutputFileFunc():
             ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     SortedSCFText = ''
     OdSCFDictCounter = collections.OrderedDict(sorted(
       SCFDictCounter.items(), key=lambda t: t[0]
@@ -1104,7 +1166,7 @@ def OutputFileFunc():
         key
         )
     print('<!--',SortedSCFText,'-->')
-
+    # ---------------------- #
     if len(YearDictCounter) !=  1:
       print('<table class="table table-hover">')
       print('<div class="alert alert-info">')
@@ -1131,7 +1193,7 @@ def OutputFileFunc():
           ))
       print('</tbody>')
       print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per Central Zip Radius</b></p>')
@@ -1202,7 +1264,7 @@ def OutputFileFunc():
             ))
       print('</tbody>')
       print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per City ( > {}% )</b></p>'.format(TOPPercentage))
@@ -1227,7 +1289,7 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('<table class="table table-hover">')
     print('<div class="alert alert-info">')
     print('<p class="text-center"><b>Quantity per City</b></p>')
@@ -1262,7 +1324,7 @@ def OutputFileFunc():
           ))
     print('</tbody>')
     print('</table>')
-
+    # ---------------------- #
     print('''
     </div>
     </div>
