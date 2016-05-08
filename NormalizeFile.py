@@ -320,6 +320,7 @@ def NormalizeFunc():
   global SeqNumPurchase
   global StateDictCounter
   global DropDictCounter
+  global SoldYearCounter
   global TOPPercentage
   global YearDictCounter
   global OutputDroplist
@@ -352,6 +353,7 @@ def NormalizeFunc():
     SCF3DFacilityCounter = {}
     DDUFacilityCounter = {}
     DropDictCounter = {}
+    SoldYearCounter = {}
     OutputDroplist = []
     OutputDictOpenFiles = {}
     MDNQCounter = 0
@@ -664,6 +666,7 @@ def NormalizeFunc():
       GenCounter(line[Constants.DDUFacility], DDUFacilityCounter)
       GenCounter(line[Constants.SCF3DFacility], SCF3DFacilityCounter)
       GenCounter(line[Constants.Drop], DropDictCounter)
+      GenCounter(line[Constants.Dld_Year], SoldYearCounter)
 
       # OUTPUT Dupes and Mail-DNQ Files
       key = (str.title(line[Constants.AddressComb]), str(line[Constants.Zip]))
@@ -1163,6 +1166,38 @@ def OutputFileSummaryReport():
         key
         )
     print('<!--',SortedSCFText,'-->')
+
+    # ---------------------- #
+    print('<table class="table table-hover">')
+    print('<div class="alert alert-info">')
+    print('<p class="text-center"><b>Year Sold Quantity</b></p>')
+    print('</div>')
+    print('<thead>')
+    print('<tr><th></th><th>Year Sold</th><th>Count</th><th>Year Sold%</th><th>RTotal</th><th>RTotal%</th></tr>')
+    print('</thead>')
+    print('<tbody>')
+    SoldYearRTotal = 0
+    OdSoldYearCounter = collections.OrderedDict(sorted(
+      SoldYearCounter.items(), key=lambda t: t[0], reverse = True
+      ))
+    for key, value in OdSoldYearCounter.items():
+      SoldYearRTotal = SoldYearRTotal + value
+      ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
+      RTotalPrcnt = Constants.ConvPercentage(SoldYearRTotal, TOTALMailCounter)
+      if key == '':
+        NewKey = 'n/a'
+      else:
+        NewKey = key
+      print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
+        NewKey,
+        value,
+        round(ValuePrcnt,2),
+        SoldYearRTotal,
+        round(RTotalPrcnt,2)
+        ))
+    print('</tbody>')
+    print('</table>')
+
     # ---------------------- #
     if len(YearDictCounter) !=  1:
       print('<table class="table table-hover">')
