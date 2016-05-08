@@ -27,13 +27,18 @@ print('            NORMALIZING FILE           ')
 print('=======================================')
 print()
 # Select processing Mode
-SuppSelect = str.upper(input('Select Mode..... (B)asic    | (S)tandard: '))
+SuppSelect = str.upper(input('Select Mode............ (B)asic    | (S)tandard: '))
 while SuppSelect != 'S' and SuppSelect != 'B':
   SuppSelect = str.upper(input('ERROR! Enter Valid Selection... : '))
 # Select Source Mode
-SourceSelect = str.upper(input('Select Source... (D)atabase | (P)urchase: '))
+SourceSelect = str.upper(input('Select Source.......... (D)atabase | (P)urchase: '))
 while SourceSelect != 'D' and SourceSelect != 'P':
   SourceSelect = str.upper(input('ERROR! Enter Valid Selection... : '))
+# Generate Output Files
+OutputFileSelect = str.upper(input('Generate Output Files..    (Y)es   |    (N)o   : '))
+while OutputFileSelect != 'Y' and OutputFileSelect != 'N':
+  OutputFileSelect = str.upper(input('ERROR! Enter Valid Selection... : '))
+
 if SuppSelect == 'B':
   print('=======================================')
   print('             B  A  S  I  C             ')
@@ -307,7 +312,6 @@ def NormalizeFunc():
   global MaxSaleYear
   global MDNQ
   global MDNQCounter
-  global PurchaseCounter
   global RadiusDictCounter
   global SCF3DFacilityCounter
   global DDUFacilityCounter
@@ -322,7 +326,7 @@ def NormalizeFunc():
   global OutputDictOpenFiles
   global TOTALMailCounter
   with open(Selection, 'rU') as InputFile,\
-  open('{}_CleanOutputMain.csv'.format(IPFName), 'at') as CleanOutput,\
+  open('{}_UpdatedOutputMAIN.csv'.format(IPFName), 'at') as CleanOutput,\
   open('>>> Dupes <<<.csv', 'at') as Dupes,\
   open('>>> M-DNQ <<<.csv', 'at') as MDNQ,\
   open('{}_PHONES.csv'.format(IPFName), 'at') as CleanOutputPhones,\
@@ -332,15 +336,9 @@ def NormalizeFunc():
   open('{}_AddToMonthlySuppression.csv'.format(IPFName), 'at') as AppendMonthlySupp:
     CleanOutputFirstTime = True
     DatabaseFirstTime = True
-    PurchaseFirstTimeP = True
-    PurchaseFirstTimeN = True
-    PurchaseFirstTimeR = True
     PurchaseFirstTimeAll = True
     PhonesFirstTime = True
     DupesFirstTime = True
-    AppendFirstTimeP = True
-    AppendFirstTimeN = True
-    AppendFirstTimeR = True
     MDNQFirstTime = True
     MonthlySuppressionFirstTime = True
     EmailFirstTime = True
@@ -354,11 +352,11 @@ def NormalizeFunc():
     SCF3DFacilityCounter = {}
     DDUFacilityCounter = {}
     DropDictCounter = {}
+    OutputDroplist = []
+    OutputDictOpenFiles = {}
     MDNQCounter = 0
     DupesCounter = 0
     TOTALMailCounter = 0
-    OutputDroplist = []
-    OutputDictOpenFiles = {}
     Input = csv.reader(InputFile)
     next(InputFile)
     for line in tqdm(Input):
@@ -667,35 +665,6 @@ def NormalizeFunc():
       GenCounter(line[Constants.SCF3DFacility], SCF3DFacilityCounter)
       GenCounter(line[Constants.Drop], DropDictCounter)
 
-      # OUTPUT Generate Phone File
-      if line[Constants.Phone] != '' and\
-      line[Constants.BlitzDNQ] != 'dnq' and\
-      line[Constants.MailDNQ] != 'dnq':
-        HeaderRowPhonesStat = [
-          'FirstName',
-          'LastName',
-          'Phone',
-          'Last Veh Year',
-          'Last Veh Make',
-          'Last Veh Model'
-          ]
-        HeaderRowPhonesOutput = (
-          line[Constants.FirstName],
-          line[Constants.LastName],
-          line[Constants.Phone],
-          line[Constants.Year],
-          line[Constants.Make],
-          line[Constants.Model]
-          )
-        if PhonesFirstTime:
-          OutputPhones = csv.writer(CleanOutputPhones)
-          OutputPhones.writerow(HeaderRowPhonesStat)
-          OutputPhones.writerow(HeaderRowPhonesOutput)
-          PhonesFirstTime = False
-        else:
-          OutputPhones = csv.writer(CleanOutputPhones)
-          OutputPhones.writerow(HeaderRowPhonesOutput)
-
       # OUTPUT Dupes and Mail-DNQ Files
       key = (str.title(line[Constants.AddressComb]), str(line[Constants.Zip]))
       if key not in Entries:
@@ -712,7 +681,7 @@ def NormalizeFunc():
             OutMDNQ.writerow(line)
             Entries.add(key)
             MDNQCounter += 1
-        else:
+        elif MDNQCounter + DupesCounter != 0:
           if CleanOutputFirstTime:
             OutputClean = csv.writer(CleanOutput)
             OutputClean.writerow(Constants.HeaderRowMain)
@@ -737,8 +706,8 @@ def NormalizeFunc():
           Entries.add(key)
           DupesCounter += 1
 
-      # Generate Suppression File
-      if line[Constants.PURL] != '':
+      # Output Suppression File
+      if OutputFileSelect == 'Y':
         HeaderRowSuppressionStat = [
           'FirstName',
           'LastName',
@@ -766,8 +735,38 @@ def NormalizeFunc():
           MonthlySupp = csv.writer(AppendMonthlySupp)
           MonthlySupp.writerow(HeaderRowSuppressionOutput)
 
-      # Generate Email File
-      if line[Constants.PURL] == '':
+      # Output Phone File
+      if OutputFileSelect == 'Y' and\
+      line[Constants.Phone] != '' and\
+      line[Constants.BlitzDNQ] != 'dnq' and\
+      line[Constants.MailDNQ] != 'dnq':
+        HeaderRowPhonesStat = [
+          'FirstName',
+          'LastName',
+          'Phone',
+          'Last Veh Year',
+          'Last Veh Make',
+          'Last Veh Model'
+          ]
+        HeaderRowPhonesOutput = (
+          line[Constants.FirstName],
+          line[Constants.LastName],
+          line[Constants.Phone],
+          line[Constants.Year],
+          line[Constants.Make],
+          line[Constants.Model]
+          )
+        if PhonesFirstTime:
+          OutputPhones = csv.writer(CleanOutputPhones)
+          OutputPhones.writerow(HeaderRowPhonesStat)
+          OutputPhones.writerow(HeaderRowPhonesOutput)
+          PhonesFirstTime = False
+        else:
+          OutputPhones = csv.writer(CleanOutputPhones)
+          OutputPhones.writerow(HeaderRowPhonesOutput)
+
+      # Output Email/Eblast File
+      if OutputFileSelect == 'Y':
         HeaderRowEmail = [
           'Customer ID',
           'FirstName',
@@ -809,7 +808,7 @@ def NormalizeFunc():
 
       # Output Database File
       if SourceSelect == 'D' and\
-      line[Constants.PURL] == '':
+      OutputFileSelect == 'Y':
         HeaderRowDatabaseStat = [
           'Customer ID',
           'FirstName',
@@ -854,8 +853,8 @@ def NormalizeFunc():
           OutputCleanDatabase.writerow(HeaderRowDatabaseOutput)
 
       # Output Purchase File
-      elif SourceSelect == 'P' and\
-      line[Constants.PURL] == '':
+      if SourceSelect == 'P' and\
+      OutputFileSelect == 'Y':
         HeaderRowPurchaseStat = [
           'Customer ID',
           'FirstName',
@@ -903,8 +902,8 @@ def NormalizeFunc():
           OutputCleanPurchase = csv.writer(CleanOutputPurchase)
           OutputCleanPurchase.writerow(HeaderRowPurchaseOutput)
 
-      # Output files based on line[Constants.Drop] value
-      else:
+      # Output Multiple Drop Files
+      if OutputFileSelect == 'Y':
         HeaderRowAppendStat = [
           'PURL',
           'FirstName',
@@ -955,7 +954,7 @@ def NormalizeFunc():
 
 # ---------------------- #
 # Function to generate output file
-def OutputFileFunc():
+def OutputFileSummaryReport():
   Report = sys.stdout
   with open('SUMMARY-REPORT_{}.html'.format(IPFName),'w') as Log:
     RadiusKeyList = sorted(RadiusDictCounter)
@@ -991,9 +990,7 @@ def OutputFileFunc():
     print('<tr><td>Max Radius</td><td>{}</td></tr>'.format(HighestRadius))
     print('<tr><td>Max Year</td><td>{}</td></tr>'.format(HigherstYear))
     print('<tr><td>Min Year</td><td>{}</td></tr>'.format(LowestYear))
-    print('<tr><td>Sold Years up to</td><td>{}</td></tr>'.format(MaxSaleYear))
-    print('<tr><td>Mail DNQ Total</td><td>({})</td></tr>'.format(MDNQCounter))
-    print('<tr><td>Dupes Total</td><td>({})</td></tr>'.format(DupesCounter))
+    print('<tr><td>Sold Years Max</td><td>{}</td></tr>'.format(MaxSaleYear))
     print('</tbody>')
     print('</table>')
     print('<p></p>')
@@ -1336,7 +1333,6 @@ def OutputFileFunc():
   print('       C  O  M  P  L  E  T  E  D       ')
   print('=======================================')
   print()
-  Constants.Upkeep()
 # ---------------------- #
 if __name__ == '__main__':
   if HRSelect == 'Y':
@@ -1344,7 +1340,9 @@ if __name__ == '__main__':
   else:
     Selection = InputFile
   NormalizeFunc()
-  OutputFileFunc()
+  if (MDNQCounter + DupesCounter) == 0:
+    OutputFileSummaryReport()
   for i in OutputDictOpenFiles:
     OutputDictOpenFiles[i].close
+  Constants.Upkeep()
 
