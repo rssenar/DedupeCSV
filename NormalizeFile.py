@@ -217,9 +217,20 @@ if SuppSelect == 'S':
     CITYList = sorted(Constants.ConvertStringToList(CITYList))
     print('...CITYList : {}'.format(CITYList))
   else:
-    CITYList =[]
+    CITYList = []
 else:
-  CITYList =[]
+  CITYList = []
+
+# Capture Sold Year List
+if SuppSelect == 'S':
+  SoldYearList = input('Enter Suppression List ...[Sold Year] : ')
+  if SoldYearList != '':
+    SoldYearList = sorted(Constants.ConvertStringToList(SoldYearList))
+    print('...SoldYearList : {}'.format(SoldYearList))
+  else:
+    SoldYearList = []
+else:
+  SoldYearList = []
 
 # Set TOPPercentage
 if SuppSelect == 'S':
@@ -371,7 +382,7 @@ def NormalizeFunc():
         line[Constants.Vendor] = 'Shopper'
       else:
         WinningNumber = 42619 # Default
-        line[Constants.Vendor] = 'Zolton'
+        line[Constants.Vendor] = 'PWC'
       line[Constants.WinningNum] = WinningNumber
       VendorSelected = line[Constants.Vendor]
 
@@ -639,6 +650,7 @@ def NormalizeFunc():
       str.lower(line[Constants.State]) in STATEList or\
       str.lower(line[Constants.SCF]) in SCFList or\
       str(line[Constants.Year]) in YEARList or\
+      str(line[Constants.Dld_Year]) in SoldYearList or\
       str.lower(line[Constants.City]) in CITYList:
         line[Constants.MailDNQ] = 'dnq'
 
