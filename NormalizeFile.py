@@ -1078,9 +1078,13 @@ def OutputFileSummaryReport():
       DDUFacilityRTotal = DDUFacilityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
       RTotalPrcnt = Constants.ConvPercentage(DDUFacilityRTotal, TOTALMailCounter)
+      if key == '':
+        NewKey = 'Not Available'
+      else:
+        NewKey = key
       if value >= 500:
         print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
+          NewKey,
           value,
           round(ValuePrcnt,2),
           DDUFacilityRTotal,
@@ -1105,8 +1109,12 @@ def OutputFileSummaryReport():
       SCFFacilityRTotal = SCFFacilityRTotal + value
       ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
       RTotalPrcnt = Constants.ConvPercentage(SCFFacilityRTotal, TOTALMailCounter)
+      if key == '':
+        NewKey = 'Not Available'
+      else:
+        NewKey = key
       print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-        key,
+        NewKey,
         value,
         round(ValuePrcnt,2),
         SCFFacilityRTotal,
@@ -1197,7 +1205,7 @@ def OutputFileSummaryReport():
       ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
       RTotalPrcnt = Constants.ConvPercentage(SoldYearRTotal, TOTALMailCounter)
       if key == '':
-        NewKey = 'n/a'
+        NewKey = 'Not Available'
       else:
         NewKey = key
       print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
