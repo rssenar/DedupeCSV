@@ -144,42 +144,51 @@ while str(CentralZip) not in ZipCoordinateDict:
 # Capture Input (Max Radius)
 if SuppSelect == 'S':
   try:
-    MaxRadius = int(input('Enter MAX Radius ...............[100] : ').strip())
+    MaxRadius = int(input('Enter MAX Radius ................[30] : ').strip())
   except:
-    MaxRadius = 100
+    MaxRadius = 30
 else:
-  MaxRadius = 1000
+  MaxRadius = 5000
 
-# Capture Input (Max Year)
+# Capture Input (Max Vehicle Year)
 if SuppSelect == 'S':
   try:
-    MaxYear = int(input('Enter MAX Year ................[2015] : ').strip())
+    MaxYear = int(input('Enter MAX Vehicle Year ........[2015] : ').strip())
   except:
     MaxYear = 2015
 else:
-  MaxYear = 2020
+  MaxYear = 2050
 
-# Capture Input (Min Year)
+# Capture Input (Min Vehicle Year)
 if SuppSelect == 'S':
   try:
-    MinYear = int(input('Enter MIN Year ................[1900] : ').strip())
+    MinYear = int(input('Enter MIN Vehicle Year ........[1995] : ').strip())
   except:
-    MinYear = 1900
+    MinYear = 1995
 else:
   MinYear = 1
 
-# Capture Input (Max SALE Year)
+# Capture Input (Max DelDate Year)
 if SuppSelect == 'S':
   try:
-    MaxSaleYear = int(input('Enter SOLD Years up to ........[2014] : ').strip())
+    MaxSaleYear = int(input('Enter MAX DelDate Year ........[2014] : ').strip())
   except:
     MaxSaleYear = 2014
 else:
-  MaxSaleYear = 2020
+  MaxSaleYear = 2050
+
+# Capture Input (Min DelDate Year)
+if SuppSelect == 'S':
+  try:
+    MinSaleYear = int(input('Enter MIN DelDate Year ........[2006] : ').strip())
+  except:
+    MinSaleYear = 2006
+else:
+  MinSaleYear = 1
 
 # Capture Suppress State List
 if SuppSelect == 'S':
-  STATEList = input('Enter Suppression List .......[State] : ')
+  STATEList = input('Enter Selection List .........[State] : ')
   if STATEList != '':
     STATEList = sorted(Constants.ConvertStringToList(STATEList))
     print('..STATEList : {}'.format(STATEList))
@@ -190,7 +199,7 @@ else:
 
 # Capture Suppress SCF List
 if SuppSelect == 'S':
-  SCFList = input('Enter Suppression List .........[SCF] : ')
+  SCFList = input('Enter Selection List ........[3Digit] : ')
   if SCFList != '':
     SCFList = sorted(Constants.ConvertStringToList(SCFList))
     print('....SCFList : {}'.format(SCFList))
@@ -198,17 +207,6 @@ if SuppSelect == 'S':
     SCFList = []
 else:
   SCFList = []
-
-# Capture Suppress Year List
-if SuppSelect == 'S':
-  YEARList = input('Enter Suppression List ........[Year] : ')
-  if YEARList != '':
-    YEARList = sorted(Constants.ConvertStringToList(YEARList))
-    print('...YEARList : {}'.format(YEARList))
-  else:
-    YEARList = []
-else:
-  YEARList = []
 
 # Capture Suppress City List
 if SuppSelect == 'S':
@@ -220,17 +218,6 @@ if SuppSelect == 'S':
     CITYList = []
 else:
   CITYList = []
-
-# Capture Sold Year List
-if SuppSelect == 'S':
-  SoldYearList = input('Enter Suppression List ...[Sold Year] : ')
-  if SoldYearList != '':
-    SoldYearList = sorted(Constants.ConvertStringToList(SoldYearList))
-    print('...SoldYearList : {}'.format(SoldYearList))
-  else:
-    SoldYearList = []
-else:
-  SoldYearList = []
 
 # Set TOPPercentage
 if SuppSelect == 'S':
@@ -452,13 +439,13 @@ def NormalizeFunc():
               )
             Constants.SeqNumPurchase += 1
         elif SourceSelect == 'D':
-          line[Constants.Drop] = 'Database'
+          line[Constants.Drop] = 'DATABASE'
           line[Constants.CustomerID] = 'D{}'.format(
             str(Constants.SeqNumDatabase)
             )
           Constants.SeqNumDatabase += 1
         elif SourceSelect == 'P':
-          line[Constants.Drop] = 'Purchase'
+          line[Constants.Drop] = 'PURCHASE'
           line[Constants.CustomerID] = 'P{}'.format(
             str(Constants.SeqNumPurchase)
             )
@@ -595,10 +582,10 @@ def NormalizeFunc():
           line[Constants.Year] = Constants.YearDecodeDict[int(line[Constants.Year])]
         if int(line[Constants.Year]) > MaxYear:
           line[Constants.MailDNQ] = 'dnq'
-        if int(line[Constants.Year]) < MinYear:
+        if int(line[Constants.Year]) < MinYear and line[Constants.DelDate] == '':
           line[Constants.MailDNQ] = 'dnq'
       except:
-        line[Constants.Year] = 'n/a'
+        line[Constants.Year] = ''
 
       # Set 'n/a' for Constants.Make & Constants.Model blank fields
       if line[Constants.Make] == '':
@@ -609,7 +596,8 @@ def NormalizeFunc():
       # Prse & Test DelDate Validity
       try:
         line[Constants.DelDate] = parse(line[Constants.DelDate]).date()
-        if int(line[Constants.DelDate].year) > MaxSaleYear:
+        if int(line[Constants.DelDate].year) > MaxSaleYear or\
+        int(line[Constants.DelDate].year) < MinSaleYear:
           line[Constants.MailDNQ] = 'dnq'
       except:
         line[Constants.DelDate] = ''
@@ -646,13 +634,17 @@ def NormalizeFunc():
       # Dedupe againts suppression files
       if str.lower(line[Constants.FirstName]) in Constants.DoNotMailSet or\
       str.lower(line[Constants.MI]) in Constants.DoNotMailSet or\
-      str.lower(line[Constants.LastName]) in Constants.DoNotMailSet or\
-      str.lower(line[Constants.State]) in STATEList or\
-      str.lower(line[Constants.SCF]) in SCFList or\
-      str(line[Constants.Year]) in YEARList or\
-      str(line[Constants.Dld_Year]) in SoldYearList or\
-      str.lower(line[Constants.City]) in CITYList:
+      str.lower(line[Constants.LastName]) in Constants.DoNotMailSet:
         line[Constants.MailDNQ] = 'dnq'
+      if STATEList != []:
+        if str.lower(line[Constants.State]) not in STATEList:
+          line[Constants.MailDNQ] = 'dnq'
+      if SCFList != []:
+        if str(line[Constants.SCF]) not in SCFList:
+          line[Constants.MailDNQ] = 'dnq'
+      if CITYList != []:
+        if str.lower(line[Constants.City]) in CITYList:
+          line[Constants.MailDNQ] = 'dnq'
 
       # Generate COUNTERS
       def GenCounter(record, DictCntr):
@@ -696,7 +688,7 @@ def NormalizeFunc():
             OutMDNQ.writerow(line)
             Entries.add(key)
             MDNQCounter += 1
-        elif MDNQCounter + DupesCounter != 0:
+        else:
           if CleanOutputFirstTime:
             OutputClean = csv.writer(CleanOutput)
             OutputClean.writerow(Constants.HeaderRowMain)
@@ -979,7 +971,6 @@ def OutputFileSummaryReport():
     HighestRadius = Constants.ConvListToString(sorted(NewRadiusList)[-1:])
     HigherstYear = Constants.ConvListToString(sorted(YearDictCounter)[-1:])
     LowestYear = Constants.ConvListToString(sorted(YearDictCounter)[:1])
-    TodayDateTime = datetime.datetime.now()
     sys.stdout = Log
     print('''
     <!DOCTYPE html>
@@ -999,13 +990,9 @@ def OutputFileSummaryReport():
     print('</div>')
     print('<table class="table table-hover">')
     print('<tbody>')
-    print('<tr><td>Summary Report Date</td><td>{}</td></tr>'.format(TodayDateTime))
+    print('<tr><td>Summary Report Date</td><td>{}</td></tr>'.format(datetime.date.today()))
     print('<tr><td>Central Zip Code</td><td>{}</td></tr>'.format(CentralZip))
-    print('<tr><td>SCF Facility</td><td>{}</td></tr>'.format(CentralZipSCFFacilityReport))
-    print('<tr><td>Max Radius</td><td>{}</td></tr>'.format(HighestRadius))
-    print('<tr><td>Max Year</td><td>{}</td></tr>'.format(HigherstYear))
-    print('<tr><td>Min Year</td><td>{}</td></tr>'.format(LowestYear))
-    print('<tr><td>Sold Years Max</td><td>{}</td></tr>'.format(MaxSaleYear))
+    print('<tr><td>Central Zip SCF Facility</td><td>{}</td></tr>'.format(CentralZipSCFFacilityReport))
     print('</tbody>')
     print('</table>')
     print('<p></p>')
@@ -1015,7 +1002,7 @@ def OutputFileSummaryReport():
     print('<p class="text-center"><b>TOTAL Mail Quantity</b></p>')
     print('</div>')
     print('<thead>')
-    print('<tr><th></th><th>Drop</th><th>Count</th><th>Drop%</th><th>RTotal</th><th>RTotal%</th></tr>')
+    print('<tr><th></th><th>Source</th><th>Count</th><th>Source%</th><th>RTotal</th><th>RTotal%</th></tr>')
     print('</thead>')
     print('<tbody>')
     DropRTotal = 0
@@ -1222,10 +1209,10 @@ def OutputFileSummaryReport():
     if len(YearDictCounter) !=  1:
       print('<table class="table table-hover">')
       print('<div class="alert alert-info">')
-      print('<p class="text-center"><b>Quantity per Year</b></p>')
+      print('<p class="text-center"><b>Vehicle Year Quantity</b></p>')
       print('</div>')
       print('<thead>')
-      print('<tr><th></th><th>Year</th><th>Count</th><th>Year%</th><th>RTotal</th><th>RTotal%</th></tr>')
+      print('<tr><th></th><th>Vehicle Year</th><th>Count</th><th>Vehicle Year%</th><th>RTotal</th><th>RTotal%</th></tr>')
       print('</thead>')
       print('<tbody>')
       YearRTotal = 0
@@ -1236,8 +1223,12 @@ def OutputFileSummaryReport():
         YearRTotal = YearRTotal + value
         ValuePrcnt = Constants.ConvPercentage(value, TOTALMailCounter)
         RTotalPrcnt = Constants.ConvPercentage(YearRTotal, TOTALMailCounter)
+        if key == '':
+          NewKey = 'Not Available'
+        else:
+          NewKey = key
         print('<tr><td></td><td>{}</td><td>{}</td><td>{}%</td><td>{}</td><td>{}%</td></tr>'.format(
-          key,
+          NewKey,
           value,
           round(ValuePrcnt,2),
           YearRTotal,
@@ -1400,4 +1391,3 @@ if __name__ == '__main__':
   for i in OutputDictOpenFiles:
     OutputDictOpenFiles[i].close
   Constants.Upkeep()
-
