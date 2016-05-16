@@ -51,10 +51,9 @@ def PURLConversion():
         '8'
         )
       FirstLastName = '{}{}'.format(
-        line[FirstName].replace(' ',''),
-        line[LastName].replace(' ','')
+        line[FirstName],
+        line[LastName]
         )
-      print(FirstLastName)
       URL = F_PURL.split(FirstLastName)
       HeaderURL = URL[Website]
       FooterURL = URL[FirstName]
@@ -80,8 +79,8 @@ def PURLConversion():
       FirstTime = False
     else:
       FirstLastName = '{}{}'.format(
-        line[FirstName].replace(' ',''),
-        line[LastName].replace(' ','')
+        line[FirstName],
+        line[LastName]
         )
       New_PURL = '{}{}{}'.format(
         HeaderURL,

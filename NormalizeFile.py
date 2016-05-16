@@ -144,9 +144,9 @@ while str(CentralZip) not in ZipCoordinateDict:
 # Capture Input (Max Radius)
 if SuppSelect == 'S':
   try:
-    MaxRadius = int(input('Enter MAX Radius ................[30] : ').strip())
+    MaxRadius = int(input('Enter MAX Radius ................[50] : ').strip())
   except:
-    MaxRadius = 30
+    MaxRadius = 50
 else:
   MaxRadius = 5000
 
