@@ -15,11 +15,13 @@ recpath = '../Dropbox/HUB/Projects/PyToolkit/Resources'
 # ---------------------- #
 DropFile = os.path.join(recpath,'_DropFile.csv')
 GenSuppressionFile = os.path.join(recpath,'_GeneralSuppression.csv')
+GenSuppressionFileNames = os.path.join(recpath,'_GeneralSuppressionNames.csv')
 MonthlySuppressionFile = os.path.join(recpath,'_MonthlySuppression.csv')
 ZipCoordFile = os.path.join(recpath,'USZIPCoordinates.csv')
 SCF3DigitFile = os.path.join(recpath,'SCFFacilites.csv')
 DDUFile = os.path.join(recpath,'DDUFacilites.csv')
 Entries = set()
+EntriesNames = set()
 
 # ---------------------- #
 print('=======================================')
@@ -87,6 +89,19 @@ if SuppSelect == 'S':
 else:
   print('... General Suppression File Not Loaded')
 
+# ---------------------- #
+# Import GeneralSuppressionNames.csv file
+if SuppSelect == 'S':
+  try:
+    with open(GenSuppressionFileNames,'rU') as GenSuppressionFileNames:
+      GenSuppressionNames = csv.reader(GenSuppressionFileNames)
+      next(GenSuppressionFileNames)
+      for line in GenSuppressionNames:
+        EntriesNames.add((str.title(line[0]),str.title(line[1])))
+  except:
+    print('..... ERROR: Unable to Load GENERAL Suppression File Names')
+else:
+  print('... General Suppression File Names Not Loaded')
 # ---------------------- #
 # Import MonthlySuppression.csv file
 if SuppSelect == 'S':
@@ -331,7 +346,7 @@ def NormalizeFunc():
   open('{}_PHONES.csv'.format(IPFName), 'at') as CleanOutputPhones,\
   open('{}_UPLOAD DATA.csv'.format(IPFName), 'at') as CleanOutputDatabase,\
   open('{}_UPLOAD.csv'.format(IPFName), 'at') as CleanOutputPurchase,\
-  open('{}_EMAILS.csv'.format(IPFName), 'at') as CleanEmail,\
+  open('{}_NITRO_LIST.csv'.format(IPFName), 'at') as CleanEmail,\
   open('{}_AddToMonthlySuppression.csv'.format(IPFName), 'at') as AppendMonthlySupp:
     CleanOutputFirstTime = True
     DatabaseFirstTime = True
@@ -674,7 +689,8 @@ def NormalizeFunc():
 
       # OUTPUT Dupes and Mail-DNQ Files
       key = (str.title(line[Constants.AddressComb]), str(line[Constants.Zip]))
-      if key not in Entries:
+      keyNames = (str.title(line[Constants.FirstName]), str(line[Constants.LastName]))
+      if key not in Entries and keyNames not in EntriesNames:
         if line[Constants.MailDNQ] == 'dnq':
           if MDNQFirstTime:
             OutMDNQ = csv.writer(MDNQ)
@@ -751,9 +767,9 @@ def NormalizeFunc():
           'FirstName',
           'LastName',
           'Phone',
-          'Last Veh Year',
-          'Last Veh Make',
-          'Last Veh Model'
+          'Year',
+          'Make',
+          'Model'
           ]
         HeaderRowPhonesOutput = (
           line[Constants.FirstName],
@@ -782,12 +798,13 @@ def NormalizeFunc():
           'City',
           'State',
           'Zip',
-          'Email',
           'Winning Number',
           'Position',
+          'Phone',
+          'TempEmail',
           'Year',
           'Make',
-          'Model',
+          'Model'
           ]
         HeaderRowEmailOutput = (
           line[Constants.CustomerID],
@@ -797,9 +814,10 @@ def NormalizeFunc():
           line[Constants.City],
           line[Constants.State],
           line[Constants.Zip],
-          line[Constants.Email],
           line[Constants.WinningNum],
           line[Constants.Drop],
+          line[Constants.Phone],
+          line[Constants.Email],
           line[Constants.Year],
           line[Constants.Make],
           line[Constants.Model]
